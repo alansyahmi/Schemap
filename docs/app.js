@@ -35,4 +35,26 @@ document.addEventListener('DOMContentLoaded', () => {
             }, delays[j-1]);
         }
     }
+
+    // Copy Install Command functionality
+    const copyBtn = document.getElementById('copy-install-btn');
+    if (copyBtn) {
+        copyBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            navigator.clipboard.writeText('pip install schemap').then(() => {
+                const originalText = copyBtn.textContent;
+                copyBtn.textContent = 'Copied to Clipboard!';
+                copyBtn.style.color = 'var(--success)';
+                copyBtn.style.borderColor = 'var(--success)';
+                
+                setTimeout(() => {
+                    copyBtn.textContent = originalText;
+                    copyBtn.style.color = '';
+                    copyBtn.style.borderColor = '';
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+            });
+        });
+    }
 });
