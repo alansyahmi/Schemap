@@ -17,6 +17,8 @@
 
 html {
     scroll-behavior: smooth;
+    max-width: 100%;
+    overflow-x: hidden;
 }
 
 body {
@@ -24,11 +26,29 @@ body {
     color: var(--text-primary);
     font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
     line-height: 1.6;
+    max-width: 100%;
     overflow-x: hidden;
 }
 
+body::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 800px;
+    height: 400px;
+    background: radial-gradient(circle, var(--accent-glow) 0%, rgba(10, 10, 12, 0) 70%);
+    z-index: -1;
+    filter: blur(60px);
+    pointer-events: none;
+}
+
 /* Typography */
-h1, h2, h3 {
+h1,
+h2,
+h3 {
     font-family: 'Red Hat Display', sans-serif;
     font-weight: 700;
     line-height: 1.2;
@@ -78,6 +98,10 @@ h1, h2, h3 {
     align-items: center;
 }
 
+.nav-logo {
+    height: 24px;
+}
+
 .nav-links {
     display: flex;
     align-items: center;
@@ -117,19 +141,7 @@ h1, h2, h3 {
     position: relative;
 }
 
-/* Glow effect behind hero */
-.hero::before {
-    content: '';
-    position: absolute;
-    top: -20%;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 600px;
-    height: 400px;
-    background: radial-gradient(circle, var(--accent-glow) 0%, rgba(10,10,12,0) 70%);
-    z-index: -1;
-    filter: blur(60px);
-}
+
 
 .badge {
     display: inline-block;
@@ -237,9 +249,17 @@ h1, h2, h3 {
     border-radius: 50%;
 }
 
-.close { background: #ff5f56; }
-.minimize { background: #ffbd2e; }
-.maximize { background: #27c93f; }
+.close {
+    background: #ff5f56;
+}
+
+.minimize {
+    background: #ffbd2e;
+}
+
+.maximize {
+    background: #27c93f;
+}
 
 .terminal-title {
     flex-grow: 1;
@@ -247,7 +267,8 @@ h1, h2, h3 {
     color: var(--text-secondary);
     font-size: 0.75rem;
     font-family: system-ui, -apple-system, Helvetica, Arial, sans-serif;
-    margin-right: 48px; /* Offset to center text */
+    margin-right: 48px;
+    /* Offset to center text */
 }
 
 .terminal-body {
@@ -276,7 +297,8 @@ h1, h2, h3 {
 }
 
 .terminal-body .highlight-token {
-    color: #fcd34d; /* yellow-300 */
+    color: #fcd34d;
+    /* yellow-300 */
 }
 
 .hidden {
@@ -293,8 +315,15 @@ h1, h2, h3 {
 }
 
 @keyframes blink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0; }
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0;
+    }
 }
 
 /* Sections */
@@ -486,8 +515,130 @@ footer {
     font-size: 0.875rem;
 }
 
+/* Visibility Utilities */
+.show-mobile {
+    display: none !important;
+}
+
 @media (max-width: 768px) {
-    .hero-title { font-size: 3rem; }
-    .price-card.featured { transform: scale(1); }
-    .nav-links { display: none; }
+
+    /* Navbar */
+    .nav-container {
+        padding: 1rem;
+    }
+
+    .hide-mobile {
+        display: none !important;
+    }
+
+    .show-mobile {
+        display: inline-block !important;
+    }
+
+    .nav-logo {
+        height: 16px;
+    }
+
+    /* Hero */
+    .hero {
+        margin: 6rem auto 3rem;
+        padding: 0 1rem;
+        overflow: hidden;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .hero-title {
+        font-size: 2rem;
+        word-wrap: break-word;
+        hyphens: auto;
+        padding: 0 0.5rem;
+    }
+
+    .hero-subtitle {
+        font-size: 1rem;
+        padding: 0 0.5rem;
+        margin-bottom: 2rem;
+    }
+
+    /* Buttons */
+    .hero-actions {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 1rem;
+        width: 100%;
+        padding: 0 1rem;
+        box-sizing: border-box;
+    }
+
+    .hero-actions .btn {
+        width: 100%;
+        margin: 0 !important;
+        text-align: center;
+        display: block;
+        box-sizing: border-box;
+    }
+
+    /* Terminal */
+    .hero-terminal {
+        margin: 3rem auto 0 auto;
+        width: 100%;
+        box-sizing: border-box;
+        border-radius: 8px;
+    }
+
+    .terminal-body {
+        font-size: 0.75rem;
+        padding: 1rem;
+        overflow-x: auto;
+    }
+
+    /* Sections */
+    .section-container {
+        padding: 3rem 1.5rem;
+        overflow: hidden;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .section-title {
+        font-size: 1.75rem;
+        word-wrap: break-word;
+    }
+
+    .section-subtitle {
+        margin-bottom: 2rem;
+        font-size: 1rem;
+    }
+
+    /* Installation Code */
+    .code-block {
+        overflow-x: auto;
+        font-size: 0.8rem;
+        padding: 1rem;
+    }
+
+    /* Pricing */
+    .pricing-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .price-card {
+        padding: 2rem 1.5rem;
+    }
+
+    .price-card.featured {
+        transform: scale(1);
+        box-shadow: none;
+        border-color: var(--border-color);
+    }
+
+    .price-card.featured:hover {
+        border-color: var(--accent);
+    }
+
+    .featured-badge {
+        font-size: 0.65rem;
+    }
 }

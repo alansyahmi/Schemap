@@ -10,19 +10,22 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap"
         rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=2">
 </head>
 
 <body>
     <nav class="navbar">
         <div class="nav-container">
             <a href="#" class="logo">
-                <img src="assets/Text_Logo__Dark_-removebg-preview2.png" alt="Schemap Logo" height="32">
+                <img src="assets/Text_Logo__Dark_-removebg-preview2.png" alt="Schemap Logo" class="nav-logo">
             </a>
             <div class="nav-links">
-                <a href="#features">Features</a>
-                <a href="#pricing">Pricing</a>
-                <a href="https://github.com/alansyahmi/Schemap" target="_blank" class="nav-btn">GitHub</a>
+                <a href="#features" class="hide-mobile">Features</a>
+                <a href="#pricing" class="hide-mobile">Pricing</a>
+                <a href="https://github.com/alansyahmi/Schemap" target="_blank" class="nav-btn hide-mobile">GitHub</a>
+                <a href="#installation" class="btn btn-primary show-mobile"
+                    style="color: #000 !important; font-weight: 600; padding: 0.5rem 1rem; font-size: 0.875rem; margin-left: 1rem;">Get
+                    for Free</a>
             </div>
         </div>
     </nav>
@@ -124,8 +127,15 @@
                 <div class="code-block mt">
                     <code>uv run schemap init</code>
                 </div>
-                <p class="install-desc">This generates your <code>schemap.yaml</code>. Just add your database URL and
-                    license key.</p>
+                <p class="install-desc">This generates your <code>schemap.yaml</code>. Update it with your database connection details:</p>
+                <div class="code-block mt" style="background: rgba(0,0,0,0.5); padding: 1.5rem; text-align: left; font-size: 0.85rem; line-height: 1.5;">
+<code style="color: var(--text-secondary); white-space: pre-wrap;"><span style="color: var(--accent);">database:</span>
+  url: <span style="color: var(--success);">"libsql://my-database.turso.io"</span>
+  <span style="color: #6b7280;"># Provide your auth token directly or use SCHEMAP_AUTH_TOKEN env var</span>
+  auth_token: <span style="color: var(--success);">"your-database-auth-token"</span>
+
+<span style="color: var(--accent);">license_key:</span> <span style="color: var(--success);">"your-license-key"</span></code>
+                </div>
             </div>
         </div>
     </section>

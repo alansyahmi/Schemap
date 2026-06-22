@@ -34,8 +34,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }, delays[j-1]);
         }
-    }
-
     // Copy Install Command functionality
     const copyBtn = document.getElementById('copy-install-btn');
     if (copyBtn) {
