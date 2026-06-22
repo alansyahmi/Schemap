@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Schemap | Token-Optimized Database Context</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="#" class="logo">
+                <img src="assets/Text_Logo__Dark_-removebg-preview2.png" alt="Schemap Logo" height="32">
+            </a>
+            <div class="nav-links">
+                <a href="#features">Features</a>
+                <a href="#pricing">Pricing</a>
+                <a href="https://github.com/yourusername/schemap" target="_blank" class="nav-btn">GitHub</a>
+            </div>
+        </div>
+    </nav>
+
+    <header class="hero">
+        <div class="hero-content">
+            <div class="badge">v0.1.0 Released</div>
+            <h1 class="hero-title">Token-Optimized Database Context for AI Pipelines.</h1>
+            <p class="hero-subtitle">Don't waste 50,000 tokens on raw SQL dumps. Schemap is a zero-friction CLI that
+                condenses your database schema into an LLM-perfect data contract.</p>
+            <div class="hero-actions">
+                <a href="#pricing" class="btn btn-primary">Get License Key</a>
+                <a href="#installation" class="btn btn-secondary">Documentation</a>
+            </div>
+        </div>
+
+        <div class="hero-terminal">
+            <div class="terminal-header">
+                <div class="mac-btns">
+                    <span class="close"></span>
+                    <span class="minimize"></span>
+                    <span class="maximize"></span>
+                </div>
+                <div class="terminal-title">bash</div>
+            </div>
+            <div class="terminal-body" id="terminal-body">
+                <div class="line"><span class="prompt">$</span> <span class="command" id="type-cmd">uv run schemap
+                        generate</span></div>
+                <div class="output hidden" id="out-1"><span class="success">-&gt;</span> Loading configuration from
+                    ./schemap.yaml... <span class="success">OK</span></div>
+                <div class="output hidden" id="out-2"><span class="success">-&gt;</span> Connecting to database... <span
+                        class="success">Connected. Found 39 active tables</span></div>
+                <div class="output hidden" id="out-3"><span class="success">-&gt;</span> Validating schema objects
+                    contract... <span class="success">OK</span></div>
+                <div class="output hidden" id="out-4"><span class="success">-&gt;</span> Compiling context engine via
+                    Jinja2... <span class="success">OK</span></div>
+                <div class="output hidden" id="out-5"><br><span class="success-bold">[SUCCESS]</span> Context map
+                    generated successfully at ./llm_data_context.md <span class="highlight-token">[14.0 KB / ~4,894
+                        tokens]</span></div>
+            </div>
+        </div>
+    </header>
+
+    <section id="features" class="features">
+        <div class="section-container">
+            <h2 class="section-title">Built for the Modern AI Engineer</h2>
+            <p class="section-subtitle">A highly decoupled Python pipeline enforcing strict data contracts.</p>
+
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                        </svg>
+                    </div>
+                    <h3>Multi-Dialect Routing</h3>
+                    <p>Natively connects to PostgreSQL, Turso/libSQL, MySQL, Oracle, and local SQLite with zero instant
+                        client dependencies required.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                    </div>
+                    <h3>The Leaky Bucket Cache</h3>
+                    <p>If you're hacking on an airplane or the network drops, Schemap's obfuscated offline cache gives
+                        you a 72-hour grace period.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path
+                                d="M20 16V7a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v9m16 0H4m16 0 1.28 2.55a1 1 0 0 1-.9 1.45H3.62a1 1 0 0 1-.9-1.45L4 16">
+                            </path>
+                        </svg>
+                    </div>
+                    <h3>CI/CD Pipeline Native</h3>
+                    <p>Run `uv run schemap init-ci` to automatically generate a GitHub Action. Your context window stays
+                        up-to-date with every PR.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="installation" class="installation">
+        <div class="section-container">
+            <div class="install-card">
+                <h2>Install in 2 Seconds</h2>
+                <p>Schemap leverages `uv` to maintain a zero-friction footprint.</p>
+                <div class="code-block">
+                    <code>pip install schemap</code>
+                </div>
+                <div class="code-block mt">
+                    <code>uv run schemap init</code>
+                </div>
+                <p class="install-desc">This generates your <code>schemap.yaml</code>. Just add your database URL and
+                    license key.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="pricing" class="pricing">
+        <div class="section-container">
+            <h2 class="section-title">Frictionless Licensing</h2>
+            <p class="section-subtitle">Simple, lifetime value. No heavy web logins required.</p>
+
+            <div class="pricing-grid">
+                <div class="price-card">
+                    <div class="tier-name">Developer</div>
+                    <div class="price">Free</div>
+                    <p class="tier-desc">For students and indie devs building local side projects.</p>
+                    <ul class="features-list">
+                        <li>Maximum 10 database tables</li>
+                        <li>Local execution only</li>
+                        <li>Markdown code generation</li>
+                        <li>Token estimations</li>
+                    </ul>
+                    <a href="#installation" class="btn btn-secondary full-width">Read Docs</a>
+                </div>
+
+                <div class="price-card featured">
+                    <div class="featured-badge">Most Popular</div>
+                    <div class="tier-name">Professional</div>
+                    <div class="price">$49<span class="period">/mo</span></div>
+                    <p class="tier-desc">For solo AI engineers and early-stage startups.</p>
+                    <ul class="features-list">
+                        <li><strong>Unlimited</strong> database tables</li>
+                        <li>Up to 3 active database connections</li>
+                        <li>Email support</li>
+                        <li>Wildcard exclusion globbing</li>
+                    </ul>
+                    <a href="#" class="btn btn-primary full-width">Buy License</a>
+                </div>
+
+                <div class="price-card">
+                    <div class="tier-name">Team</div>
+                    <div class="price">$99<span class="period">/mo</span></div>
+                    <p class="tier-desc">For tech teams needing automated context synchronization.</p>
+                    <ul class="features-list">
+                        <li><strong>Unlimited</strong> database tables</li>
+                        <li><strong>CI/CD Pipeline Execution</strong></li>
+                        <li>Automated GitHub Actions sync</li>
+                        <li>Priority team support</li>
+                    </ul>
+                    <a href="#" class="btn btn-secondary full-width">Buy Team License</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="footer-content">
+            <img src="assets/Icon Dark.png" alt="Schemap Icon" height="24">
+            <p>&copy; 2026 Schemap. A zero-friction dev tool.</p>
+        </div>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+
+</html>

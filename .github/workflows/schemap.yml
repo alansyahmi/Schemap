@@ -1,0 +1,33 @@
+name: Update Schemap Context
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'migrations/**'
+      - 'alembic/versions/**'
+
+jobs:
+  update-schema-map:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          version: "0.1.0"
+          
+      - name: Run Schemap Generate
+        run: |
+          # Note: Ensure your CI environment variables include your database credentials.
+          uv run schemap generate
+          
+      - name: Commit and Push Context Map
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add llm_data_context.md
+          # Only commit if there are changes
+          git diff --quiet && git diff --staged --quiet || (git commit -m "docs: auto-update llm_data_context.md" && git push)

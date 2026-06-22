@@ -1,0 +1,9 @@
+# Schemap Configuration Asset
+database:
+  connection_url: "libsql://il-migma-new-alansyahmi.aws-ap-northeast-1.turso.io?authToken=eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicnciLCJpYXQiOjE3ODIxMTMyNDUsImlkIjoiMDE5ZWQ0ZTUtYWIwMC03M2YwLWIwOTgtMWRhNDgyNTNhZjIwIiwicmlkIjoiZTJjYzc0MDYtOTg1NC00ODZjLWIxMzEtZjk2MzNhMTIzYzNkIn0.fnQNAdZURmoO9V27q1nmtPVA_-A1KuhgOiYOgQAfxSmQzXeTfStT44seIU8eJGtjY6kTLLHwqATKDUy9qS2aAw"
+  exclude_tables:
+    - "spatial_ref_sys"
+    - "alembic_version"
+output:
+  file_path: "./llm_data_context.md"
+  format: "markdown"
