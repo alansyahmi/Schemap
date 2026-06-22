@@ -145,7 +145,8 @@ h1, h2, h3 {
     font-size: 1.25rem;
     color: var(--text-secondary);
     max-width: 650px;
-    margin-bottom: 3rem;
+    margin: 0 auto 3rem auto;
+    text-align: center;
 }
 
 /* Buttons */
