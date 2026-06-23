@@ -13,6 +13,8 @@ from .renderer import render_output, write_output
 from .license import verify_tier, LicenseError
 from .enrichment import apply_heuristics, apply_llm
 from .linter import calculate_score
+from .diff import save_current_state, load_previous_state, calculate_diff
+from .export import generate_langchain, generate_llamaindex, generate_mcp_tools
 
 @click.group()
 def cli():
@@ -67,11 +69,8 @@ def _process_schema(cfg, enrich: bool):
         sys.exit(1)
         
     schema_model = DatabaseSchemaModel(tables=raw_tables)
-    
-    # Layer 1 & 2: Heuristics & Domain Plugins
     schema_model, unresolved = apply_heuristics(schema_model, cfg.domain.mappings)
     
-    # Layer 3: LLM Override
     if enrich and cfg.llm.api_key:
         click.echo("-> Calling LLM Enrichment Layer... ", nl=False)
         schema_model = apply_llm(schema_model, cfg.llm.api_key, cfg.llm.model)
@@ -88,7 +87,7 @@ def _process_schema(cfg, enrich: bool):
             
     return schema_model, raw_tables, unresolved
 
-def _generate(config: str, verbose: bool, format_override: str = None, enrich: bool = False):
+def _generate(config: str, verbose: bool, format_override: str = None, enrich: bool = False, track: bool = True):
     try:
         click.echo(f"-> Loading configuration from ./{config}... ", nl=False)
         cfg = load_config(config)
@@ -96,11 +95,15 @@ def _generate(config: str, verbose: bool, format_override: str = None, enrich: b
         
         schema_model, raw_tables, unresolved = _process_schema(cfg, enrich)
         
+        # Save state for diffing
+        if track:
+            save_current_state(schema_model)
+        
         fmt = format_override if format_override else cfg.output.format
         fmt = fmt.lower()
         
         out_path = Path(cfg.output.file_path)
-        if fmt == "json" or fmt == "mcp":
+        if fmt == "json" or fmt == "mcp" or fmt == "mcp-tools":
             out_path = out_path.with_suffix(".json")
         elif fmt == "yaml":
             out_path = out_path.with_suffix(".yaml")
@@ -153,9 +156,84 @@ def _generate(config: str, verbose: bool, format_override: str = None, enrich: b
 @click.option('--verbose', is_flag=True, help="Enable verbose output.")
 @click.option('--format', 'fmt', type=click.Choice(['markdown', 'json', 'yaml', 'xml', 'mcp', 'ai'], case_sensitive=False), help="Override the output format.")
 @click.option('--enrich', is_flag=True, help="Use OpenAI LLM to powerfully enrich table and column business definitions.")
-def generate(config, verbose, fmt, enrich):
+@click.option('--track/--no-track', default=True, help="Track schema state for diff intelligence.")
+def generate(config, verbose, fmt, enrich, track):
     """Connect to the database, extract schema, and generate the LLM context."""
-    _generate(config, verbose, fmt, enrich)
+    _generate(config, verbose, fmt, enrich, track)
+
+@cli.command()
+@click.option('--config', default="schemap.yaml", help="Path to the configuration file.")
+@click.option('--verbose', is_flag=True, help="Enable verbose output.")
+def diff(config, verbose):
+    """Compare current database schema to the last known tracked state."""
+    try:
+        cfg = load_config(config)
+        old_schema = load_previous_state()
+        if not old_schema:
+            click.secho("[INFO] No previous schema state found. Run `schemap generate` first to build the cache.", fg="yellow")
+            return
+            
+        schema_model, _, _ = _process_schema(cfg, enrich=False)
+        
+        diffs = calculate_diff(old_schema, schema_model)
+        
+        click.secho("\n" + "=" * 50, fg="cyan", bold=True)
+        click.secho(f" Schema Diff Intelligence", fg="cyan", bold=True)
+        click.secho("=" * 50, fg="cyan", bold=True)
+        
+        if not diffs:
+            click.secho("  No changes detected since last run.", fg="green")
+        else:
+            for d in diffs:
+                if d.startswith("+"):
+                    click.secho(f"  {d}", fg="green")
+                elif d.startswith("-"):
+                    click.secho(f"  {d}", fg="red")
+                elif d.startswith("~"):
+                    click.secho(f"  {d}", fg="yellow")
+                    
+        click.secho("=" * 50 + "\n", fg="cyan", bold=True)
+        
+    except Exception as e:
+        click.secho(f"\n[ERROR] {str(e)}", fg="red")
+        if verbose:
+            raise
+
+@cli.command()
+@click.option('--framework', type=click.Choice(['langchain', 'llamaindex', 'mcp-tools', 'json'], case_sensitive=False), required=True, help="Target agent framework.")
+@click.option('--config', default="schemap.yaml", help="Path to the configuration file.")
+@click.option('--verbose', is_flag=True, help="Enable verbose output.")
+def export(framework, config, verbose):
+    """Export the schema as copy-pasteable, highly contextual Python code or JSON for Agent Frameworks."""
+    try:
+        cfg = load_config(config)
+        schema_model, _, _ = _process_schema(cfg, enrich=False)
+        
+        click.echo(f"-> Generating {framework} export... ", nl=False)
+        
+        out_path = Path("schemap_tools")
+        if framework == "langchain":
+            content = generate_langchain(schema_model)
+            out_path = out_path.with_suffix(".py")
+        elif framework == "llamaindex":
+            content = generate_llamaindex(schema_model)
+            out_path = out_path.with_suffix(".py")
+        elif framework == "mcp-tools":
+            content = generate_mcp_tools(schema_model)
+            out_path = out_path.with_suffix(".json")
+        elif framework == "json":
+            content = render_output(schema_model, fmt="json")
+            out_path = out_path.with_suffix(".json")
+            
+        write_output(content, str(out_path))
+        click.secho("OK", fg="green")
+        
+        click.secho(f"\n[SUCCESS] AI-ready {framework} context module exported to {out_path}", fg="green", bold=True)
+        
+    except Exception as e:
+        click.secho(f"\n[ERROR] {str(e)}", fg="red")
+        if verbose:
+            raise
 
 @cli.command()
 @click.option('--config', default="schemap.yaml", help="Path to the configuration file.")
@@ -191,11 +269,12 @@ def score(config, verbose):
             raise
 
 class MigrationHandler(FileSystemEventHandler):
-    def __init__(self, config: str, verbose: bool, fmt: str = None, enrich: bool = False):
+    def __init__(self, config: str, verbose: bool, fmt: str = None, enrich: bool = False, track: bool = True):
         self.config = config
         self.verbose = verbose
         self.fmt = fmt
         self.enrich = enrich
+        self.track = track
         self.last_run = 0
 
     def on_modified(self, event):
@@ -205,7 +284,7 @@ class MigrationHandler(FileSystemEventHandler):
             now = time.time()
             if now - self.last_run > 2:
                 click.secho(f"\n[WATCH] Change detected in {event.src_path}. Regenerating...", fg="cyan")
-                _generate(self.config, self.verbose, self.fmt, self.enrich)
+                _generate(self.config, self.verbose, self.fmt, self.enrich, self.track)
                 self.last_run = time.time()
 
 @cli.command()
@@ -214,7 +293,8 @@ class MigrationHandler(FileSystemEventHandler):
 @click.option('--verbose', is_flag=True, help="Enable verbose output.")
 @click.option('--format', 'fmt', type=click.Choice(['markdown', 'json', 'yaml', 'xml', 'mcp', 'ai'], case_sensitive=False), help="Override the output format.")
 @click.option('--enrich', is_flag=True, help="Use OpenAI LLM to powerfully enrich table and column business definitions.")
-def watch(watch_dir, config, verbose, fmt, enrich):
+@click.option('--track/--no-track', default=True, help="Track schema state for diff intelligence.")
+def watch(watch_dir, config, verbose, fmt, enrich, track):
     """Watch a local directory for changes and automatically regenerate the context map."""
     path = Path(watch_dir).resolve()
     if not path.exists():
@@ -224,9 +304,9 @@ def watch(watch_dir, config, verbose, fmt, enrich):
     click.secho(f"Starting Schemap watch mode on {path}...", fg="cyan")
     click.secho("Press Ctrl+C to stop.", fg="cyan")
     
-    _generate(config, verbose, fmt, enrich)
+    _generate(config, verbose, fmt, enrich, track)
     
-    event_handler = MigrationHandler(config, verbose, fmt, enrich)
+    event_handler = MigrationHandler(config, verbose, fmt, enrich, track)
     observer = Observer()
     observer.schedule(event_handler, str(path), recursive=True)
     observer.start()
