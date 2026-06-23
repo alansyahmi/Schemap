@@ -1,0 +1,14 @@
+
+TABLE users [Users]
+PK id [Identifier]
+COL name TEXT [Name]
+
+
+TABLE orders [Orders]
+PK id [Identifier]
+COL user_id INTEGER [User Identifier]
+FK user_id -> users.id
+
+
+JOURNEYS
+PATH Users → Orders

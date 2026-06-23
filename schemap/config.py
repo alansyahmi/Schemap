@@ -10,9 +10,20 @@ class OutputConfig(BaseModel):
     file_path: str = "./llm_data_context.md"
     format: str = "markdown"
 
+class LLMConfig(BaseModel):
+    provider: str = "openai"
+    model: str = "gpt-4o-mini"
+    api_key: str | None = None
+
+class DomainConfig(BaseModel):
+    name: str | None = None
+    mappings: dict[str, str] = Field(default_factory=dict)
+
 class SchemapConfig(BaseModel):
     database: DatabaseConfig
     output: OutputConfig
+    llm: LLMConfig = Field(default_factory=LLMConfig)
+    domain: DomainConfig = Field(default_factory=DomainConfig)
     license_key: str | None = None
     license_endpoint: str | None = "https://api.lemonsqueezy.com/v1/licenses/validate"
 

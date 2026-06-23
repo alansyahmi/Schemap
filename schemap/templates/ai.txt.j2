@@ -1,0 +1,26 @@
+{% for table in schema.tables %}
+TABLE {{ table.name }}
+{%- if table.business_name %} [{{ table.business_name }}]{% endif %}
+{%- if table.description %}
+DESC {{ table.description }}
+{%- endif %}
+{%- for col in table.columns %}
+{%- if col.primary_key %}
+PK {{ col.name }}{% if col.business_name %} [{{ col.business_name }}]{% endif %}
+{%- else %}
+COL {{ col.name }} {{ col.data_type }}{% if col.business_name %} [{{ col.business_name }}]{% endif %}
+{%- endif %}
+{%- endfor %}
+
+{%- for fk in table.foreign_keys %}
+FK {{ fk.column_name }} -> {{ fk.foreign_table_name }}.{{ fk.foreign_column_name }}
+{%- endfor %}
+
+{% endfor %}
+
+{%- if schema.common_journeys %}
+JOURNEYS
+{%- for journey in schema.common_journeys %}
+PATH {{ journey }}
+{%- endfor %}
+{%- endif %}

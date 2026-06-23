@@ -115,6 +115,11 @@ def render_output(schema: DatabaseSchemaModel, fmt: str = "markdown") -> str:
                     ce.text = c.description
         from xml.dom import minidom
         return minidom.parseString(ET.tostring(root)).toprettyxml(indent="  ")
+    elif fmt == "ai":
+        templates_dir = Path(__file__).parent / "templates"
+        env = Environment(loader=FileSystemLoader(templates_dir))
+        template = env.get_template("ai.txt.j2")
+        return template.render(schema=schema)
     else:
         # Default to markdown
         templates_dir = Path(__file__).parent / "templates"

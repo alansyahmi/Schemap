@@ -6,6 +6,7 @@ class ColumnModel(BaseModel):
     is_nullable: bool = True
     primary_key: bool = False
     description: str | None = None
+    business_name: str | None = None
 
 class ForeignKeyModel(BaseModel):
     column_name: str
@@ -15,6 +16,7 @@ class ForeignKeyModel(BaseModel):
 class TableModel(BaseModel):
     name: str
     description: str | None = None
+    business_name: str | None = None
     columns: list[ColumnModel] = Field(default_factory=list)
     foreign_keys: list[ForeignKeyModel] = Field(default_factory=list)
     hierarchy_tree: str | None = None

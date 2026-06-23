@@ -28,6 +28,9 @@ dev = [
     "pytest>=8.0.0",
     "pytest-mock>=3.10.0"
 ]
+enrich = [
+    "openai>=1.14.0"
+]
 
 [project.scripts]
 schemap = "schemap.cli:cli"
