@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "schemap": {
+      "resources": [
+        {
+          "uri": "schema://database",
+          "name": "Database Schema Context",
+          "description": "Token-optimized representation of the database schema.",
+          "text": "{\n  \"tables\": [\n    {\n      \"name\": \"users\",\n      \"description\": null,\n      \"columns\": [\n        {\n          \"name\": \"id\",\n          \"data_type\": \"INTEGER\",\n          \"is_nullable\": true,\n          \"primary_key\": true,\n          \"description\": null\n        },\n        {\n          \"name\": \"name\",\n          \"data_type\": \"TEXT\",\n          \"is_nullable\": true,\n          \"primary_key\": false,\n          \"description\": null\n        }\n      ],\n      \"foreign_keys\": [],\n      \"hierarchy_tree\": \"users\\n \u2514\u2500 orders\"\n    },\n    {\n      \"name\": \"orders\",\n      \"description\": null,\n      \"columns\": [\n        {\n          \"name\": \"id\",\n          \"data_type\": \"INTEGER\",\n          \"is_nullable\": true,\n          \"primary_key\": true,\n          \"description\": null\n        },\n        {\n          \"name\": \"user_id\",\n          \"data_type\": \"INTEGER\",\n          \"is_nullable\": true,\n          \"primary_key\": false,\n          \"description\": null\n        }\n      ],\n      \"foreign_keys\": [\n        {\n          \"column_name\": \"user_id\",\n          \"foreign_table_name\": \"users\",\n          \"foreign_column_name\": \"id\"\n        }\n      ],\n      \"hierarchy_tree\": null\n    }\n  ],\n  \"common_journeys\": [\n    \"Users \u2192 Orders\"\n  ]\n}"
+        }
+      ]
+    }
+  }
+}

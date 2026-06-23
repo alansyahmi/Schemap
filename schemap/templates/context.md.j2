@@ -3,19 +3,30 @@
 This document contains a token-optimized representation of the database schema for LLM context injection.
 
 {% for table in schema.tables %}
-## Table: `{{ table.name }}`
-{% if table.description %}*{{ table.description }}*{% endif %}
+Table: {{ table.name }}
 
-**Columns:**
+{% if table.description %}
+Purpose:
+{{ table.description }}
+
+{% endif %}
+Columns:
 {% for col in table.columns %}
-- `{{ col.name }}` ({{ col.data_type }}){% if col.primary_key %} **[PK]**{% endif %}{% if not col.is_nullable %} *[NOT NULL]*{% endif %}{% if col.description %} - {{ col.description }}{% endif %}
+- {{ col.name }} ({{ col.data_type }}): {% if col.primary_key %}Primary key{% endif %}{% if not col.is_nullable %}{% if col.primary_key %}, {% endif %}Not null{% endif %}{% if col.description %}{% if col.primary_key or not col.is_nullable %} - {% endif %}{{ col.description }}{% endif %}
 {%- endfor %}
 
-{% if table.foreign_keys %}
-**Relations:**
-{% for fk in table.foreign_keys %}
-- `{{ fk.column_name }}` -> `{{ fk.foreign_table_name }}.{{ fk.foreign_column_name }}`
-{%- endfor %}
+{% if table.hierarchy_tree %}
+Relationships:
+```text
+{{ table.hierarchy_tree }}
+```
 {% endif %}
 
 {% endfor %}
+
+{% if schema.common_journeys %}
+Common User Journeys:
+{% for journey in schema.common_journeys %}
+{{ journey }}
+{% endfor %}
+{% endif %}

@@ -1,5 +1,5 @@
 from schemap.models import DatabaseSchemaModel, TableModel, ColumnModel, ForeignKeyModel
-from schemap.renderer import render_markdown
+from schemap.renderer import render_output
 
 def test_renderer_formats_markdown_correctly():
     """Verify that renderer.py correctly formats a Pydantic object into the target Markdown layout."""
@@ -36,10 +36,14 @@ def test_renderer_formats_markdown_correctly():
         ]
     )
     
-    markdown = render_markdown(schema)
+    markdown = render_output(schema, fmt="markdown")
     
-    assert "## Table: `employees`" in markdown
-    assert "*Employee directory*" in markdown
-    assert "- `id` (integer) **[PK]** *[NOT NULL]* - Employee ID" in markdown
-    assert "- `department_id` (integer)" in markdown
-    assert "- `department_id` -> `departments.id`" in markdown
+    assert "Table: employees" in markdown
+    assert "Employee directory" in markdown
+    assert "- id (integer): Primary key, Not null - Employee ID" in markdown
+    assert "- department_id (integer): " in markdown
+
+def test_renderer_json_format():
+    schema = DatabaseSchemaModel(tables=[TableModel(name="test")])
+    out = render_output(schema, fmt="json")
+    assert '"name": "test"' in out

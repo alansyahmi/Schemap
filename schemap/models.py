@@ -17,6 +17,8 @@ class TableModel(BaseModel):
     description: str | None = None
     columns: list[ColumnModel] = Field(default_factory=list)
     foreign_keys: list[ForeignKeyModel] = Field(default_factory=list)
+    hierarchy_tree: str | None = None
 
 class DatabaseSchemaModel(BaseModel):
     tables: list[TableModel] = Field(default_factory=list)
+    common_journeys: list[str] = Field(default_factory=list)

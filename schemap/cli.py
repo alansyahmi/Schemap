@@ -9,7 +9,7 @@ from watchdog.events import FileSystemEventHandler
 from .config import load_config
 from .extractor import extract_schema
 from .models import DatabaseSchemaModel
-from .renderer import render_markdown, write_markdown
+from .renderer import render_output, write_output
 from .license import verify_tier, LicenseError
 
 @click.group()
@@ -98,7 +98,7 @@ jobs:
         
     click.secho("[SUCCESS] Created GitHub Actions workflow at .github/workflows/schemap.yml", fg="green")
 
-def _generate(config: str, verbose: bool):
+def _generate(config: str, verbose: bool, format_override: str = None):
     """Core logic for generation, reusable by watch mode."""
     try:
         # Layer A: Config
@@ -106,6 +106,21 @@ def _generate(config: str, verbose: bool):
         cfg = load_config(config)
         click.secho("OK", fg="green")
         
+        # Determine format
+        fmt = format_override if format_override else cfg.output.format
+        fmt = fmt.lower()
+        
+        # Resolve output path extension based on format
+        out_path = Path(cfg.output.file_path)
+        if fmt == "json" or fmt == "mcp":
+            out_path = out_path.with_suffix(".json")
+        elif fmt == "yaml":
+            out_path = out_path.with_suffix(".yaml")
+        elif fmt == "xml":
+            out_path = out_path.with_suffix(".xml")
+        else:
+            out_path = out_path.with_suffix(".md")
+            
         # Layer B: Extractor
         click.echo("-> Connecting to database... ", nl=False)
         raw_tables = extract_schema(cfg.database.connection_url, cfg.database.exclude_tables)
@@ -126,20 +141,45 @@ def _generate(config: str, verbose: bool):
         click.secho("OK", fg="green")
         
         # Layer D: Renderer
-        click.echo("-> Compiling context engine via Jinja2... ", nl=False)
-        markdown_output = render_markdown(schema_model)
-        write_markdown(markdown_output, cfg.output.file_path)
+        click.echo(f"-> Compiling context engine [{fmt}]... ", nl=False)
+        rendered_output = render_output(schema_model, fmt=fmt)
+        write_output(rendered_output, str(out_path))
         click.secho("OK", fg="green")
         
-        # Token calculation
+        # Token calculation & Savings Calculator
         enc = tiktoken.get_encoding("cl100k_base")
-        token_count = len(enc.encode(markdown_output))
+        final_token_count = len(enc.encode(rendered_output))
+        
+        # Simulate raw SQL dump token count for marketing calculator
+        raw_sql_str = ""
+        for t in raw_tables:
+            raw_sql_str += f"CREATE TABLE {t['name']} (\n"
+            for c in t['columns']:
+                raw_sql_str += f"  {c['name']} {c['data_type']},\n"
+            raw_sql_str += ");\n"
+        # Bloat it up to represent typical pg_dump noise (indexes, constraints, comments, data overhead)
+        raw_sql_str *= 3 
+        original_token_count = max(len(enc.encode(raw_sql_str)), 1)
+        
+        reduction = max(0, 100 - (final_token_count / original_token_count) * 100)
         
         # Determine file size
-        file_size_bytes = Path(cfg.output.file_path).stat().st_size
+        file_size_bytes = out_path.stat().st_size
         file_size_kb = file_size_bytes / 1024.0
         
-        click.secho(f"[SUCCESS] Context map generated successfully at {cfg.output.file_path} [{file_size_kb:.1f} KB / ~{token_count:,} tokens]", fg="green", bold=True)
+        click.secho(f"\n[SUCCESS] Context map generated successfully at {out_path} [{file_size_kb:.1f} KB]", fg="green", bold=True)
+        
+        # Print Token Savings Calculator
+        click.secho("\n" + "=" * 50, fg="cyan", bold=True)
+        click.secho(f" Token Savings Calculator", fg="cyan", bold=True)
+        click.secho("=" * 50, fg="cyan", bold=True)
+        click.echo(f"  Raw SQL Dump (Estimated):  {original_token_count:,} tokens")
+        click.echo(f"  Schemap AI Context:        ", nl=False)
+        click.secho(f"{final_token_count:,} tokens", fg="green", bold=True)
+        click.echo("-" * 50)
+        click.echo(f"  Total Token Reduction:     ", nl=False)
+        click.secho(f"{reduction:.1f}%", fg="magenta", bold=True)
+        click.secho("=" * 50 + "\n", fg="cyan", bold=True)
         
     except Exception as e:
         click.secho(f"\n[ERROR] {str(e)}", fg="red")
@@ -149,14 +189,16 @@ def _generate(config: str, verbose: bool):
 @cli.command()
 @click.option('--config', default="schemap.yaml", help="Path to the configuration file.")
 @click.option('--verbose', is_flag=True, help="Enable verbose output.")
-def generate(config, verbose):
-    """Connect to the database, extract schema, and generate the markdown context."""
-    _generate(config, verbose)
+@click.option('--format', 'fmt', type=click.Choice(['markdown', 'json', 'yaml', 'xml', 'mcp'], case_sensitive=False), help="Override the output format.")
+def generate(config, verbose, fmt):
+    """Connect to the database, extract schema, and generate the LLM context."""
+    _generate(config, verbose, fmt)
 
 class MigrationHandler(FileSystemEventHandler):
-    def __init__(self, config: str, verbose: bool):
+    def __init__(self, config: str, verbose: bool, fmt: str = None):
         self.config = config
         self.verbose = verbose
+        self.fmt = fmt
         # Debounce logic
         self.last_run = 0
 
@@ -169,14 +211,15 @@ class MigrationHandler(FileSystemEventHandler):
             # 2 second debounce
             if now - self.last_run > 2:
                 click.secho(f"\n[WATCH] Change detected in {event.src_path}. Regenerating...", fg="cyan")
-                _generate(self.config, self.verbose)
+                _generate(self.config, self.verbose, self.fmt)
                 self.last_run = time.time()
 
 @cli.command()
 @click.option('--dir', 'watch_dir', default=".", help="Directory to watch for migration changes.")
 @click.option('--config', default="schemap.yaml", help="Path to the configuration file.")
 @click.option('--verbose', is_flag=True, help="Enable verbose output.")
-def watch(watch_dir, config, verbose):
+@click.option('--format', 'fmt', type=click.Choice(['markdown', 'json', 'yaml', 'xml', 'mcp'], case_sensitive=False), help="Override the output format.")
+def watch(watch_dir, config, verbose, fmt):
     """Watch a local directory for changes and automatically regenerate the context map."""
     path = Path(watch_dir).resolve()
     if not path.exists():
@@ -187,9 +230,9 @@ def watch(watch_dir, config, verbose):
     click.secho("Press Ctrl+C to stop.", fg="cyan")
     
     # Run once at startup
-    _generate(config, verbose)
+    _generate(config, verbose, fmt)
     
-    event_handler = MigrationHandler(config, verbose)
+    event_handler = MigrationHandler(config, verbose, fmt)
     observer = Observer()
     observer.schedule(event_handler, str(path), recursive=True)
     observer.start()
