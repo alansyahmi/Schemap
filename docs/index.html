@@ -4,13 +4,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Schemap | Token-Optimized Database Context</title>
+    <title>AI Database Schema Generator & Context Engine | Schemap</title>
+    <meta name="description"
+        content="Generate AI-optimized database documentation, LangChain tools, MCP context, schema diffs, and LLM-ready exports. Schemap is Git for AI database context.">
+    <meta name="keywords"
+        content="database schema for AI, database documentation generator, schema to markdown, database schema generator, AI database schema, LLM database context, database context generator, schema for AI agents, MCP database schema, LangChain schema generator">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
         href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap"
         rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=2">
+    <link rel="stylesheet" href="style.css?v=3">
     <link rel="icon" type="image/png" href="assets/Icon Dark.png">
 </head>
 
@@ -31,170 +35,361 @@
         </div>
     </nav>
 
-    <header class="hero">
-        <div class="hero-content">
-            <div class="badge">v0.1.0 Released</div>
-            <h1 class="hero-title">Token-Optimized Database Context for AI Pipelines.</h1>
-            <p class="hero-subtitle">Don't waste 50,000 tokens on raw SQL dumps. Schemap is a zero-friction CLI that
-                condenses your database schema into an LLM-perfect data contract.</p>
-            <div class="hero-actions">
-                <a href="#pricing" class="btn btn-primary">Get License Key</a>
-                <a href="#installation" class="btn btn-secondary">Install Now</a>
-            </div>
-        </div>
-
-        <div class="hero-terminal">
-            <div class="terminal-header">
-                <div class="mac-btns">
-                    <span class="close"></span>
-                    <span class="minimize"></span>
-                    <span class="maximize"></span>
+    <main>
+        <canvas id="matrix-bg" style="position: absolute; top: 0; left: 0; z-index: -1;"></canvas>
+        <header class="hero" style="position: relative; z-index: 1;">
+            <div class="hero-content">
+                <div class="badge">v0.8.0 Released - AI Linter & MCP Exports</div>
+                <h1 class="hero-title">AI Database Schema Generator & Context Engine.</h1>
+                <p class="hero-subtitle">Generate AI-optimized database documentation, LangChain tools, MCP context,
+                    schema diffs, and LLM-ready exports.</p>
+                <p class="hero-subsubtitle">Git for AI Database Context.</p>
+                <div class="hero-actions">
+                    <a href="#pricing" class="btn btn-primary">Get License Key</a>
+                    <a href="#installation" class="btn btn-secondary">Install Now</a>
                 </div>
-                <div class="terminal-title">bash</div>
             </div>
-            <div class="terminal-body" id="terminal-body">
-                <div class="line"><span class="prompt">$</span> <span class="command" id="type-cmd">uv run schemap
-                        generate</span></div>
-                <div class="output hidden" id="out-1"><span class="success">-&gt;</span> Loading configuration from
-                    ./schemap.yaml... <span class="success">OK</span></div>
-                <div class="output hidden" id="out-2"><span class="success">-&gt;</span> Connecting to database... <span
-                        class="success">Connected. Found 39 active tables</span></div>
-                <div class="output hidden" id="out-3"><span class="success">-&gt;</span> Validating schema objects
-                    contract... <span class="success">OK</span></div>
-                <div class="output hidden" id="out-4"><span class="success">-&gt;</span> Compiling context engine via
-                    Jinja2... <span class="success">OK</span></div>
-                <div class="output hidden" id="out-5"><br><span class="success-bold">[SUCCESS]</span> Context map
-                    generated successfully at ./llm_data_context.md <span class="highlight-token">[14.0 KB / ~4,894
-                        tokens]</span></div>
-            </div>
-        </div>
-    </header>
 
-    <section id="features" class="features">
-        <div class="section-container">
-            <h2 class="section-title">Built for the Modern AI Engineer</h2>
-            <p class="section-subtitle">A highly decoupled Python pipeline enforcing strict data contracts.</p>
-
-            <div class="feature-grid">
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
-                            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
-                        </svg>
+            <div class="hero-terminal">
+                <div class="terminal-header">
+                    <div class="mac-btns">
+                        <span class="close"></span>
+                        <span class="minimize"></span>
+                        <span class="maximize"></span>
                     </div>
-                    <h3>Multi-Dialect Routing</h3>
-                    <p>Natively connects to PostgreSQL, Turso/libSQL, MySQL, Oracle, and local SQLite with zero instant
-                        client dependencies required.</p>
+                    <div class="terminal-title">bash</div>
                 </div>
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="12" cy="12" r="10"></circle>
-                            <polyline points="12 6 12 12 16 14"></polyline>
-                        </svg>
+                <div class="terminal-body" id="terminal-body">
+                    <div class="line"><span class="prompt">$</span> <span class="command" id="type-cmd">uv run schemap
+                            generate --format=ai</span></div>
+                    <div class="output hidden" id="out-1"><span class="success">-&gt;</span> Connecting to database...
+                        <span class="success">Connected. Found 39 active tables</span></div>
+                    <div class="output hidden" id="out-2"><span class="success">-&gt;</span> Extracting heuristics...
+                        <span class="success">OK</span></div>
+                    <div class="output hidden" id="out-3"><span class="success">-&gt;</span> Compiling context engine
+                        [ai]... <span class="success">OK</span></div>
+
+                    <div class="output hidden" id="out-4"><br>==================================================</div>
+                    <div class="output hidden" id="out-5"><span class="highlight-token">Token Savings Calculator</span>
                     </div>
-                    <h3>The Leaky Bucket Cache</h3>
-                    <p>If you're hacking on an airplane or the network drops, Schemap's obfuscated offline cache gives
-                        you a 72-hour grace period.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path
-                                d="M20 16V7a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v9m16 0H4m16 0 1.28 2.55a1 1 0 0 1-.9 1.45H3.62a1 1 0 0 1-.9-1.45L4 16">
-                            </path>
-                        </svg>
-                    </div>
-                    <h3>CI/CD Pipeline Native</h3>
-                    <p>Run `uv run schemap init-ci` to automatically generate a GitHub Action. Your context window stays
-                        up-to-date with every PR.</p>
+                    <div class="output hidden" id="out-6">==================================================</div>
+
+                    <div class="output hidden" id="out-7">&nbsp;&nbsp;Raw SQL Dump: 52,318 tokens</div>
+                    <div class="output hidden" id="out-8">&nbsp;&nbsp;Schemap AI Context: <span
+                            class="success-bold">3,127 tokens</span></div>
+                    <div class="output hidden" id="out-9">--------------------------------------------------</div>
+                    <div class="output hidden" id="out-10">&nbsp;&nbsp;Total Token Reduction: <span
+                            style="color: #ffbd2e; font-weight: bold;">94.0%</span></div>
+
+                    <div class="output hidden" id="out-11"><br><span class="success-bold">[SUCCESS]</span> Context map
+                        generated successfully.</div>
                 </div>
             </div>
-        </div>
-    </section>
 
-    <section id="installation" class="installation">
-        <div class="section-container">
-            <div class="install-card">
-                <h2>Install in 2 Seconds</h2>
-                <p>Schemap leverages `uv` to maintain a zero-friction footprint.</p>
-                <div class="code-block">
-                    <code>pip install schemap</code>
+            <div class="export-showcase">
+                <p class="showcase-title">NATIVE EXPORTS FOR</p>
+                <div class="showcase-window">
+                    <div class="showcase-tabs">
+                        <button class="tab-btn active" data-target="tab-langchain">LangChain</button>
+                        <button class="tab-btn" data-target="tab-mcp">MCP Tools</button>
+                        <button class="tab-btn" data-target="tab-json">JSON Schema</button>
+                    </div>
+                    <div class="showcase-content">
+                        <!-- LangChain -->
+                        <div class="tab-pane active" id="tab-langchain">
+<pre><code><span style="color: #c678dd;">from</span> langchain.tools <span style="color: #c678dd;">import</span> BaseTool
+<span style="color: #c678dd;">from</span> pydantic <span style="color: #c678dd;">import</span> BaseModel
+
+<span style="color: #c678dd;">class</span> <span style="color: #e5c07b;">DatabaseSchemaTool</span>(BaseTool):
+    name = <span style="color: #98c379;">"database_schema_context"</span>
+    description = <span style="color: #98c379;">"""
+    Table: users
+    Columns: id, email, created_at
+    Relationships: users -> orders (1:N)
+    """</span>
+    
+    <span style="color: #c678dd;">def</span> <span style="color: #61afef;">_run</span>(self, query: str) -> str:
+        <span style="color: #5c6370;"># Injects pristine context into agent</span>
+        <span style="color: #c678dd;">return</span> self.description</code></pre>
+                        </div>
+                        
+                        <!-- MCP -->
+                        <div class="tab-pane" id="tab-mcp">
+<pre><code>{
+  <span style="color: #e06c75;">"name"</span>: <span style="color: #98c379;">"schemap_server"</span>,
+  <span style="color: #e06c75;">"version"</span>: <span style="color: #98c379;">"1.0.0"</span>,
+  <span style="color: #e06c75;">"tools"</span>: [
+    {
+      <span style="color: #e06c75;">"name"</span>: <span style="color: #98c379;">"get_database_schema"</span>,
+      <span style="color: #e06c75;">"description"</span>: <span style="color: #98c379;">"Retrieves highly compressed AI context."</span>,
+      <span style="color: #e06c75;">"inputSchema"</span>: {
+        <span style="color: #e06c75;">"type"</span>: <span style="color: #98c379;">"object"</span>,
+        <span style="color: #e06c75;">"properties"</span>: {
+          <span style="color: #e06c75;">"query"</span>: { <span style="color: #e06c75;">"type"</span>: <span style="color: #98c379;">"string"</span> }
+        }
+      }
+    }
+  ]
+}</code></pre>
+                        </div>
+                        
+                        <!-- JSON -->
+                        <div class="tab-pane" id="tab-json">
+<pre><code>{
+  <span style="color: #e06c75;">"tables"</span>: [
+    {
+      <span style="color: #e06c75;">"name"</span>: <span style="color: #98c379;">"users"</span>,
+      <span style="color: #e06c75;">"columns"</span>: [
+        { <span style="color: #e06c75;">"name"</span>: <span style="color: #98c379;">"id"</span>, <span style="color: #e06c75;">"type"</span>: <span style="color: #98c379;">"UUID"</span>, <span style="color: #e06c75;">"pk"</span>: <span style="color: #d19a66;">true</span> },
+        { <span style="color: #e06c75;">"name"</span>: <span style="color: #98c379;">"email"</span>, <span style="color: #e06c75;">"type"</span>: <span style="color: #98c379;">"VARCHAR"</span> }
+      ]
+    }
+  ],
+  <span style="color: #e06c75;">"relationships"</span>: [
+    { <span style="color: #e06c75;">"source"</span>: <span style="color: #98c379;">"users"</span>, <span style="color: #e06c75;">"target"</span>: <span style="color: #98c379;">"orders"</span> }
+  ]
+}</code></pre>
+                        </div>
+                    </div>
                 </div>
-                <div class="code-block mt">
-                    <code>uv run schemap init</code>
+            </div>
+        </header>
+
+        <section class="comparison">
+            <div class="section-container">
+                <h2 class="section-title">Don't Waste 50,000 Tokens on Raw SQL.</h2>
+                <p class="section-subtitle">Frontier models reward dense structure, not conversational noise. Schemap
+                    translates massive SQL dumps into perfect AI context.</p>
+
+                <div class="compare-grid">
+                    <div class="compare-card before">
+                        <div class="compare-header">Before (Raw SQL Dump)</div>
+                        <div class="compare-body">
+                            <pre><code>CREATE TABLE users (
+  id UUID PRIMARY KEY,
+  email VARCHAR(255) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  password_hash VARCHAR(255),
+  stripe_cust_id VARCHAR(50)
+);
+
+CREATE TABLE orders (
+  id UUID PRIMARY KEY,
+  user_id UUID,
+  amount DECIMAL(10,2),
+  status VARCHAR(20),
+  FOREIGN KEY (user_id) REFERENCES users(id)
+);
+-- ... 50,000 tokens later</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="compare-card after">
+                        <div class="compare-header">After (Schemap AI Output)</div>
+                        <div class="compare-body">
+                            <pre><code>TABLE users [Customer]
+PK id [Identifier]
+COL email string [Email]
+
+TABLE orders [Invoice]
+PK id [Identifier]
+COL amount float [Amount]
+
+REL users 1:N orders
+
+JOURNEYS
+PATH users -> orders
+</code></pre>
+                        </div>
+                    </div>
                 </div>
-                <p class="install-desc">This generates your <code>schemap.yaml</code>. Update it with your database connection details:</p>
-                <div class="code-block mt" style="background: rgba(0,0,0,0.5); padding: 1.5rem; text-align: left; font-size: 0.85rem; line-height: 1.5;">
-<code style="color: var(--text-secondary); white-space: pre-wrap;"><span style="color: var(--accent);">database:</span>
-  url: <span style="color: var(--success);">"libsql://my-database.turso.io"</span>
-  <span style="color: #6b7280;"># Provide your auth token directly or use SCHEMAP_AUTH_TOKEN env var</span>
-  auth_token: <span style="color: var(--success);">"your-database-auth-token"</span>
+            </div>
+        </section>
+
+        <section id="features" class="features">
+            <div class="section-container">
+                <h2 class="section-title">Core Infrastructure for AI Agents</h2>
+                <p class="section-subtitle">Everything you need to inject live database schema context into your agentic
+                    pipelines.</p>
+
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M4 14l8-8 8 8M12 12v10"></path>
+                            </svg>
+                        </div>
+                        <h3>AI Context Compression</h3>
+                        <div class="feature-metric">52k → 3k tokens</div>
+                        <p>We strip out conversational noise and inject pure, heavily-minified structural DSL that keeps
+                            LLM attention heads focused.</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                            </svg>
+                        </div>
+                        <h3>Native Agent Exports</h3>
+                        <div class="feature-metric">LangChain • LlamaIndex • MCP</div>
+                        <p>Generate highly contextual, directly-executable Python tools pre-loaded with your database
+                            schema for immediate use.</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                            </svg>
+                        </div>
+                        <h3>The AI Schema Linter</h3>
+                        <div class="feature-metric">Score: 84/100</div>
+                        <p>Is your schema hurting LLM accuracy? Run `schemap score` to catch missing Primary Keys,
+                            detached tables, and ambiguous column names.</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="18" cy="18" r="3"></circle>
+                                <circle cx="6" cy="6" r="3"></circle>
+                                <path d="M13 6h3a2 2 0 0 1 2 2v7"></path>
+                                <line x1="6" y1="9" x2="6" y2="21"></line>
+                            </svg>
+                        </div>
+                        <h3>Schema Diff Intelligence</h3>
+                        <div class="feature-metric">+ invoices, - users.age</div>
+                        <p>A true version-control system. Catch silent schema drifts in CI/CD pipelines before they
+                            break your downstream text-to-SQL agents.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="who-for">
+            <div class="section-container">
+                <h2 class="section-title">Built for the Modern Data Stack</h2>
+                <div class="who-grid">
+                    <div class="who-column">
+                        <h3>🤖 For AI Engineers</h3>
+                        <ul>
+                            <li>RAG Data Systems</li>
+                            <li>Text-to-SQL Pipelines</li>
+                            <li>Autonomous Agents</li>
+                        </ul>
+                    </div>
+                    <div class="who-column">
+                        <h3>📊 For Data Teams</h3>
+                        <ul>
+                            <li>Living Documentation</li>
+                            <li>Schema Governance</li>
+                            <li>Database Onboarding</li>
+                        </ul>
+                    </div>
+                    <div class="who-column">
+                        <h3>🚀 For Startups</h3>
+                        <ul>
+                            <li>Slash Token Costs</li>
+                            <li>Improve AI Accuracy</li>
+                            <li>Ship Faster</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="installation" class="installation">
+            <div class="section-container">
+                <div class="install-card">
+                    <h2>Install in 2 Seconds</h2>
+                    <p>Schemap leverages `uv` to maintain a zero-friction footprint.</p>
+                    <div class="code-block">
+                        <code>pip install schemap-tool</code>
+                    </div>
+                    <div class="code-block mt">
+                        <code>uv run schemap init</code>
+                    </div>
+                    <p class="install-desc">This generates your <code>schemap.yaml</code>. Update it with your database
+                        connection details:</p>
+                    <div class="code-block mt"
+                        style="background: rgba(0,0,0,0.5); padding: 1.5rem; text-align: left; font-size: 0.85rem; line-height: 1.5;">
+                        <code
+                            style="color: var(--text-secondary); white-space: pre-wrap;"><span style="color: var(--accent);">database:</span>
+  connection_url: <span style="color: var(--success);">"postgresql://user:password@localhost:5432/my_db"</span>
+  exclude_tables:
+    - <span style="color: var(--success);">"spatial_ref_sys"</span>
+
+<span style="color: var(--accent);">domain:</span>
+  name: <span style="color: var(--success);">"ecommerce"</span>
 
 <span style="color: var(--accent);">license_key:</span> <span style="color: var(--success);">"your-license-key"</span></code>
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <section id="pricing" class="pricing">
-        <div class="section-container">
-            <h2 class="section-title">Frictionless Licensing</h2>
-            <p class="section-subtitle">Simple, lifetime value. No heavy web logins required.</p>
+        <section id="pricing" class="pricing">
+            <div class="section-container">
+                <h2 class="section-title">Frictionless Licensing</h2>
+                <p class="section-subtitle">Simple, lifetime value. No heavy web logins required.</p>
 
-            <div class="pricing-grid">
-                <div class="price-card">
-                    <div class="tier-name">Developer</div>
-                    <div class="price">Free</div>
-                    <p class="tier-desc">For students and indie devs building local side projects.</p>
-                    <ul class="features-list">
-                        <li>Maximum 10 database tables</li>
-                        <li>Local execution only</li>
-                        <li>Markdown code generation</li>
-                        <li>Token estimations</li>
-                    </ul>
-                    <button id="copy-install-btn" class="btn btn-secondary full-width"
-                        style="font-family: inherit; font-size: 1rem; cursor: pointer;">Copy Install Command</button>
-                </div>
+                <div class="pricing-grid">
+                    <div class="price-card">
+                        <div class="tier-name">Developer</div>
+                        <div class="price">Free</div>
+                        <p class="tier-desc">For students and indie devs building local side projects.</p>
+                        <ul class="features-list">
+                            <li>Maximum 10 database tables</li>
+                            <li>Local execution only</li>
+                            <li>Basic Heuristics</li>
+                            <li>Token estimations</li>
+                        </ul>
+                        <button id="copy-install-btn" class="btn btn-secondary full-width"
+                            style="font-family: inherit; font-size: 1rem; cursor: pointer;">Copy Install
+                            Command</button>
+                    </div>
 
-                <div class="price-card featured">
-                    <div class="featured-badge">Most Popular</div>
-                    <div class="tier-name">Professional</div>
-                    <div class="price">$49<span class="period">/mo</span></div>
-                    <p class="tier-desc">For solo AI engineers and early-stage startups.</p>
-                    <ul class="features-list">
-                        <li><strong>Unlimited</strong> database tables</li>
-                        <li>Up to 3 active database connections</li>
-                        <li>Email support</li>
-                        <li>Wildcard exclusion globbing</li>
-                    </ul>
-                    <a href="#" class="btn btn-primary full-width">Buy License</a>
-                </div>
+                    <div class="price-card featured">
+                        <div class="featured-badge">Most Popular</div>
+                        <div class="tier-name">Professional</div>
+                        <div class="price">$49<span class="period">/mo</span></div>
+                        <p class="tier-desc">For solo AI engineers and early-stage startups.</p>
+                        <ul class="features-list">
+                            <li><strong>Unlimited</strong> database tables</li>
+                            <li>AI Context Linter & Diffing</li>
+                            <li>Native Langchain & LlamaIndex Exports</li>
+                            <li>OpenAI Business Enrichment Pass</li>
+                        </ul>
+                        <a href="#" class="btn btn-primary full-width">Buy License</a>
+                    </div>
 
-                <div class="price-card">
-                    <div class="tier-name">Team</div>
-                    <div class="price">$99<span class="period">/mo</span></div>
-                    <p class="tier-desc">For tech teams needing automated context synchronization.</p>
-                    <ul class="features-list">
-                        <li><strong>Unlimited</strong> database tables</li>
-                        <li><strong>CI/CD Pipeline Execution</strong></li>
-                        <li>Automated GitHub Actions sync</li>
-                        <li>Priority team support</li>
-                    </ul>
-                    <a href="#" class="btn btn-secondary full-width">Buy Team License</a>
+                    <div class="price-card">
+                        <div class="tier-name">Team</div>
+                        <div class="price">$99<span class="period">/mo</span></div>
+                        <p class="tier-desc">For tech teams needing automated context synchronization.</p>
+                        <ul class="features-list">
+                            <li><strong>Everything in Pro</strong></li>
+                            <li><strong>CI/CD Pipeline Execution</strong></li>
+                            <li>Automated GitHub Actions sync</li>
+                            <li>Priority team support</li>
+                        </ul>
+                        <a href="#" class="btn btn-secondary full-width">Buy Team License</a>
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
+    </main>
     <footer>
         <div class="footer-content">
             <img src="assets/Icon Dark.png" alt="Schemap Icon" height="24">
-            <p>&copy; 2026 Schemap. A zero-friction dev tool.</p>
+            <p>&copy; 2026 Schemap. Git for AI Database Context.</p>
             <p>Developed by Swarty</p>
         </div>
     </footer>
