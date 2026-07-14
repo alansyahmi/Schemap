@@ -90,10 +90,12 @@ CORE_MAPPINGS = {
     "ppt": "PowerPoint"
 }
 
-def apply_heuristics(schema: DatabaseSchemaModel, domain_mappings: dict = None) -> tuple[DatabaseSchemaModel, list[str]]:
+def apply_heuristics(schema: DatabaseSchemaModel, domain_mappings: dict = None, ignore_abbreviations: list[str] = None) -> tuple[DatabaseSchemaModel, list[str]]:
     mappings = CORE_MAPPINGS.copy()
     if domain_mappings:
         mappings.update(domain_mappings)
+        
+    ignore_set = {s.lower() for s in ignore_abbreviations} if ignore_abbreviations else set()
         
     unresolved = set()
     
@@ -106,8 +108,17 @@ def apply_heuristics(schema: DatabaseSchemaModel, domain_mappings: dict = None) 
                 expanded.append(mappings[plower])
             else:
                 # If it's short and not in mappings, it might be an unresolved abbreviation
-                if len(plower) <= 4 and plower not in ("name", "type", "date", "time", "year", "code", "role", "user", "file", "path", "size", "hash", "salt", "key", "cert", "host", "port", "zone", "tier", "plan", "cost", "fee", "tax", "rate", "tag", "flag", "memo", "note", "link", "icon", "logo"):
-                    unresolved.add(p)
+                if len(plower) <= 4 and plower not in (
+                    "name", "type", "date", "time", "year", "code", "role", "user", "file", "path", 
+                    "size", "hash", "salt", "key", "cert", "host", "port", "zone", "tier", "plan", 
+                    "cost", "fee", "tax", "rate", "tag", "flag", "memo", "note", "link", "icon", 
+                    "logo", "form", "slug", "pos", "ids", "fem", "masc", "lang", "word", "text", 
+                    "data", "main", "root", "base", "head", "body", "item", "part", "list", "kind", 
+                    "sort", "rank", "mode", "view", "show", "hide", "edit", "save", "load", "desc",
+                    "term", "meta", "info", "true", "null"
+                ):
+                    if plower not in ignore_set:
+                        unresolved.add(p)
                 expanded.append(p.capitalize())
         return " ".join(expanded)
         
@@ -185,4 +196,25 @@ def apply_llm(schema: DatabaseSchemaModel, api_key: str, model: str) -> Database
                 if c.name in col_map:
                     c.business_name = col_map[c.name].get("business_name", c.business_name)
                     
+    return schema
+
+def apply_description_overrides(schema: DatabaseSchemaModel, overrides: dict) -> DatabaseSchemaModel:
+    """
+    Applies custom description and business name overrides from configuration.
+    """
+    for table in schema.tables:
+        if table.name in overrides:
+            override = overrides[table.name]
+            if override.description is not None:
+                table.description = override.description
+            if override.business_name is not None:
+                table.business_name = override.business_name
+                
+            for col in table.columns:
+                if col.name in override.columns:
+                    col_override = override.columns[col.name]
+                    if col_override.description is not None:
+                        col.description = col_override.description
+                    if col_override.business_name is not None:
+                        col.business_name = col_override.business_name
     return schema

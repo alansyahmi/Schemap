@@ -11,7 +11,7 @@ from .extractor import extract_schema
 from .models import DatabaseSchemaModel
 from .renderer import render_output, write_output
 from .license import verify_tier, LicenseError
-from .enrichment import apply_heuristics, apply_llm
+from .enrichment import apply_heuristics, apply_llm, apply_description_overrides
 from .linter import calculate_score
 from .diff import save_current_state, load_previous_state, calculate_diff
 from .export import generate_langchain, generate_llamaindex, generate_mcp_tools
@@ -45,6 +45,15 @@ domain:
   mappings:
     inv: "Invoice"
     cust: "Customer"
+  ignore_abbreviations:
+    - "slug"
+    - "pos"
+schema_descriptions:
+  users:
+    description: "Custom table override details"
+    columns:
+      pos:
+        description: "Position index of the element"
 """
     with open(config_path, "w", encoding="utf-8") as f:
         f.write(boilerplate)
@@ -65,7 +74,8 @@ def _process_schema(cfg, enrich: bool):
         sys.exit(1)
         
     schema_model = DatabaseSchemaModel(tables=raw_tables)
-    schema_model, unresolved = apply_heuristics(schema_model, cfg.domain.mappings)
+    schema_model, unresolved = apply_heuristics(schema_model, cfg.domain.mappings, cfg.domain.ignore_abbreviations)
+    schema_model = apply_description_overrides(schema_model, cfg.schema_descriptions)
     
     if enrich and cfg.llm.api_key:
         click.echo("-> Calling LLM Enrichment Layer... ", nl=False)

@@ -18,12 +18,23 @@ class LLMConfig(BaseModel):
 class DomainConfig(BaseModel):
     name: str | None = None
     mappings: dict[str, str] = Field(default_factory=dict)
+    ignore_abbreviations: list[str] = Field(default_factory=list)
+
+class ColumnOverride(BaseModel):
+    description: str | None = None
+    business_name: str | None = None
+
+class TableOverride(BaseModel):
+    description: str | None = None
+    business_name: str | None = None
+    columns: dict[str, ColumnOverride] = Field(default_factory=dict)
 
 class SchemapConfig(BaseModel):
     database: DatabaseConfig
     output: OutputConfig
     llm: LLMConfig = Field(default_factory=LLMConfig)
     domain: DomainConfig = Field(default_factory=DomainConfig)
+    schema_descriptions: dict[str, TableOverride] = Field(default_factory=dict)
     license_key: str | None = None
     license_endpoint: str | None = "https://api.lemonsqueezy.com/v1/licenses/validate"
 

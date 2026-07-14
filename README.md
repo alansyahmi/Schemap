@@ -86,6 +86,33 @@ schemap init-ci
 ```
 This drops a ready-to-use `.github/workflows/schemap.yml` action into your repository that runs Schemap and commits the new Markdown file automatically.
 
+## Domain Mapping & Schema Overrides
+
+To tailor the context map to your domain and reduce noise, configure mappings, ignore specific warnings, and override schema documentation directly in `schemap.yaml`:
+
+```yaml
+domain:
+  name: "ecommerce"
+  # Expand abbreviation tokens into human-readable business terms
+  mappings:
+    inv: "Invoice"
+    cust: "Customer"
+  # Ignore specific short terms to prevent warning logs
+  ignore_abbreviations:
+    - "slug"
+    - "pos"
+
+# Document database schemas manually or override native catalog comments
+schema_descriptions:
+  users:
+    description: "System users database table."
+    business_name: "User Account"
+    columns:
+      pos:
+        description: "Position priority index of the user in the rendering list."
+        business_name: "Rendering Position"
+```
+
 ## Licensing
 
 Schemap operates on a Frictionless License Model. 
