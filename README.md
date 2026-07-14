@@ -31,7 +31,7 @@ It natively connects to your database, strips out the noise, and generates a hig
 Schemap is published on PyPI. Install it globally or within your project environment:
 
 ```bash
-pip install schemap
+pip install schemap-tool
 ```
 
 *(Note: We highly recommend using [uv](https://github.com/astral-sh/uv) for blazing-fast environment management.)*
@@ -89,7 +89,7 @@ This drops a ready-to-use `.github/workflows/schemap.yml` action into your repos
 ## Licensing
 
 Schemap operates on a Frictionless License Model. 
-- **Developer Tier (Free):** Use Schemap for free locally on databases with up to 10 tables.
+- **Developer Tier (Free):** Use Schemap for free locally on databases with up to 50 tables.
 - **Professional & Team Tiers:** For unlimited tables, wildcard filtering, and CI/CD pipeline automation, purchase a license key at [schemap.com](https://your-username.github.io/schemap).
 
 Once purchased, simply drop your key into the `schemap.yaml`:

@@ -316,6 +316,13 @@ def extract_schema(connection_url: str, exclude_tables: list[str]) -> list[dict[
     Connects to the database and extracts the schema metadata using native catalog queries.
     Routes to the correct extractor based on the connection scheme.
     """
+    if "user:password" in connection_url or "localhost:5432/my_db" in connection_url:
+        raise ConnectionError(
+            "It looks like you are using the default boilerplate connection URL in schemap.yaml.\n"
+            "Please open schemap.yaml and replace 'postgresql://user:password@localhost:5432/my_db' "
+            "with your actual database connection string."
+        )
+
     if connection_url.startswith(("postgresql://", "postgres://")):
         return _extract_postgres(connection_url, exclude_tables)
     elif connection_url.startswith(("libsql://", "https://", "http://", "sqlite://", "file:")):

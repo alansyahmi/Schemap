@@ -45,10 +45,6 @@ domain:
   mappings:
     inv: "Invoice"
     cust: "Customer"
-llm:
-  provider: "openai"
-  model: "gpt-4o-mini"
-  api_key: ""
 """
     with open(config_path, "w", encoding="utf-8") as f:
         f.write(boilerplate)
@@ -155,7 +151,7 @@ def _generate(config: str, verbose: bool, format_override: str = None, enrich: b
 @click.option('--config', default="schemap.yaml", help="Path to the configuration file.")
 @click.option('--verbose', is_flag=True, help="Enable verbose output.")
 @click.option('--format', 'fmt', type=click.Choice(['markdown', 'json', 'yaml', 'xml', 'mcp', 'ai'], case_sensitive=False), help="Override the output format.")
-@click.option('--enrich', is_flag=True, help="Use OpenAI LLM to powerfully enrich table and column business definitions.")
+@click.option('--enrich', is_flag=True, hidden=True, help="Use OpenAI LLM to powerfully enrich table and column business definitions.")
 @click.option('--track/--no-track', default=True, help="Track schema state for diff intelligence.")
 def generate(config, verbose, fmt, enrich, track):
     """Connect to the database, extract schema, and generate the LLM context."""
@@ -292,7 +288,7 @@ class MigrationHandler(FileSystemEventHandler):
 @click.option('--config', default="schemap.yaml", help="Path to the configuration file.")
 @click.option('--verbose', is_flag=True, help="Enable verbose output.")
 @click.option('--format', 'fmt', type=click.Choice(['markdown', 'json', 'yaml', 'xml', 'mcp', 'ai'], case_sensitive=False), help="Override the output format.")
-@click.option('--enrich', is_flag=True, help="Use OpenAI LLM to powerfully enrich table and column business definitions.")
+@click.option('--enrich', is_flag=True, hidden=True, help="Use OpenAI LLM to powerfully enrich table and column business definitions.")
 @click.option('--track/--no-track', default=True, help="Track schema state for diff intelligence.")
 def watch(watch_dir, config, verbose, fmt, enrich, track):
     """Watch a local directory for changes and automatically regenerate the context map."""
