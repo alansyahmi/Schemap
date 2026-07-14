@@ -7,6 +7,7 @@
     --accent: #60a5fa;
     --accent-glow: rgba(96, 165, 250, 0.2);
     --success: #34d399;
+    --radius: 0px;
 }
 
 * {
@@ -122,7 +123,7 @@ h3 {
 .nav-btn {
     border: 1px solid var(--border-color);
     padding: 0.5rem 1rem;
-    border-radius: 6px;
+    border-radius: var(--radius);
 }
 
 .nav-btn:hover {
@@ -148,7 +149,7 @@ h3 {
     padding: 0.25rem 0.75rem;
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid var(--border-color);
-    border-radius: 9999px;
+    border-radius: var(--radius);
     font-size: 0.875rem;
     color: var(--text-secondary);
     margin-bottom: 2rem;
@@ -175,7 +176,7 @@ h3 {
 .btn {
     display: inline-block;
     padding: 0.75rem 1.5rem;
-    border-radius: 8px;
+    border-radius: var(--radius);
     font-size: 1rem;
     font-weight: 500;
     text-decoration: none;
@@ -224,7 +225,7 @@ h3 {
     max-width: 800px;
     background: #111113;
     border: 1px solid var(--border-color);
-    border-radius: 12px;
+    border-radius: var(--radius);
     overflow: hidden;
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
     text-align: left;
@@ -340,11 +341,20 @@ h3 {
     gap: 2rem;
 }
 
+@media (min-width: 1025px) {
+    .feature-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    .feature-card:nth-child(4) {
+        grid-column: 2;
+    }
+}
+
 .feature-card {
     background: var(--bg-card);
     border: 1px solid var(--border-color);
     padding: 2rem;
-    border-radius: 12px;
+    border-radius: var(--radius);
     backdrop-filter: blur(10px);
     transition: transform 0.2s, border-color 0.2s;
 }
@@ -395,7 +405,7 @@ h3 {
     background: #000;
     border: 1px solid var(--border-color);
     padding: 1rem;
-    border-radius: 8px;
+    border-radius: var(--radius);
     font-family: 'JetBrains Mono', monospace;
     color: var(--accent);
     text-align: left;
@@ -422,7 +432,7 @@ h3 {
     background: var(--bg-card);
     border: 1px solid var(--border-color);
     padding: 3rem 2rem;
-    border-radius: 16px;
+    border-radius: var(--radius);
     position: relative;
     display: flex;
     flex-direction: column;
@@ -444,7 +454,7 @@ h3 {
     background: var(--accent);
     color: #fff;
     padding: 4px 12px;
-    border-radius: 9999px;
+    border-radius: var(--radius);
     font-size: 0.75rem;
     font-weight: 600;
     text-transform: uppercase;
@@ -584,7 +594,7 @@ footer {
         margin: 3rem auto 0 auto;
         width: 100%;
         box-sizing: border-box;
-        border-radius: 8px;
+        border-radius: var(--radius);
     }
 
     .terminal-body {
@@ -660,7 +670,7 @@ footer {
 .compare-card {
     background: #111113;
     border: 1px solid var(--border-color);
-    border-radius: 12px;
+    border-radius: var(--radius);
     overflow: hidden;
 }
 
@@ -709,7 +719,7 @@ footer {
     background: rgba(96, 165, 250, 0.1);
     color: var(--accent);
     border: 1px solid rgba(96, 165, 250, 0.3);
-    border-radius: 9999px;
+    border-radius: var(--radius);
     font-size: 0.75rem;
     font-weight: 600;
     margin-bottom: 1rem;
@@ -730,13 +740,23 @@ footer {
     background: var(--bg-card);
     border: 1px solid var(--border-color);
     padding: 2rem;
-    border-radius: 12px;
+    border-radius: var(--radius);
 }
 
 .who-column h3 {
     margin-bottom: 1.5rem;
     font-size: 1.25rem;
     color: var(--text-primary);
+}
+
+.who-icon {
+    margin-bottom: 1rem;
+    color: var(--accent);
+}
+
+.who-svg {
+    width: 28px;
+    height: 28px;
 }
 
 .who-column ul {
@@ -777,7 +797,7 @@ footer {
 .showcase-window {
     background: #111113;
     border: 1px solid var(--border-color);
-    border-radius: 12px;
+    border-radius: var(--radius);
     overflow: hidden;
     box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
 }

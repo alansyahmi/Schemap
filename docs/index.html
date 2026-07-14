@@ -63,9 +63,11 @@
                     <div class="line"><span class="prompt">$</span> <span class="command" id="type-cmd">uv run schemap
                             generate --format=ai</span></div>
                     <div class="output hidden" id="out-1"><span class="success">-&gt;</span> Connecting to database...
-                        <span class="success">Connected. Found 39 active tables</span></div>
+                        <span class="success">Connected. Found 39 active tables</span>
+                    </div>
                     <div class="output hidden" id="out-2"><span class="success">-&gt;</span> Extracting heuristics...
-                        <span class="success">OK</span></div>
+                        <span class="success">OK</span>
+                    </div>
                     <div class="output hidden" id="out-3"><span class="success">-&gt;</span> Compiling context engine
                         [ai]... <span class="success">OK</span></div>
 
@@ -97,7 +99,7 @@
                     <div class="showcase-content">
                         <!-- LangChain -->
                         <div class="tab-pane active" id="tab-langchain">
-<pre><code><span style="color: #c678dd;">from</span> langchain.tools <span style="color: #c678dd;">import</span> BaseTool
+                            <pre><code><span style="color: #c678dd;">from</span> langchain.tools <span style="color: #c678dd;">import</span> BaseTool
 <span style="color: #c678dd;">from</span> pydantic <span style="color: #c678dd;">import</span> BaseModel
 
 <span style="color: #c678dd;">class</span> <span style="color: #e5c07b;">DatabaseSchemaTool</span>(BaseTool):
@@ -112,10 +114,10 @@
         <span style="color: #5c6370;"># Injects pristine context into agent</span>
         <span style="color: #c678dd;">return</span> self.description</code></pre>
                         </div>
-                        
+
                         <!-- MCP -->
                         <div class="tab-pane" id="tab-mcp">
-<pre><code>{
+                            <pre><code>{
   <span style="color: #e06c75;">"name"</span>: <span style="color: #98c379;">"schemap_server"</span>,
   <span style="color: #e06c75;">"version"</span>: <span style="color: #98c379;">"1.0.0"</span>,
   <span style="color: #e06c75;">"tools"</span>: [
@@ -132,10 +134,10 @@
   ]
 }</code></pre>
                         </div>
-                        
+
                         <!-- JSON -->
                         <div class="tab-pane" id="tab-json">
-<pre><code>{
+                            <pre><code>{
   <span style="color: #e06c75;">"tables"</span>: [
     {
       <span style="color: #e06c75;">"name"</span>: <span style="color: #98c379;">"users"</span>,
@@ -277,7 +279,15 @@ PATH users -> orders
                 <h2 class="section-title">Built for the Modern Data Stack</h2>
                 <div class="who-grid">
                     <div class="who-column">
-                        <h3>🤖 For AI Engineers</h3>
+                        <div class="who-icon">
+                            <svg class="who-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="square" stroke-linejoin="miter">
+                                <rect x="4" y="4" width="16" height="16" />
+                                <path d="M9 9h6v6H9z" />
+                                <path d="M9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 15h3M1 9h3M1 15h3" />
+                            </svg>
+                        </div>
+                        <h3>For AI Engineers</h3>
                         <ul>
                             <li>RAG Data Systems</li>
                             <li>Text-to-SQL Pipelines</li>
@@ -285,7 +295,14 @@ PATH users -> orders
                         </ul>
                     </div>
                     <div class="who-column">
-                        <h3>📊 For Data Teams</h3>
+                        <div class="who-icon">
+                            <svg class="who-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="square" stroke-linejoin="miter">
+                                <rect x="3" y="3" width="18" height="18" />
+                                <path d="M3 9h18M3 15h18M9 9v12" />
+                            </svg>
+                        </div>
+                        <h3>For Data Teams</h3>
                         <ul>
                             <li>Living Documentation</li>
                             <li>Schema Governance</li>
@@ -293,7 +310,14 @@ PATH users -> orders
                         </ul>
                     </div>
                     <div class="who-column">
-                        <h3>🚀 For Startups</h3>
+                        <div class="who-icon">
+                            <svg class="who-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="square" stroke-linejoin="miter">
+                                <path d="M3 21h18M3 21l6-6 4 4 8-8" />
+                                <path d="M17 11h4V7" />
+                            </svg>
+                        </div>
+                        <h3>For Startups</h3>
                         <ul>
                             <li>Slash Token Costs</li>
                             <li>Improve AI Accuracy</li>
@@ -341,14 +365,14 @@ PATH users -> orders
 
                 <div class="pricing-grid">
                     <div class="price-card">
-                        <div class="tier-name">Developer</div>
+                        <div class="tier-name">Free</div>
                         <div class="price">Free</div>
-                        <p class="tier-desc">For students and indie devs building local side projects.</p>
+                        <p class="tier-desc">For developers building local side projects.</p>
                         <ul class="features-list">
-                            <li>Maximum 10 database tables</li>
+                            <li>Maximum 50 database tables</li>
                             <li>Local execution only</li>
-                            <li>Basic Heuristics</li>
-                            <li>Token estimations</li>
+                            <li>Schema linting & basic exports</li>
+                            <li>Token footprint metrics</li>
                         </ul>
                         <button id="copy-install-btn" class="btn btn-secondary full-width"
                             style="font-family: inherit; font-size: 1rem; cursor: pointer;">Copy Install
@@ -357,29 +381,31 @@ PATH users -> orders
 
                     <div class="price-card featured">
                         <div class="featured-badge">Most Popular</div>
-                        <div class="tier-name">Professional</div>
-                        <div class="price">$49<span class="period">/mo</span></div>
-                        <p class="tier-desc">For solo AI engineers and early-stage startups.</p>
+                        <div class="tier-name">Pro (Monthly)</div>
+                        <div class="price">$19<span class="period">/mo</span></div>
+                        <p class="tier-desc">For active AI developers needing full pipeline automation.</p>
                         <ul class="features-list">
                             <li><strong>Unlimited</strong> database tables</li>
-                            <li>AI Context Linter & Diffing</li>
-                            <li>Native Langchain & LlamaIndex Exports</li>
-                            <li>OpenAI Business Enrichment Pass</li>
+                            <li><strong>CI/CD execution</strong> (GitHub Actions)</li>
+                            <li>AI Linter & Schema Diffing</li>
+                            <li>All exporter formats (LangChain, MCP)</li>
                         </ul>
-                        <a href="#" class="btn btn-primary full-width">Buy License</a>
+                        <a href="https://swarty.lemonsqueezy.com/checkout/buy/880db9a8-0d7f-4e3a-a8bf-8bbdd4dc64dc"
+                            class="btn btn-primary full-width">Buy Pro Monthly</a>
                     </div>
 
                     <div class="price-card">
-                        <div class="tier-name">Team</div>
-                        <div class="price">$99<span class="period">/mo</span></div>
-                        <p class="tier-desc">For tech teams needing automated context synchronization.</p>
+                        <div class="tier-name">Pro (Lifetime)</div>
+                        <div class="price">$99<span class="period"> lifetime</span></div>
+                        <p class="tier-desc">One-time payment for lifetime updates and peace of mind.</p>
                         <ul class="features-list">
-                            <li><strong>Everything in Pro</strong></li>
-                            <li><strong>CI/CD Pipeline Execution</strong></li>
-                            <li>Automated GitHub Actions sync</li>
-                            <li>Priority team support</li>
+                            <li><strong>Everything in Pro Monthly</strong></li>
+                            <li><strong>One-time payment</strong></li>
+                            <li>Lifetime product updates</li>
+                            <li>Priority developer support</li>
                         </ul>
-                        <a href="#" class="btn btn-secondary full-width">Buy Team License</a>
+                        <a href="https://swarty.lemonsqueezy.com/checkout/buy/35b6aac6-c0e7-4b5d-b729-7c0944e10f18"
+                            class="btn btn-secondary full-width">Buy Pro Lifetime</a>
                     </div>
                 </div>
             </div>

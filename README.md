@@ -116,8 +116,8 @@ schema_descriptions:
 ## Licensing
 
 Schemap operates on a Frictionless License Model. 
-- **Developer Tier (Free):** Use Schemap for free locally on databases with up to 50 tables.
-- **Professional & Team Tiers:** For unlimited tables, wildcard filtering, and CI/CD pipeline automation, purchase a license key at [schemap.com](https://your-username.github.io/schemap).
+- **Free Tier:** Use Schemap for free locally on databases with up to 50 tables.
+- **Pro Tier (Monthly or Lifetime):** For unlimited tables, wildcard filtering, and CI/CD pipeline automation, purchase a license key at [schemap.com](https://your-username.github.io/schemap).
 
 Once purchased, simply drop your key into the `schemap.yaml`:
 ```yaml

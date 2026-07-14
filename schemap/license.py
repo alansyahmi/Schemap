@@ -93,14 +93,14 @@ def verify_tier(tables_count: int, license_key: str | None, endpoint: str | None
     
     # 1. Block CI/CD usage on Free Tier
     if is_ci and not license_key:
-        raise LicenseError("Schemap Team License required for CI/CD pipeline automation.")
+        raise LicenseError("Schemap Pro License required for CI/CD pipeline automation.")
         
     # 2. Enforce Free Tier table limits
     if tables_count <= 50 and not is_ci and not license_key:
         return # allowed on free tier
         
     if not license_key:
-        raise LicenseError(f"Free tier limited to 50 tables. Found {tables_count} tables. Please upgrade to Schemap Professional.")
+        raise LicenseError(f"Free tier limited to 50 tables. Found {tables_count} tables. Please upgrade to Schemap Pro.")
         
     # 3. Local Cache Optimization (bypass in CI)
     if not is_ci:
