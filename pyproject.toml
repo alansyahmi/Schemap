@@ -4,10 +4,38 @@ build-backend = "hatchling.build"
 
 [project]
 name = "schemap-tool"
-version = "0.8.0"
-description = "A deterministic tool that outputs highly compressed database schemas"
+version = "2.0.0"
+description = "The AI Database Context Compiler for Claude Code, Cursor, Codex, and Copilot. Turn raw database structures into 88% smaller, AI-ready context maps."
+readme = "README.md"
+license = { text = "MIT" }
 authors = [
-    { name = "Data Architect", email = "architect@example.com" }
+    { name = "Swarty", email = "swarty@schemap.com" }
+]
+keywords = [
+    "database",
+    "ai",
+    "schemap",
+    "claude",
+    "cursor",
+    "copilot",
+    "context-window",
+    "token-optimization",
+    "text-to-sql",
+    "mcp-server",
+    "langchain-tools",
+    "schema-linter"
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: Build Tools",
+    "Topic :: Database",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12"
 ]
 requires-python = ">=3.10"
 dependencies = [
@@ -22,6 +50,13 @@ dependencies = [
     "pymysql",
     "oracledb"
 ]
+
+[project.urls]
+Homepage = "https://schemap-tool.pages.dev/
+Documentation = "https://schemap-tool.pages.dev/#features"
+Repository = "https://github.com/alansyahmi/Schemap"
+Changelog = "https://github.com/alansyahmi/Schemap/releases"
+"Bug Tracker" = "https://github.com/alansyahmi/Schemap/issues"
 
 [project.optional-dependencies]
 dev = [
