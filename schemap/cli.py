@@ -26,14 +26,16 @@ def cli():
     pass
 
 @cli.command()
-def init():
+@click.option('--full', is_flag=True, help="Generate full boilerplate with domain mappings and schema description overrides.")
+def init(full):
     """Initialize a new schemap.yaml configuration file in the current directory."""
     config_path = Path("schemap.yaml")
     if config_path.exists():
         click.secho("schemap.yaml already exists in the current directory.", fg="yellow")
         sys.exit(0)
         
-    boilerplate = """# Schemap Configuration Asset
+    if full:
+        boilerplate = """# Schemap Full Configuration Asset
 database:
   connection_url: "postgresql://user:password@localhost:5432/my_db"
   exclude_tables:
@@ -59,10 +61,22 @@ schema_descriptions:
       pos:
         description: "Position index of the element"
 """
+    else:
+        boilerplate = """# Schemap Configuration
+database:
+  connection_url: "sqlite:///test.db"
+
+output:
+  file_path: "./database_context.md"
+
+domain:
+  mappings: {}
+"""
+
     with open(config_path, "w", encoding="utf-8") as f:
         f.write(boilerplate)
         
-    click.secho("✔ Created boilerplate schemap.yaml", fg="green")
+    click.secho("✔ Created schemap.yaml", fg="green")
 
 def _process_schema(cfg, enrich: bool):
     click.echo("-> Connecting to database... ", nl=False)
@@ -172,32 +186,31 @@ def doctor(config, json_output, verbose):
 @click.option('--json', 'json_output', is_flag=True, help="Output benchmark data in JSON format.")
 @click.option('--verbose', is_flag=True, help="Enable verbose output.")
 def benchmark(config, json_output, verbose):
-    """Measure context efficiency (raw SQL tokens vs Schemap tokens)."""
+    """Run Database Context Benchmark (tables, raw vs schemap tokens, compression, relationships, AI score, latency)."""
     try:
         cfg = load_config(config)
-        schema_model, raw_tables, _ = _process_schema(cfg, enrich=False)
+        schema_model, raw_tables, unresolved = _process_schema(cfg, enrich=False)
         
-        bench_data = calculate_benchmark(schema_model, raw_tables)
+        bench_data = calculate_benchmark(schema_model, raw_tables, unresolved)
         
         if json_output:
             import json
             click.echo(json.dumps(bench_data, indent=2))
             return
             
-        eff = bench_data["context_efficiency"]
-        qual = bench_data["context_quality"]
-        
         click.secho("\n" + "=" * 50, fg="magenta", bold=True)
-        click.secho(" Schemap Context Efficiency Benchmark", fg="magenta", bold=True)
+        click.secho(" Database Context Benchmark", fg="magenta", bold=True)
         click.secho("=" * 50, fg="magenta", bold=True)
-        click.echo(f"  Raw SQL Dump:         {eff['raw_sql_tokens']:,} tokens")
-        click.echo(f"  Schemap AI Context:   ", nl=False)
-        click.secho(f"{eff['schemap_tokens']:,} tokens", fg="green", bold=True)
-        click.echo(f"  Context Reduction:   ", nl=False)
-        click.secho(f"{eff['reduction_percentage']}", fg="magenta", bold=True)
+        click.echo(f"  Tables:               {bench_data['tables_count']}")
+        click.echo(f"  Raw Schema:           {bench_data['raw_sql_tokens']:,} tokens")
+        click.echo(f"  Schemap Context:      ", nl=False)
+        click.secho(f"{bench_data['schemap_tokens']:,} tokens", fg="green", bold=True)
+        click.echo(f"  Compression:          ", nl=False)
+        click.secho(f"{bench_data['compression_percentage']}", fg="magenta", bold=True)
         click.echo("-" * 50)
-        click.echo(f"  Relationship Graph:   {qual['relationship_graph']} ({qual['relationship_count']} links)")
-        click.echo("  Agent Files Ready:    CLAUDE.md [OK], AGENTS.md [OK]")
+        click.echo(f"  Relationships Mapped: {bench_data['relationships_mapped']}")
+        click.echo(f"  AI Readiness Score:   {bench_data['ai_readiness_score']}/100")
+        click.echo(f"  Generation Latency:   {bench_data['generation_latency_ms']}")
         click.secho("=" * 50 + "\n", fg="magenta", bold=True)
         
     except Exception as e:
