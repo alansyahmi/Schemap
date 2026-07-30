@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="docs/assets/Text_Logo__Dark_-removebg-preview.png" alt="Schemap Logo — AI Database Context Compiler" width="320" />
+  <img src="docs/assets/Text_Logo__Dark_-removebg-preview2.png" alt="Schemap Logo — AI Database Context Compiler" width="320" />
 </div>
 
 <br/>
