@@ -15,10 +15,14 @@ from .enrichment import apply_heuristics, apply_llm, apply_description_overrides
 from .linter import calculate_score
 from .diff import save_current_state, load_previous_state, calculate_diff
 from .export import generate_langchain, generate_llamaindex, generate_mcp_tools
+from .context import generate_database_context
+from .agents import write_agent_files
+from .doctor import get_doctor_report
+from .benchmark import calculate_benchmark
 
 @click.group()
 def cli():
-    """Schemap: A deterministic tool for exporting database schemas."""
+    """Schemap: AI Database Context Compiler — The fastest way to make your database AI-ready."""
     pass
 
 @cli.command()
@@ -38,7 +42,7 @@ database:
   license_key: ""
   license_endpoint: "https://api.lemonsqueezy.com/v1/licenses/validate"
 output:
-  file_path: "./llm_data_context.md"
+  file_path: "./database_context.md"
   format: "markdown"
 domain:
   name: "ecommerce"
@@ -77,12 +81,13 @@ def _process_schema(cfg, enrich: bool):
     schema_model, unresolved = apply_heuristics(schema_model, cfg.domain.mappings, cfg.domain.ignore_abbreviations)
     schema_model = apply_description_overrides(schema_model, cfg.schema_descriptions)
     
-    if enrich and cfg.llm.api_key:
-        click.echo("-> Calling LLM Enrichment Layer... ", nl=False)
-        schema_model = apply_llm(schema_model, cfg.llm.api_key, cfg.llm.model)
-        click.secho("OK", fg="green")
-    elif enrich:
-        click.secho("\n[WARNING] --enrich flag passed but no llm.api_key found in config. Using heuristics only.", fg="yellow")
+    if enrich:
+        if cfg.llm.api_key:
+            click.echo("-> Calling Beta LLM Enrichment Layer... ", nl=False)
+            schema_model = apply_llm(schema_model, cfg.llm.api_key, cfg.llm.model)
+            click.secho("OK", fg="green")
+        else:
+            click.secho("\n[WARNING] --enrich flag passed (Beta Feature) but no llm.api_key found in config. Using deterministic heuristics.", fg="yellow")
 
     if unresolved:
         click.secho("\n[WARNING] Unresolved abbreviations detected. Add these to your domain mappings:", fg="yellow")
@@ -93,63 +98,151 @@ def _process_schema(cfg, enrich: bool):
             
     return schema_model, raw_tables, unresolved
 
-def _generate(config: str, verbose: bool, format_override: str = None, enrich: bool = False, track: bool = True):
+def _display_token_savings(rendered_output: str, raw_tables: list, out_path: Path):
+    enc = tiktoken.get_encoding("cl100k_base")
+    final_token_count = len(enc.encode(rendered_output))
+    
+    raw_sql_str = ""
+    for t in raw_tables:
+        raw_sql_str += f"CREATE TABLE {t['name']} (\n"
+        for c in t['columns']:
+            raw_sql_str += f"  {c['name']} {c['data_type']},\n"
+        raw_sql_str += ");\n"
+    raw_sql_str *= 3 
+    original_token_count = max(len(enc.encode(raw_sql_str)), 1)
+    reduction = max(0, 100 - (final_token_count / original_token_count) * 100)
+    
+    file_size_kb = out_path.stat().st_size / 1024.0 if out_path.exists() else 0.0
+    
+    click.secho(f"\n[SUCCESS] Context map generated successfully at {out_path} [{file_size_kb:.1f} KB]", fg="green", bold=True)
+    click.secho("\n" + "=" * 50, fg="cyan", bold=True)
+    click.secho(f" Token Savings Calculator", fg="cyan", bold=True)
+    click.secho("=" * 50, fg="cyan", bold=True)
+    click.echo(f"  Raw SQL Dump (Estimated):  {original_token_count:,} tokens")
+    click.echo(f"  Schemap AI Context:        ", nl=False)
+    click.secho(f"{final_token_count:,} tokens", fg="green", bold=True)
+    click.echo("-" * 50)
+    click.echo(f"  Total Token Reduction:     ", nl=False)
+    click.secho(f"{reduction:.1f}%", fg="magenta", bold=True)
+    click.secho("=" * 50 + "\n", fg="cyan", bold=True)
+
+@cli.command()
+@click.option('--config', default="schemap.yaml", help="Path to configuration file.")
+@click.option('--json', 'json_output', is_flag=True, help="Output health report in machine-readable JSON.")
+@click.option('--verbose', is_flag=True, help="Enable verbose output.")
+def doctor(config, json_output, verbose):
+    """Run Schemap AI Database Health Check & Onboarding Diagnostic."""
     try:
-        click.echo(f"-> Loading configuration from ./{config}... ", nl=False)
         cfg = load_config(config)
-        click.secho("OK", fg="green")
+        schema_model, raw_tables, unresolved = _process_schema(cfg, enrich=False)
         
-        schema_model, raw_tables, unresolved = _process_schema(cfg, enrich)
+        report = get_doctor_report(schema_model, raw_tables, unresolved)
         
-        # Save state for diffing
-        if track:
-            save_current_state(schema_model)
-        
-        fmt = format_override if format_override else cfg.output.format
-        fmt = fmt.lower()
-        
-        out_path = Path(cfg.output.file_path)
-        if fmt == "json" or fmt == "mcp" or fmt == "mcp-tools":
-            out_path = out_path.with_suffix(".json")
-        elif fmt == "yaml":
-            out_path = out_path.with_suffix(".yaml")
-        elif fmt == "xml":
-            out_path = out_path.with_suffix(".xml")
-        elif fmt == "ai":
-            out_path = out_path.with_suffix(".txt")
-        else:
-            out_path = out_path.with_suffix(".md")
+        if json_output:
+            import json
+            click.echo(json.dumps(report, indent=2))
+            return
             
-        click.echo(f"-> Compiling context engine [{fmt}]... ", nl=False)
-        rendered_output = render_output(schema_model, fmt=fmt)
-        write_output(rendered_output, str(out_path))
-        click.secho("OK", fg="green")
-        
-        enc = tiktoken.get_encoding("cl100k_base")
-        final_token_count = len(enc.encode(rendered_output))
-        
-        raw_sql_str = ""
-        for t in raw_tables:
-            raw_sql_str += f"CREATE TABLE {t['name']} (\n"
-            for c in t['columns']:
-                raw_sql_str += f"  {c['name']} {c['data_type']},\n"
-            raw_sql_str += ");\n"
-        raw_sql_str *= 3 
-        original_token_count = max(len(enc.encode(raw_sql_str)), 1)
-        reduction = max(0, 100 - (final_token_count / original_token_count) * 100)
-        
-        file_size_kb = out_path.stat().st_size / 1024.0
-        
-        click.secho(f"\n[SUCCESS] Context map generated successfully at {out_path} [{file_size_kb:.1f} KB]", fg="green", bold=True)
         click.secho("\n" + "=" * 50, fg="cyan", bold=True)
-        click.secho(f" Token Savings Calculator", fg="cyan", bold=True)
+        click.secho(" Schemap AI Database Health Check", fg="cyan", bold=True)
         click.secho("=" * 50, fg="cyan", bold=True)
-        click.echo(f"  Raw SQL Dump (Estimated):  {original_token_count:,} tokens")
-        click.echo(f"  Schemap AI Context:        ", nl=False)
-        click.secho(f"{final_token_count:,} tokens", fg="green", bold=True)
+        click.echo(f"  Connection:            Connected ({report['tables_count']} tables)")
+        click.echo(f"  Relationships Analyzed: {report['relationships_count']}")
         click.echo("-" * 50)
-        click.echo(f"  Total Token Reduction:     ", nl=False)
-        click.secho(f"{reduction:.1f}%", fg="magenta", bold=True)
+        click.echo("  AI Readiness Score:")
+        color = "green" if report['ai_readiness_score'] >= 80 else "yellow" if report['ai_readiness_score'] >= 50 else "red"
+        click.secho(f"  {report['progress_bar']}", fg=color, bold=True)
+        
+        if report['issues']:
+            click.echo("\n  Top Issues Identified:")
+            for issue in report['issues'][:5]:
+                click.secho(f"  - {issue}", fg="yellow")
+                
+        click.secho("-" * 50, fg="cyan")
+        click.secho(f" Recommendation: {report['recommendation']}", fg="green", bold=True)
+        click.secho("=" * 50 + "\n", fg="cyan", bold=True)
+        
+    except Exception as e:
+        click.secho(f"\n[ERROR] {str(e)}", fg="red")
+        if verbose:
+            raise
+
+@cli.command()
+@click.option('--config', default="schemap.yaml", help="Path to configuration file.")
+@click.option('--json', 'json_output', is_flag=True, help="Output benchmark data in JSON format.")
+@click.option('--verbose', is_flag=True, help="Enable verbose output.")
+def benchmark(config, json_output, verbose):
+    """Measure context efficiency (raw SQL tokens vs Schemap tokens)."""
+    try:
+        cfg = load_config(config)
+        schema_model, raw_tables, _ = _process_schema(cfg, enrich=False)
+        
+        bench_data = calculate_benchmark(schema_model, raw_tables)
+        
+        if json_output:
+            import json
+            click.echo(json.dumps(bench_data, indent=2))
+            return
+            
+        eff = bench_data["context_efficiency"]
+        qual = bench_data["context_quality"]
+        
+        click.secho("\n" + "=" * 50, fg="magenta", bold=True)
+        click.secho(" Schemap Context Efficiency Benchmark", fg="magenta", bold=True)
+        click.secho("=" * 50, fg="magenta", bold=True)
+        click.echo(f"  Raw SQL Dump:         {eff['raw_sql_tokens']:,} tokens")
+        click.echo(f"  Schemap AI Context:   ", nl=False)
+        click.secho(f"{eff['schemap_tokens']:,} tokens", fg="green", bold=True)
+        click.echo(f"  Context Reduction:   ", nl=False)
+        click.secho(f"{eff['reduction_percentage']}", fg="magenta", bold=True)
+        click.echo("-" * 50)
+        click.echo(f"  Relationship Graph:   {qual['relationship_graph']} ({qual['relationship_count']} links)")
+        click.echo("  Agent Files Ready:    CLAUDE.md [OK], AGENTS.md [OK]")
+        click.secho("=" * 50 + "\n", fg="magenta", bold=True)
+        
+    except Exception as e:
+        click.secho(f"\n[ERROR] {str(e)}", fg="red")
+        if verbose:
+            raise
+
+@cli.command()
+@click.option('--config', default="schemap.yaml", help="Path to configuration file.")
+@click.option('--json', 'json_output', is_flag=True, help="Output metadata in JSON format.")
+@click.option('--verbose', is_flag=True, help="Enable verbose output.")
+def inspect(config, json_output, verbose):
+    """Extract database metadata and display a clean structural summary."""
+    try:
+        cfg = load_config(config)
+        schema_model, raw_tables, _ = _process_schema(cfg, enrich=False)
+        
+        total_cols = sum(len(t['columns']) for t in raw_tables)
+        total_fks = sum(len(t.get('foreign_keys', [])) for t in raw_tables)
+        total_indexes = sum(len(t.get('indexes', [])) for t in raw_tables)
+        
+        if json_output:
+            import json
+            payload = {
+                "tables_count": len(raw_tables),
+                "columns_count": total_cols,
+                "foreign_keys_count": total_fks,
+                "indexes_count": total_indexes,
+                "tables": [t['name'] for t in raw_tables]
+            }
+            click.echo(json.dumps(payload, indent=2))
+            return
+            
+        click.secho("\n" + "=" * 50, fg="cyan", bold=True)
+        click.secho(" Database Inspection Intelligence", fg="cyan", bold=True)
+        click.secho("=" * 50, fg="cyan", bold=True)
+        click.echo(f"  Tables Extracted:          {len(raw_tables)}")
+        click.echo(f"  Total Columns:             {total_cols}")
+        click.echo(f"  Foreign Key Constraints:   {total_fks}")
+        click.echo(f"  Indexes Discovered:        {total_indexes}")
+        click.secho("-" * 50, fg="cyan")
+        click.echo("  Table Breakdown:")
+        for t in raw_tables:
+            fks = len(t.get('foreign_keys', []))
+            click.echo(f"   - {t['name']} ({len(t['columns'])} cols, {fks} FKs)")
         click.secho("=" * 50 + "\n", fg="cyan", bold=True)
         
     except Exception as e:
@@ -161,26 +254,106 @@ def _generate(config: str, verbose: bool, format_override: str = None, enrich: b
 @click.option('--config', default="schemap.yaml", help="Path to the configuration file.")
 @click.option('--verbose', is_flag=True, help="Enable verbose output.")
 @click.option('--format', 'fmt', type=click.Choice(['markdown', 'json', 'yaml', 'xml', 'mcp', 'ai'], case_sensitive=False), help="Override the output format.")
-@click.option('--enrich', is_flag=True, hidden=True, help="Use OpenAI LLM to powerfully enrich table and column business definitions.")
+@click.option('--enrich', is_flag=True, help="[BETA] Apply optional LLM enrichment for table descriptions.")
 @click.option('--track/--no-track', default=True, help="Track schema state for diff intelligence.")
-def generate(config, verbose, fmt, enrich, track):
-    """Connect to the database, extract schema, and generate the LLM context."""
-    _generate(config, verbose, fmt, enrich, track)
+def context(config, verbose, fmt, enrich, track):
+    """Generate AI-optimized database context (database_context.md)."""
+    try:
+        cfg = load_config(config)
+        schema_model, raw_tables, _ = _process_schema(cfg, enrich)
+        
+        if track:
+            save_current_state(schema_model)
+            
+        target_fmt = fmt if fmt else cfg.output.format
+        out_path = Path("database_context.md") if target_fmt == "markdown" else Path(cfg.output.file_path)
+        
+        click.echo(f"-> Compiling AI context engine [{target_fmt}]... ", nl=False)
+        if target_fmt == "markdown":
+            rendered_output = generate_database_context(schema_model)
+        else:
+            rendered_output = render_output(schema_model, fmt=target_fmt)
+            
+        write_output(rendered_output, str(out_path))
+        click.secho("OK", fg="green")
+        
+        _display_token_savings(rendered_output, raw_tables, out_path)
+        
+    except Exception as e:
+        click.secho(f"\n[ERROR] {str(e)}", fg="red")
+        if verbose:
+            raise
 
 @cli.command()
-@click.option('--config', default="schemap.yaml", help="Path to the configuration file.")
+@click.option('--config', default="schemap.yaml", help="Path to configuration file.")
+@click.option('--dir', 'target_dir', default=".", help="Target directory for agent files.")
+@click.option('--verbose', is_flag=True, help="Enable verbose output.")
+def agents(config, target_dir, verbose):
+    """Generate CLAUDE.md and AGENTS.md for AI coding agents."""
+    try:
+        cfg = load_config(config)
+        schema_model, _, _ = _process_schema(cfg, enrich=False)
+        
+        click.echo("-> Compiling AI agent context rules... ", nl=False)
+        files = write_agent_files(schema_model, target_dir)
+        click.secho("OK", fg="green")
+        
+        click.secho("\n[SUCCESS] AI Agent Context files generated successfully:", fg="green", bold=True)
+        for fname, fpath in files.items():
+            click.echo(f"  [OK] {fname} -> {fpath}")
+        click.echo("")
+        
+    except Exception as e:
+        click.secho(f"\n[ERROR] {str(e)}", fg="red")
+        if verbose:
+            raise
+
+@cli.command()
+@click.option('--config', default="schemap.yaml", help="Path to configuration file.")
+@click.option('--verbose', is_flag=True, help="Enable verbose output.")
+def score(config, verbose):
+    """Calculate AI Readiness Score for the database schema."""
+    try:
+        cfg = load_config(config)
+        schema_model, _, unresolved = _process_schema(cfg, enrich=False)
+        
+        ai_score, issues = calculate_score(schema_model, unresolved)
+        
+        click.secho("\n" + "=" * 50, fg="magenta", bold=True)
+        click.secho(f" AI Readiness Score", fg="magenta", bold=True)
+        click.secho("=" * 50, fg="magenta", bold=True)
+        
+        color = "green" if ai_score >= 80 else "yellow" if ai_score >= 50 else "red"
+        click.echo(f"  Score: ", nl=False)
+        click.secho(f"{ai_score}/100", fg=color, bold=True)
+        
+        if issues:
+            click.echo("\n  Issues Found:")
+            for issue in issues:
+                click.secho(f"  - {issue}", fg="yellow")
+        else:
+            click.secho("\n  Perfect score! Your database schema is 100% AI-ready.", fg="green")
+            
+        click.secho("=" * 50 + "\n", fg="magenta", bold=True)
+        
+    except Exception as e:
+        click.secho(f"\n[ERROR] {str(e)}", fg="red")
+        if verbose:
+            raise
+
+@cli.command()
+@click.option('--config', default="schemap.yaml", help="Path to configuration file.")
 @click.option('--verbose', is_flag=True, help="Enable verbose output.")
 def diff(config, verbose):
-    """Compare current database schema to the last known tracked state."""
+    """Compare current database schema to the last tracked state."""
     try:
         cfg = load_config(config)
         old_schema = load_previous_state()
         if not old_schema:
-            click.secho("[INFO] No previous schema state found. Run `schemap generate` first to build the cache.", fg="yellow")
+            click.secho("[INFO] No previous schema state found. Run `schemap context` first to track state.", fg="yellow")
             return
             
         schema_model, _, _ = _process_schema(cfg, enrich=False)
-        
         diffs = calculate_diff(old_schema, schema_model)
         
         click.secho("\n" + "=" * 50, fg="cyan", bold=True)
@@ -205,18 +378,28 @@ def diff(config, verbose):
         if verbose:
             raise
 
+@cli.command(hidden=True)
+@click.option('--config', default="schemap.yaml", help="Path to configuration file.")
+@click.option('--verbose', is_flag=True, help="Enable verbose output.")
+@click.option('--format', 'fmt', type=click.Choice(['markdown', 'json', 'yaml', 'xml', 'mcp', 'ai'], case_sensitive=False), help="Override format.")
+@click.option('--enrich', is_flag=True, help="[BETA] Apply optional LLM enrichment.")
+@click.option('--track/--no-track', default=True, help="Track schema state.")
+@click.pass_context
+def generate(ctx, config, verbose, fmt, enrich, track):
+    """Legacy alias for `schemap context`."""
+    ctx.invoke(context, config=config, verbose=verbose, fmt=fmt, enrich=enrich, track=track)
+
 @cli.command()
 @click.option('--framework', type=click.Choice(['langchain', 'llamaindex', 'mcp-tools', 'json'], case_sensitive=False), required=True, help="Target agent framework.")
-@click.option('--config', default="schemap.yaml", help="Path to the configuration file.")
+@click.option('--config', default="schemap.yaml", help="Path to configuration file.")
 @click.option('--verbose', is_flag=True, help="Enable verbose output.")
 def export(framework, config, verbose):
-    """Export the schema as copy-pasteable, highly contextual Python code or JSON for Agent Frameworks."""
+    """Export schema as code or JSON for Agent Frameworks."""
     try:
         cfg = load_config(config)
         schema_model, _, _ = _process_schema(cfg, enrich=False)
         
         click.echo(f"-> Generating {framework} export... ", nl=False)
-        
         out_path = Path("schemap_tools")
         if framework == "langchain":
             content = generate_langchain(schema_model)
@@ -233,41 +416,7 @@ def export(framework, config, verbose):
             
         write_output(content, str(out_path))
         click.secho("OK", fg="green")
-        
         click.secho(f"\n[SUCCESS] AI-ready {framework} context module exported to {out_path}", fg="green", bold=True)
-        
-    except Exception as e:
-        click.secho(f"\n[ERROR] {str(e)}", fg="red")
-        if verbose:
-            raise
-
-@cli.command()
-@click.option('--config', default="schemap.yaml", help="Path to the configuration file.")
-@click.option('--verbose', is_flag=True, help="Enable verbose output.")
-def score(config, verbose):
-    """Analyze the database schema and calculate its AI-Readiness Score."""
-    try:
-        cfg = load_config(config)
-        schema_model, _, unresolved = _process_schema(cfg, enrich=False)
-        
-        ai_score, issues = calculate_score(schema_model, unresolved)
-        
-        click.secho("\n" + "=" * 50, fg="magenta", bold=True)
-        click.secho(f" Schema AI Quality Score", fg="magenta", bold=True)
-        click.secho("=" * 50, fg="magenta", bold=True)
-        
-        color = "green" if ai_score >= 80 else "yellow" if ai_score >= 50 else "red"
-        click.echo(f"  Score: ", nl=False)
-        click.secho(f"{ai_score}/100", fg=color, bold=True)
-        
-        if issues:
-            click.echo("\n  Issues Found:")
-            for issue in issues:
-                click.secho(f"  - {issue}", fg="yellow")
-        else:
-            click.secho("\n  Perfect score! Your schema is perfectly structured for LLM consumption.", fg="green")
-            
-        click.secho("=" * 50 + "\n", fg="magenta", bold=True)
         
     except Exception as e:
         click.secho(f"\n[ERROR] {str(e)}", fg="red")
@@ -290,18 +439,18 @@ class MigrationHandler(FileSystemEventHandler):
             now = time.time()
             if now - self.last_run > 2:
                 click.secho(f"\n[WATCH] Change detected in {event.src_path}. Regenerating...", fg="cyan")
-                _generate(self.config, self.verbose, self.fmt, self.enrich, self.track)
+                context(self.config, self.verbose, self.fmt, self.enrich, self.track)
                 self.last_run = time.time()
 
 @cli.command()
 @click.option('--dir', 'watch_dir', default=".", help="Directory to watch for migration changes.")
-@click.option('--config', default="schemap.yaml", help="Path to the configuration file.")
+@click.option('--config', default="schemap.yaml", help="Path to configuration file.")
 @click.option('--verbose', is_flag=True, help="Enable verbose output.")
-@click.option('--format', 'fmt', type=click.Choice(['markdown', 'json', 'yaml', 'xml', 'mcp', 'ai'], case_sensitive=False), help="Override the output format.")
-@click.option('--enrich', is_flag=True, hidden=True, help="Use OpenAI LLM to powerfully enrich table and column business definitions.")
-@click.option('--track/--no-track', default=True, help="Track schema state for diff intelligence.")
+@click.option('--format', 'fmt', type=click.Choice(['markdown', 'json', 'yaml', 'xml', 'mcp', 'ai'], case_sensitive=False), help="Override format.")
+@click.option('--enrich', is_flag=True, help="[BETA] Apply optional LLM enrichment.")
+@click.option('--track/--no-track', default=True, help="Track schema state.")
 def watch(watch_dir, config, verbose, fmt, enrich, track):
-    """Watch a local directory for changes and automatically regenerate the context map."""
+    """Watch local directory for changes and automatically regenerate context map."""
     path = Path(watch_dir).resolve()
     if not path.exists():
         click.secho(f"[ERROR] Watch directory {path} does not exist.", fg="red")
@@ -310,7 +459,7 @@ def watch(watch_dir, config, verbose, fmt, enrich, track):
     click.secho(f"Starting Schemap watch mode on {path}...", fg="cyan")
     click.secho("Press Ctrl+C to stop.", fg="cyan")
     
-    _generate(config, verbose, fmt, enrich, track)
+    context(config, verbose, fmt, enrich, track)
     
     event_handler = MigrationHandler(config, verbose, fmt, enrich, track)
     observer = Observer()

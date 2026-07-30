@@ -5,68 +5,112 @@
 <br/>
 
 <div align="center">
-  <strong>Token-Optimized Database Context for AI Pipelines.</strong>
+  <strong>The fastest way to make your database AI-ready.</strong>
 </div>
 
 <div align="center">
-  Don't waste 50,000 tokens on raw SQL dumps. Schemap is a zero-friction CLI that condenses your database schema into an LLM-perfect data contract.
+  Schemap evolves your database schemas into an AI Database Context Compiler. Turn complex database structures into optimized context for AI coding agents (Claude Code, Cursor, Codex, Copilot).
 </div>
 
 <br/>
 
-## Why Schemap?
+## Product Architecture
 
-When building AI agents or RAG pipelines that interact with databases, developers usually dump raw `pg_dump` schemas into the context window. This wastes massive amounts of tokens, causes the LLM to hallucinate over irrelevant system tables, and breaks easily when schemas change.
+Schemap operates in 3 deterministic layers:
 
-**Schemap solves this.**
-It natively connects to your database, strips out the noise, and generates a highly compressed, token-optimized Markdown file representing your exact data contract.
+1. **Layer 1: Database Intelligence** (`inspect`, `score`, `diff`)
+2. **Layer 2: AI Context Generation** (`context`) -> `database_context.md`
+3. **Layer 3: AI Agent Integration** (`agents`) -> `CLAUDE.md` & `AGENTS.md`
 
-- **Zero-Friction:** No heavy setup. Generates a clean config in one command.
-- **Multi-Dialect Routing:** Native support for PostgreSQL, MySQL, Oracle, Turso/libSQL, and SQLite.
-- **Token Estimation:** Automatically calculates your exact token footprint (`~4,894 tokens`).
-- **CI/CD Native:** Automatically run it in GitHub Actions to keep your context maps perfectly synced with your migrations.
+## CLI Commands
+
+### 1. `schemap doctor`
+Run the AI Database Health Check onboarding diagnostic to analyze schema health and get direct recommendations.
+
+```bash
+schemap doctor
+```
+
+*Output:*
+```text
+==================================================
+ Schemap AI Database Health Check
+==================================================
+  Connection:            Connected (39 tables)
+  Relationships Analyzed: 26
+--------------------------------------------------
+  AI Readiness Score:
+  ██████████░░░░░░░░ 53/100
+
+  Top Issues Identified:
+  - [Priority 1 - Missing Documentation] 39 tables lack descriptions/comments (-20 pts)
+  - [Priority 2 - Disconnected Entities] 20 tables have no foreign keys (-7 pts)
+  - [Priority 3 - Ambiguous Naming] 44 unresolved abbreviations detected (-20 pts)
+--------------------------------------------------
+ Recommendation: Run `schemap context` to generate AI-ready database context.
+==================================================
+```
+
+### 2. `schemap context`
+Compile AI-optimized database context (`database_context.md`) including:
+- **Database Overview**
+- **Schema Relationship Map**
+- **Central Tables** (ranked by centrality & utility signal filtering)
+- **Query Examples** (standard SQL JOIN snippets)
+
+```bash
+schemap context
+```
+
+### 3. `schemap benchmark`
+Calculate context efficiency metrics comparing raw SQL dumps against Schemap context maps.
+
+```bash
+schemap benchmark
+```
+
+*Output:*
+```text
+==================================================
+ Schemap Context Efficiency Benchmark
+==================================================
+  Raw SQL Dump:         6,714 tokens
+  Schemap AI Context:   804 tokens
+  Context Reduction:   88%
+--------------------------------------------------
+  Relationship Graph:   explicit graph (26 links)
+  Agent Files Ready:    CLAUDE.md [OK], AGENTS.md [OK]
+==================================================
+```
+
+### 4. `schemap score`
+Analyze your schema's AI Readiness Score (0-100) and prioritized issue roadmap.
+
+```bash
+schemap score
+```
+
+### 5. `schemap agents`
+Automatically generate target files for AI coding agents:
+- `CLAUDE.md` (optimized for Claude Code & Anthropic models)
+- `AGENTS.md` (standardized for Codex, Cursor, & AI agents)
+
+```bash
+schemap agents
+```
+
+### Machine-Readable JSON Output (`--json`)
+Available on `schemap doctor`, `schemap score`, `schemap inspect`, and `schemap benchmark` for CI/CD pipelines & extensions:
+
+```bash
+schemap doctor --json
+```
 
 ## Installation
-
-Schemap is published on PyPI. Install it globally or within your project environment:
 
 ```bash
 pip install schemap-tool
 ```
-
-*(Note: We highly recommend using [uv](https://github.com/astral-sh/uv) for blazing-fast environment management.)*
-
-## Quick Start
-
-1. **Initialize the configuration:**
-   Run the following command in your project root to generate a boilerplate `schemap.yaml` file:
-   ```bash
-   schemap init
-   ```
-
-2. **Configure your connection:**
-   Open `schemap.yaml` and paste your database connection URL. You can also define wildcard exclusions to ignore system tables.
-   ```yaml
-   database:
-     connection_url: "postgresql://user:password@localhost:5432/my_db"
-     exclude_tables:
-       - "spatial_ref_sys"
-       - "alembic_version"
-       - "*_history"
-   ```
-
-3. **Generate your context map:**
-   ```bash
-   schemap generate
-   ```
-   *Output:*
-   ```text
-   -> Loading configuration from ./schemap.yaml... OK
-   -> Connecting to database... Connected. Found 39 active tables
-   -> Validating schema objects contract... OK
-   -> Compiling context engine via Jinja2... OK
-   [SUCCESS] Context map generated successfully at ./llm_data_context.md [14.0 KB / ~4,894 tokens]
-   ```
 
 ## Supported Databases
 
@@ -76,60 +120,7 @@ pip install schemap-tool
 - MySQL (`mysql://...`)
 - Oracle (`oracle://...`)
 
-## Continuous Integration (CI/CD)
-
-Want to automate your context map generation every time you merge a database migration?
-
-Run:
-```bash
-schemap init-ci
-```
-This drops a ready-to-use `.github/workflows/schemap.yml` action into your repository that runs Schemap and commits the new Markdown file automatically.
-
-## Domain Mapping & Schema Overrides
-
-To tailor the context map to your domain and reduce noise, configure mappings, ignore specific warnings, and override schema documentation directly in `schemap.yaml`:
-
-```yaml
-domain:
-  name: "ecommerce"
-  # Expand abbreviation tokens into human-readable business terms
-  mappings:
-    inv: "Invoice"
-    cust: "Customer"
-  # Ignore specific short terms to prevent warning logs
-  ignore_abbreviations:
-    - "slug"
-    - "pos"
-
-# Document database schemas manually or override native catalog comments
-schema_descriptions:
-  users:
-    description: "System users database table."
-    business_name: "User Account"
-    columns:
-      pos:
-        description: "Position priority index of the user in the rendering list."
-        business_name: "Rendering Position"
-```
-
 ## Licensing
 
-Schemap operates on a Frictionless License Model. 
-- **Free Tier:** Use Schemap for free locally on databases with up to 50 tables.
-- **Pro Tier (Monthly or Lifetime):** For unlimited tables, wildcard filtering, and CI/CD pipeline automation, purchase a license key at [schemap.com](https://your-username.github.io/schemap).
-
-Once purchased, simply drop your key into the `schemap.yaml`:
-```yaml
-database:
-  license_key: "YOUR_LICENSE_KEY_HERE"
-```
-
-## Built With
-- `psycopg` (PostgreSQL)
-- `libsql` (Turso)
-- `pymysql` (MySQL)
-- `oracledb` (Oracle)
-- `pydantic` v2 (Strict type-safety)
-- `jinja2` (Markdown compilation)
-- `tiktoken` (Token counting)
+- **Free Tier:** Locally inspect and compile context for databases up to 50 tables.
+- **Pro Tier:** Unlimited tables, advanced scoring, and CI/CD automation.

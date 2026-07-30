@@ -35,7 +35,7 @@ def test_free_tier_blocked_tables(mock_env):
 
 def test_ci_blocked_no_license(monkeypatch):
     monkeypatch.setenv("CI", "true")
-    with pytest.raises(LicenseError, match="Schemap Team License required"):
+    with pytest.raises(LicenseError, match="Schemap Pro License required"):
         verify_tier(5, None)
 
 def test_valid_api_activation(mocker, mock_env):
