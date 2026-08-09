@@ -25,8 +25,8 @@ Raw `pg_dump` SQL dumps waste **10,000+ tokens**, introduce noisy system metadat
 
 **Schemap solves this.** Schemap is a deterministic CLI compiler that extracts database schemas, computes **AI Readiness Scores**, and generates compressed, token-optimized context maps (`database_context.md`, `CLAUDE.md`, `AGENTS.md`).
 
-- **90%+ Token Reduction:** Cut database prompt overhead from ~18,000 tokens to ~1,100 tokens.
-- **100% Deterministic & Private:** Runs locally without external API keys. Zero data leaves your network.
+- **Token-optimized context:** Run `schemap benchmark` against your own schema to measure the raw-vs-compiled token footprint.
+- **Local-first & deterministic:** Schema extraction and compilation run locally by default. Optional `--enrich` uses the configured OpenAI API, and licensed CI/CD usage performs an online license check.
 - **Sub-2ms Compilation:** Compiles 200+ table database schemas in under 3 milliseconds.
 - **Multi-Database Support:** PostgreSQL, MySQL, Turso / libSQL, SQLite, and Oracle.
 
@@ -34,9 +34,11 @@ Raw `pg_dump` SQL dumps waste **10,000+ tokens**, introduce noisy system metadat
 
 ## Benchmark: Raw SQL vs. Schemap Context
 
+Compression varies by schema. Run `schemap benchmark` to measure the token footprint, relationship coverage, AI Readiness Score, and generation latency for your own database.
+
 | Metric | Raw SQL Dump | Schemap AI Context | Difference |
 | :--- | :--- | :--- | :--- |
-| **Token Footprint** | ~18,432 tokens | **~1,120 tokens** | **93.9% Token Reduction** |
+| **Token Footprint** | Full raw schema estimate | **Compiled context** | Measured per schema |
 | **Relationship Mapping** | Implicit / Scattered | **Explicit FK Graph** | **Instant JOIN Clarity** |
 | **AI Readiness Score** | Unmeasured | **Diagnosed (e.g. 78/100)** | **Actionable Fix Roadmap** |
 | **Agent Rule Files** | None | **CLAUDE.md & AGENTS.md** | **Native Agent Integration** |

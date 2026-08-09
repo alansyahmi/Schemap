@@ -1,253 +1,109 @@
-document.addEventListener('DOMContentLoaded', () => {
-    // Typing effect for the terminal
-    const cmdElement = document.getElementById('type-cmd');
-    const originalText = "uv run schemap generate --format=ai";
-    cmdElement.textContent = "";
+document.addEventListener("DOMContentLoaded", () => {
+    const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const command = "schemap context";
+    const commandElement = document.getElementById("type-cmd");
+    const terminalOutput = document.getElementById("terminal-output");
 
-    // Add cursor
-    const cursor = document.createElement('span');
-    cursor.className = 'cursor';
-    cmdElement.parentNode.appendChild(cursor);
-
-    let i = 0;
-    const typeInterval = setInterval(() => {
-        if (i < originalText.length) {
-            cmdElement.textContent += originalText.charAt(i);
-            i++;
+    if (commandElement && terminalOutput) {
+        if (reduced) {
+            commandElement.textContent = command;
+            terminalOutput.hidden = false;
         } else {
-            clearInterval(typeInterval);
-            // Wait 500ms then remove cursor and show output
-            setTimeout(() => {
-                cursor.remove();
-                showOutput();
-            }, 500);
-        }
-    }, 80);
-
-    function showOutput() {
-        // Show up to 10 output lines
-        const delays = [300, 600, 800, 900, 1000, 1300, 1600, 1900, 2200, 2500];
-        for (let j = 1; j <= 10; j++) {
-            setTimeout(() => {
-                const el = document.getElementById(`out-${j}`);
-                if (el) {
-                    el.classList.remove('hidden');
-                }
-            }, delays[j - 1] || 3000);
-        }
-    }
-
-    // Copy Install Command functionality
-    const copyBtn = document.getElementById('copy-install-btn');
-    if (copyBtn) {
-        copyBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            navigator.clipboard.writeText('pip install schemap-tool').then(() => {
-                const originalText = copyBtn.textContent;
-                copyBtn.textContent = 'Copied to Clipboard!';
-                copyBtn.style.color = 'var(--success)';
-                copyBtn.style.borderColor = 'var(--success)';
-
-                setTimeout(() => {
-                    copyBtn.textContent = originalText;
-                    copyBtn.style.color = '';
-                    copyBtn.style.borderColor = '';
-                }, 2000);
-            }).catch(err => {
-                console.error('Failed to copy: ', err);
-            });
-        });
-    }
-
-    // Matrix-Style SQL Purification Background (Tweaked for sparsity and slower speed)
-    const canvas = document.getElementById('matrix-bg');
-    if (canvas) {
-        const ctx = canvas.getContext('2d');
-        
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = document.querySelector('.hero').offsetHeight;
-        }
-        
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
-
-        const rawSQL = "CREATE TABLE INSERT INTO SELECT FROM WHERE JOIN ON GROUP BY ORDER BY PRIMARY KEY FOREIGN KEY VARCHAR INT TIMESTAMP".split(" ");
-        const pureContext = "[TABLE] [PK] [COL] [REL] -> PATH".split(" ");
-        
-        const fontSize = 14;
-        // Increase the divisor to drastically reduce the number of columns (less text)
-        let columns = Math.floor(canvas.width / (fontSize * 2.5));
-        
-        // Instead of a single y-coordinate, track the entire tail of characters
-        let drops = [];
-        const tailLength = 10; // Shorter tail to reduce text density
-        
-        for (let x = 0; x < columns; x++) {
-            drops[x] = {
-                y: Math.random() * -100, // Head position
-                // Drastically slower speed: max 0.15, min 0.05
-                speed: Math.random() * 0.1 + 0.05,
-                chars: Array(tailLength).fill('') // Store the characters in the tail
+            let index = 0;
+            const type = () => {
+                commandElement.textContent = command.slice(0, index++);
+                if (index <= command.length) setTimeout(type, 55);
+                else setTimeout(() => terminalOutput.hidden = false, 350);
             };
+            type();
         }
-
-        function draw() {
-            // MUST use clearRect to preserve the beautiful CSS radial glow behind the canvas
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.font = fontSize + 'px "JetBrains Mono", monospace';
-            
-            for (let i = 0; i < drops.length; i++) {
-                let drop = drops[i];
-                
-                // Determine new character for the head
-                const isPurified = drop.y * fontSize > canvas.height / 2;
-                const newChar = isPurified 
-                    ? pureContext[Math.floor(Math.random() * pureContext.length)]
-                    : rawSQL[Math.floor(Math.random() * rawSQL.length)];
-                
-                // Shift array: remove last, add new at beginning
-                if (Math.floor(drop.y) > Math.floor(drop.y - drop.speed)) {
-                     drop.chars.unshift(newChar);
-                     drop.chars.pop();
-                }
-
-                // Draw the tail
-                for (let j = 0; j < drop.chars.length; j++) {
-                    const charY = (drop.y - j) * fontSize;
-                    if (charY < 0 || !drop.chars[j]) continue;
-                    
-                    const charIsPurified = charY > canvas.height / 2;
-                    
-                    // Alpha fades out the further back in the tail we are
-                    const alpha = Math.max(0, 1 - (j / tailLength));
-                    
-                    // X-coordinate is spaced out by fontSize * 2.5
-                    const xCoord = i * (fontSize * 2.5);
-                    
-                    if (charIsPurified) {
-                        ctx.fillStyle = `rgba(52, 211, 153, ${alpha * 0.4})`; // Green
-                    } else {
-                        ctx.fillStyle = `rgba(255, 95, 86, ${alpha * 0.15})`; // Faint red
-                    }
-                    
-                    ctx.fillText(drop.chars[j], xCoord, charY);
-                }
-                
-                if (drop.y * fontSize > canvas.height + (tailLength * fontSize) && Math.random() > 0.985) {
-                    drop.y = 0;
-                    drop.chars = Array(tailLength).fill('');
-                }
-                
-                drop.y += drop.speed;
-            }
-        }
-        
-        // Use requestAnimationFrame for smoother rendering instead of setInterval
-        function animate() {
-            draw();
-            requestAnimationFrame(animate);
-        }
-        animate();
     }
 
-    // Export Formats Showcase Tab Logic
-    const tabBtns = document.querySelectorAll('.tab-btn');
-    const tabPanes = document.querySelectorAll('.tab-pane');
-
-    tabBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            // Remove active class from all buttons and panes
-            tabBtns.forEach(b => b.classList.remove('active'));
-            tabPanes.forEach(p => p.classList.remove('active'));
-
-            // Add active class to clicked button
-            btn.classList.add('active');
-
-            // Find matching pane and activate it
-            const targetId = btn.getAttribute('data-target');
-            const targetPane = document.getElementById(targetId);
-            if (targetPane) {
-                targetPane.classList.add('active');
-            }
+    document.querySelectorAll("[data-proof-tab]").forEach((tab) => {
+        tab.addEventListener("click", () => {
+            const target = tab.dataset.proofTab;
+            document.querySelectorAll("[data-proof-tab]").forEach((item) => {
+                const active = item === tab;
+                item.classList.toggle("is-active", active);
+                item.setAttribute("aria-selected", String(active));
+            });
+            document.querySelectorAll("[data-proof-panel]").forEach((panel) => {
+                const active = panel.dataset.proofPanel === target;
+                panel.hidden = !active;
+                panel.classList.toggle("is-active", active);
+            });
         });
     });
 
-    // Dynamic Subscription Interval Switcher
-    const subData = {
-        monthly: {
-            title: "Pro Subscription",
-            price: "$7.99",
-            period: "/mo",
-            desc: '2026 Founder Price <span style="text-decoration: line-through; color: var(--text-secondary);">$9.99/mo</span>',
-            badge: "Flexible Monthly",
-            discount: "20% OFF",
-            saveTag: "Cancel anytime",
-            link: "https://buy.stripe.com/dRm00jeG13kpfoA131dIA01"
-        },
-        quarterly: {
-            title: "Pro Subscription",
-            price: "$21.99",
-            period: "/3mo",
-            desc: '2026 Founder Price <span style="text-decoration: line-through; color: var(--text-secondary);">$27.99 / 3mo</span>',
-            badge: "Save 21%",
-            discount: "21% OFF",
-            saveTag: "Billed every 3 months",
-            link: "https://buy.stripe.com/9B6bJ1gO94otekw275dIA02"
-        },
-        semiannual: {
-            title: "Pro Subscription",
-            price: "$39.99",
-            period: "/6mo",
-            desc: '2026 Founder Price <span style="text-decoration: line-through; color: var(--text-secondary);">$49.99 / 6mo</span>',
-            badge: "Save 20%",
-            discount: "20% OFF",
-            saveTag: "Billed every 6 months",
-            link: "https://buy.stripe.com/9B6fZh0Pb6wB0tG5jhdIA03"
-        },
-        annual: {
-            title: "Pro Subscription",
-            price: "$79.99",
-            period: "/yr",
-            desc: '2026 Founder Price <span style="text-decoration: line-through; color: var(--text-secondary);">$99.99/yr</span>',
-            badge: "Best Value (Save 20%)",
-            discount: "20% OFF",
-            saveTag: "<strong>2 months free</strong>&nbsp;equivalent",
-            link: "https://buy.stripe.com/6oU8wP9lH3kpgsE275dIA04"
-        }
-    };
-
-    window.switchSubInterval = function(interval, btnElement) {
-        const subBtns = document.querySelectorAll('.sub-btn');
-        const subTitle = document.getElementById('sub-title');
-        const subPrice = document.getElementById('sub-price');
-        const subDesc = document.getElementById('sub-desc');
-        const subBadge = document.getElementById('sub-badge');
-        const subDiscountTag = document.getElementById('sub-discount-tag');
-        const subSaveTag = document.getElementById('sub-save-tag');
-        const subCheckoutBtn = document.getElementById('sub-checkout-btn');
-
-        subBtns.forEach(b => {
-            b.classList.remove('active');
-            b.style.backgroundColor = 'transparent';
-            b.style.color = 'var(--text-secondary)';
+    const copy = document.getElementById("copy-install-btn");
+    if (copy) {
+        copy.addEventListener("click", async () => {
+            try {
+                await navigator.clipboard.writeText("pip install schemap-tool");
+                const original = copy.textContent;
+                copy.textContent = "Copied to clipboard";
+                setTimeout(() => copy.textContent = original, 1800);
+            } catch {
+                copy.textContent = "Copy unavailable";
+            }
         });
+    }
 
-        if (btnElement) {
-            btnElement.classList.add('active');
-            btnElement.style.backgroundColor = 'var(--accent)';
-            btnElement.style.color = '#ffffff';
-        }
-
-        const data = subData[interval];
-        if (data) {
-            if (subTitle) subTitle.textContent = data.title;
-            if (subPrice) subPrice.innerHTML = `${data.price}<span class="period">${data.period}</span>`;
-            if (subDesc) subDesc.innerHTML = data.desc;
-            if (subBadge) subBadge.textContent = data.badge;
-            if (subDiscountTag) subDiscountTag.textContent = data.discount;
-            if (subSaveTag) subSaveTag.innerHTML = data.saveTag;
-            if (subCheckoutBtn) subCheckoutBtn.href = data.link;
-        }
+    const plans = {
+        monthly: ["$7.99", "/mo", "Flexible monthly billing.", "https://buy.stripe.com/dRm00jeG13kpfoA131dIA01"],
+        quarterly: ["$21.99", "/3mo", "Billed every three months.", "https://buy.stripe.com/9B6bJ1gO94otekw275dIA02"],
+        semiannual: ["$39.99", "/6mo", "Billed every six months.", "https://buy.stripe.com/9B6fZh0Pb6wB0tG5jhdIA03"],
+        annual: ["$79.99", "/yr", "Best value: two months free equivalent.", "https://buy.stripe.com/6oU8wP9lH3kpgsE275dIA04"]
     };
+    document.querySelectorAll("[data-sub-interval]").forEach((button) => {
+        button.addEventListener("click", () => {
+            const plan = plans[button.dataset.subInterval];
+            if (!plan) return;
+            document.querySelectorAll("[data-sub-interval]").forEach((item) => {
+                item.classList.toggle("is-active", item === button);
+            });
+            document.getElementById("sub-price").firstChild.textContent = plan[0];
+            document.getElementById("sub-period").textContent = plan[1];
+            document.getElementById("sub-desc").textContent = plan[2];
+            document.getElementById("sub-checkout-btn").href = plan[3];
+        });
+    });
+
+    const canvas = document.getElementById("matrix-bg");
+    if (canvas && !reduced) {
+        const context = canvas.getContext("2d");
+        const hero = document.querySelector(".hero");
+        const raw = ["CREATE", "TABLE", "SELECT", "FROM", "JOIN", "WHERE", "PRIMARY", "FOREIGN", "KEY"];
+        const compiled = ["TABLE", "PK", "COL", "REL", "PATH"];
+        let width = 0;
+        let height = 0;
+        let drops = [];
+
+        const resize = () => {
+            width = canvas.width = hero.clientWidth;
+            height = canvas.height = hero.clientHeight;
+            canvas.style.cssText = "position:absolute;inset:0;width:100%;height:100%;opacity:.7;pointer-events:none";
+            drops = Array.from({ length: Math.ceil(width / 30) }, () => ({
+                y: Math.random() * -height / 16,
+                speed: 0.18 + Math.random() * 0.28
+            }));
+        };
+        const draw = () => {
+            context.clearRect(0, 0, width, height);
+            context.font = '11px "JetBrains Mono"';
+            drops.forEach((drop, column) => {
+                const y = drop.y * 16;
+                const purified = y > height * 0.52;
+                const words = purified ? compiled : raw;
+                context.fillStyle = purified ? "rgba(80,211,154,.2)" : "rgba(141,184,255,.12)";
+                context.fillText(words[Math.floor(Math.random() * words.length)], column * 30, y);
+                drop.y += drop.speed;
+                if (y > height + 30) drop.y = 0;
+            });
+            requestAnimationFrame(draw);
+        };
+        resize();
+        addEventListener("resize", resize);
+        draw();
+    }
 });
