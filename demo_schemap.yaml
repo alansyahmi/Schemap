@@ -1,0 +1,6 @@
+database:
+  connection_url: "sqlite:///demo_ecommerce.db"
+  exclude_tables: []
+output:
+  file_path: "./database_context.md"
+  format: "markdown"

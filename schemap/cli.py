@@ -42,7 +42,7 @@ database:
     - "spatial_ref_sys"
     - "alembic_version"
   license_key: ""
-  license_endpoint: "https://api.lemonsqueezy.com/v1/licenses/validate"
+  license_endpoint: "https://api.stripe.com/v1/licenses/verify"
 output:
   file_path: "./database_context.md"
   format: "markdown"

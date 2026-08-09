@@ -2,64 +2,45 @@
 
 ## Database Overview
 
-- **Total Tables**: 39
-- **Total Columns**: 380
-- **Total Foreign Key Relationships**: 26
+- **Total Tables**: 8
+- **Total Columns**: 45
+- **Total Foreign Key Relationships**: 7
 
 ## Schema Relationship Map
 
 ```
-attestation_scores (source_id) ──> lexical_sources (id)
-attestation_scores (attestation_id) ──> attestation_reliability (id)
-root_pattern_forms (pattern_id) ──> patterns (id)
-root_pattern_forms (root_id) ──> roots_old (id)
-subentries (entry_id) ──> entries (id)
-phonetics (subentry_id) ──> subentries (id)
-phonetics (entry_id) ──> entries (id)
-attestation_reliability (entry_id) ──> entries (id)
-dialect_variants (entry_id) ──> entries (id)
-flashcard_lists (user_id) ──> users (id)
-suggested_entries (submitted_by_user_id) ──> users (id)
-votes (suggested_entry_id) ──> suggested_entries (id)
-votes (user_id) ──> users (id)
-verb_morphology (entry_id) ──> entries (id)
-entry_relationships (target_entry_id) ──> entries (id)
-entry_relationships (entry_id) ──> entries (id)
-alternative_forms (entry_id) ──> entries (id)
-entry_tags (tag_id) ──> tags (id)
-entry_tags (entry_id) ──> entries (id)
-pattern_applicability (pattern_id) ──> patterns (id)
-entries (source_id) ──> lexical_sources (id)
-adj_morphology (entry_id) ──> entries (id)
-audio_files (subentry_id) ──> subentries (id)
-audio_files (entry_id) ──> entries (id)
-subscriptions (user_id) ──> users (id)
-api_keys (user_id) ──> users (id)
+products (category_id) ──> categories (id)
+orders (user_id) ──> users (id)
+order_items (product_id) ──> products (id)
+order_items (order_id) ──> orders (id)
+payments (order_id) ──> orders (id)
+reviews (product_id) ──> products (id)
+reviews (user_id) ──> users (id)
 ```
 
 ## Central Tables
 
-### `entries`
-- **Connectivity Score**: 12.0 (12 connections)
-- **Description**: No description available.
-- **Primary Key(s)**: id
-
-### `users`
-- **Connectivity Score**: 5.0 (5 connections)
-- **Description**: No description available.
-- **Primary Key(s)**: id
-
-### `subentries`
+### `products`
 - **Connectivity Score**: 3.0 (3 connections)
 - **Description**: No description available.
 - **Primary Key(s)**: id
 
-### `attestation_scores`
+### `orders`
+- **Connectivity Score**: 3.0 (3 connections)
+- **Description**: No description available.
+- **Primary Key(s)**: id
+
+### `users`
 - **Connectivity Score**: 2.0 (2 connections)
 - **Description**: No description available.
 - **Primary Key(s)**: id
 
-### `patterns`
+### `order_items`
+- **Connectivity Score**: 2.0 (2 connections)
+- **Description**: No description available.
+- **Primary Key(s)**: id
+
+### `reviews`
 - **Connectivity Score**: 2.0 (2 connections)
 - **Description**: No description available.
 - **Primary Key(s)**: id
@@ -67,36 +48,36 @@ api_keys (user_id) ──> users (id)
 ## Query Examples
 
 ```sql
--- Join attestation_scores with lexical_sources
+-- Join products with categories
 SELECT *
-FROM attestation_scores
-JOIN lexical_sources ON attestation_scores.source_id = lexical_sources.id;
+FROM products
+JOIN categories ON products.category_id = categories.id;
 ```
 
 ```sql
--- Join attestation_scores with attestation_reliability
+-- Join orders with users
 SELECT *
-FROM attestation_scores
-JOIN attestation_reliability ON attestation_scores.attestation_id = attestation_reliability.id;
+FROM orders
+JOIN users ON orders.user_id = users.id;
 ```
 
 ```sql
--- Join root_pattern_forms with patterns
+-- Join order_items with products
 SELECT *
-FROM root_pattern_forms
-JOIN patterns ON root_pattern_forms.pattern_id = patterns.id;
+FROM order_items
+JOIN products ON order_items.product_id = products.id;
 ```
 
 ```sql
--- Join root_pattern_forms with roots_old
+-- Join order_items with orders
 SELECT *
-FROM root_pattern_forms
-JOIN roots_old ON root_pattern_forms.root_id = roots_old.id;
+FROM order_items
+JOIN orders ON order_items.order_id = orders.id;
 ```
 
 ```sql
--- Join subentries with entries
+-- Join payments with orders
 SELECT *
-FROM subentries
-JOIN entries ON subentries.entry_id = entries.id;
+FROM payments
+JOIN orders ON payments.order_id = orders.id;
 ```

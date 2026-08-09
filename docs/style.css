@@ -345,6 +345,7 @@ h3 {
     .feature-grid {
         grid-template-columns: repeat(3, 1fr);
     }
+
     .feature-card:nth-child(4) {
         grid-column: 2;
     }
@@ -495,15 +496,23 @@ h3 {
 .features-list li {
     margin-bottom: 1rem;
     font-size: 0.9375rem;
-    display: flex;
-    align-items: center;
+    line-height: 1.5;
+    position: relative;
+    padding-left: 1.5rem;
+}
+
+.features-list li strong {
+    font-weight: 700;
+    margin-right: 0.2rem;
 }
 
 .features-list li::before {
     content: '✓';
     color: var(--success);
-    margin-right: 0.75rem;
     font-weight: 700;
+    position: absolute;
+    left: 0;
+    top: 0;
 }
 
 /* Footer */
@@ -523,6 +532,24 @@ footer {
 .footer-content p {
     color: var(--text-secondary);
     font-size: 0.875rem;
+}
+
+/* Custom CSS representation of "Noto Serif Extra Condensed" Swarty brand logo */
+.logo-font {
+    font-family: 'Noto Serif', serif;
+    font-weight: 400;
+    letter-spacing: 0.01em;
+    display: inline-flex;
+    align-items: baseline;
+    transform: scaleX(0.82);
+    transform-origin: left center;
+    text-decoration: none;
+    color: var(--text-primary);
+    transition: opacity 0.2s;
+}
+
+.logo-font:hover {
+    opacity: 0.8;
 }
 
 /* Visibility Utilities */
@@ -858,8 +885,15 @@ footer {
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(5px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 @media (max-width: 768px) {

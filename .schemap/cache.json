@@ -1,516 +1,17 @@
 {
   "tables": [
     {
-      "name": "attestation_scores",
-      "description": null,
-      "business_name": "Attestation Scores",
-      "columns": [
-        {
-          "name": "id",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": true,
-          "description": null,
-          "business_name": "Identifier"
-        },
-        {
-          "name": "attestation_id",
-          "data_type": "TEXT",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Attestation Identifier"
-        },
-        {
-          "name": "source_id",
-          "data_type": "TEXT",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Source Identifier"
-        },
-        {
-          "name": "attested",
-          "data_type": "INTEGER",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Attested"
-        },
-        {
-          "name": "notes",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Notes"
-        }
-      ],
-      "foreign_keys": [
-        {
-          "column_name": "source_id",
-          "foreign_table_name": "lexical_sources",
-          "foreign_column_name": "id"
-        },
-        {
-          "column_name": "attestation_id",
-          "foreign_table_name": "attestation_reliability",
-          "foreign_column_name": "id"
-        }
-      ],
-      "hierarchy_tree": null
-    },
-    {
-      "name": "patterns",
-      "description": null,
-      "business_name": "Patterns",
-      "columns": [
-        {
-          "name": "id",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": true,
-          "description": null,
-          "business_name": "Identifier"
-        },
-        {
-          "name": "cv_notation",
-          "data_type": "TEXT",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Cv Notation"
-        },
-        {
-          "name": "wizen_notation",
-          "data_type": "TEXT",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Wizen Notation"
-        },
-        {
-          "name": "example_word",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Example Word"
-        },
-        {
-          "name": "tags",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Tags"
-        },
-        {
-          "name": "created_at",
-          "data_type": "TEXT",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Created At"
-        },
-        {
-          "name": "description",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Description"
-        }
-      ],
-      "foreign_keys": [],
-      "hierarchy_tree": null
-    },
-    {
-      "name": "root_pattern_forms",
-      "description": null,
-      "business_name": "Root Pattern Forms",
-      "columns": [
-        {
-          "name": "id",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": true,
-          "description": null,
-          "business_name": "Identifier"
-        },
-        {
-          "name": "root_id",
-          "data_type": "TEXT",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Root Identifier"
-        },
-        {
-          "name": "pattern_id",
-          "data_type": "TEXT",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Pattern Identifier"
-        },
-        {
-          "name": "derived_form",
-          "data_type": "TEXT",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Derived Form"
-        }
-      ],
-      "foreign_keys": [
-        {
-          "column_name": "pattern_id",
-          "foreign_table_name": "patterns",
-          "foreign_column_name": "id"
-        },
-        {
-          "column_name": "root_id",
-          "foreign_table_name": "roots_old",
-          "foreign_column_name": "id"
-        }
-      ],
-      "hierarchy_tree": null
-    },
-    {
-      "name": "subentries",
-      "description": null,
-      "business_name": "Subentries",
-      "columns": [
-        {
-          "name": "id",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": true,
-          "description": null,
-          "business_name": "Identifier"
-        },
-        {
-          "name": "entry_id",
-          "data_type": "TEXT",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Entry Identifier"
-        },
-        {
-          "name": "headword",
-          "data_type": "TEXT",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Headword"
-        },
-        {
-          "name": "pos",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Pos"
-        },
-        {
-          "name": "tags",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Tags"
-        },
-        {
-          "name": "sort_order",
-          "data_type": "INTEGER",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Sort Order"
-        }
-      ],
-      "foreign_keys": [
-        {
-          "column_name": "entry_id",
-          "foreign_table_name": "entries",
-          "foreign_column_name": "id"
-        }
-      ],
-      "hierarchy_tree": null
-    },
-    {
-      "name": "phonetics",
-      "description": null,
-      "business_name": "Phonetics",
-      "columns": [
-        {
-          "name": "id",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": true,
-          "description": null,
-          "business_name": "Identifier"
-        },
-        {
-          "name": "entry_id",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Entry Identifier"
-        },
-        {
-          "name": "subentry_id",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Subentry Identifier"
-        },
-        {
-          "name": "ipa",
-          "data_type": "TEXT",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Ipa"
-        },
-        {
-          "name": "dialect",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Dialect"
-        },
-        {
-          "name": "notes",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Notes"
-        }
-      ],
-      "foreign_keys": [
-        {
-          "column_name": "subentry_id",
-          "foreign_table_name": "subentries",
-          "foreign_column_name": "id"
-        },
-        {
-          "column_name": "entry_id",
-          "foreign_table_name": "entries",
-          "foreign_column_name": "id"
-        }
-      ],
-      "hierarchy_tree": null
-    },
-    {
-      "name": "lexical_sources",
-      "description": null,
-      "business_name": "Lexical Sources",
-      "columns": [
-        {
-          "name": "id",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": true,
-          "description": null,
-          "business_name": "Identifier"
-        },
-        {
-          "name": "name",
-          "data_type": "TEXT",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Name"
-        },
-        {
-          "name": "full_title",
-          "data_type": "TEXT",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Full Title"
-        },
-        {
-          "name": "author",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Author"
-        },
-        {
-          "name": "year",
-          "data_type": "INTEGER",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Year"
-        },
-        {
-          "name": "reliability_weight",
-          "data_type": "REAL",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Reliability Weight"
-        },
-        {
-          "name": "source_type",
-          "data_type": "TEXT",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Source Type"
-        },
-        {
-          "name": "url",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Uniform Resource Locator"
-        },
-        {
-          "name": "publisher",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Publisher"
-        }
-      ],
-      "foreign_keys": [],
-      "hierarchy_tree": null
-    },
-    {
-      "name": "attestation_reliability",
-      "description": null,
-      "business_name": "Attestation Reliability",
-      "columns": [
-        {
-          "name": "id",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": true,
-          "description": null,
-          "business_name": "Identifier"
-        },
-        {
-          "name": "entry_id",
-          "data_type": "TEXT",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Entry Identifier"
-        },
-        {
-          "name": "reliability_index",
-          "data_type": "REAL",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Reliability Index"
-        },
-        {
-          "name": "computed_at",
-          "data_type": "TEXT",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Computed At"
-        }
-      ],
-      "foreign_keys": [
-        {
-          "column_name": "entry_id",
-          "foreign_table_name": "entries",
-          "foreign_column_name": "id"
-        }
-      ],
-      "hierarchy_tree": null
-    },
-    {
-      "name": "dialect_variants",
-      "description": null,
-      "business_name": "Dialect Variants",
-      "columns": [
-        {
-          "name": "id",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": true,
-          "description": null,
-          "business_name": "Identifier"
-        },
-        {
-          "name": "entry_id",
-          "data_type": "TEXT",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Entry Identifier"
-        },
-        {
-          "name": "region",
-          "data_type": "TEXT",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Region"
-        },
-        {
-          "name": "variant_form",
-          "data_type": "TEXT",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Variant Form"
-        },
-        {
-          "name": "notes",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Notes"
-        }
-      ],
-      "foreign_keys": [
-        {
-          "column_name": "entry_id",
-          "foreign_table_name": "entries",
-          "foreign_column_name": "id"
-        }
-      ],
-      "hierarchy_tree": null
-    },
-    {
       "name": "users",
       "description": null,
       "business_name": "Users",
       "columns": [
         {
           "name": "id",
-          "data_type": "TEXT",
+          "data_type": "INTEGER",
           "is_nullable": true,
           "primary_key": true,
           "description": null,
           "business_name": "Identifier"
-        },
-        {
-          "name": "clerk_id",
-          "data_type": "TEXT",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Clerk Identifier"
         },
         {
           "name": "email",
@@ -521,41 +22,25 @@
           "business_name": "Email"
         },
         {
-          "name": "display_name",
+          "name": "full_name",
+          "data_type": "TEXT",
+          "is_nullable": false,
+          "primary_key": false,
+          "description": null,
+          "business_name": "Full Name"
+        },
+        {
+          "name": "role",
           "data_type": "TEXT",
           "is_nullable": true,
           "primary_key": false,
           "description": null,
-          "business_name": "Display Name"
-        },
-        {
-          "name": "tier",
-          "data_type": "TEXT",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Tier"
-        },
-        {
-          "name": "ads_disabled",
-          "data_type": "INTEGER",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Ads Disabled"
-        },
-        {
-          "name": "audio_unlocked",
-          "data_type": "INTEGER",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Audio Unlocked"
+          "business_name": "Role"
         },
         {
           "name": "created_at",
-          "data_type": "TEXT",
-          "is_nullable": false,
+          "data_type": "DATETIME",
+          "is_nullable": true,
           "primary_key": false,
           "description": null,
           "business_name": "Created At"
@@ -565,25 +50,17 @@
       "hierarchy_tree": null
     },
     {
-      "name": "flashcard_lists",
+      "name": "categories",
       "description": null,
-      "business_name": "Flashcard Lists",
+      "business_name": "Categories",
       "columns": [
         {
           "name": "id",
-          "data_type": "TEXT",
+          "data_type": "INTEGER",
           "is_nullable": true,
           "primary_key": true,
           "description": null,
           "business_name": "Identifier"
-        },
-        {
-          "name": "user_id",
-          "data_type": "TEXT",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "User Identifier"
         },
         {
           "name": "name",
@@ -592,192 +69,6 @@
           "primary_key": false,
           "description": null,
           "business_name": "Name"
-        },
-        {
-          "name": "entry_ids",
-          "data_type": "TEXT",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Entry Ids"
-        },
-        {
-          "name": "created_at",
-          "data_type": "TEXT",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Created At"
-        },
-        {
-          "name": "updated_at",
-          "data_type": "TEXT",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Updated At"
-        }
-      ],
-      "foreign_keys": [
-        {
-          "column_name": "user_id",
-          "foreign_table_name": "users",
-          "foreign_column_name": "id"
-        }
-      ],
-      "hierarchy_tree": null
-    },
-    {
-      "name": "suggested_entries",
-      "description": null,
-      "business_name": "Suggested Entries",
-      "columns": [
-        {
-          "name": "id",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": true,
-          "description": null,
-          "business_name": "Identifier"
-        },
-        {
-          "name": "submitted_by_user_id",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Submitted By User Identifier"
-        },
-        {
-          "name": "headword",
-          "data_type": "TEXT",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Headword"
-        },
-        {
-          "name": "notes",
-          "data_type": "TEXT",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Notes"
-        },
-        {
-          "name": "status",
-          "data_type": "TEXT",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Status"
-        },
-        {
-          "name": "vote_count",
-          "data_type": "INTEGER",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Vote Count"
-        },
-        {
-          "name": "submitted_at",
-          "data_type": "TEXT",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Submitted At"
-        }
-      ],
-      "foreign_keys": [
-        {
-          "column_name": "submitted_by_user_id",
-          "foreign_table_name": "users",
-          "foreign_column_name": "id"
-        }
-      ],
-      "hierarchy_tree": null
-    },
-    {
-      "name": "votes",
-      "description": null,
-      "business_name": "Votes",
-      "columns": [
-        {
-          "name": "id",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": true,
-          "description": null,
-          "business_name": "Identifier"
-        },
-        {
-          "name": "user_id",
-          "data_type": "TEXT",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "User Identifier"
-        },
-        {
-          "name": "suggested_entry_id",
-          "data_type": "TEXT",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Suggested Entry Identifier"
-        },
-        {
-          "name": "value",
-          "data_type": "INTEGER",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Value"
-        },
-        {
-          "name": "reason",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Reason"
-        },
-        {
-          "name": "voted_at",
-          "data_type": "TEXT",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Voted At"
-        }
-      ],
-      "foreign_keys": [
-        {
-          "column_name": "suggested_entry_id",
-          "foreign_table_name": "suggested_entries",
-          "foreign_column_name": "id"
-        },
-        {
-          "column_name": "user_id",
-          "foreign_table_name": "users",
-          "foreign_column_name": "id"
-        }
-      ],
-      "hierarchy_tree": null
-    },
-    {
-      "name": "blog_posts",
-      "description": null,
-      "business_name": "Blog Posts",
-      "columns": [
-        {
-          "name": "id",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": true,
-          "description": null,
-          "business_name": "Identifier"
         },
         {
           "name": "slug",
@@ -788,472 +79,263 @@
           "business_name": "Slug"
         },
         {
-          "name": "title",
-          "data_type": "TEXT",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Title"
-        },
-        {
-          "name": "excerpt",
+          "name": "description",
           "data_type": "TEXT",
           "is_nullable": true,
           "primary_key": false,
           "description": null,
-          "business_name": "Excerpt"
-        },
-        {
-          "name": "content_md",
-          "data_type": "TEXT",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Content Markdown"
-        },
-        {
-          "name": "author",
-          "data_type": "TEXT",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Author"
-        },
-        {
-          "name": "published_at",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Published At"
-        },
-        {
-          "name": "tags",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Tags"
-        },
-        {
-          "name": "cover_image_url",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Cover Image Uniform Resource Locator"
+          "business_name": "Description"
         }
       ],
       "foreign_keys": [],
       "hierarchy_tree": null
     },
     {
-      "name": "admin_config",
+      "name": "products",
       "description": null,
-      "business_name": "Admin Config",
+      "business_name": "Products",
       "columns": [
         {
           "name": "id",
-          "data_type": "TEXT",
+          "data_type": "INTEGER",
           "is_nullable": true,
           "primary_key": true,
           "description": null,
           "business_name": "Identifier"
         },
         {
-          "name": "category",
+          "name": "category_id",
+          "data_type": "INTEGER",
+          "is_nullable": false,
+          "primary_key": false,
+          "description": null,
+          "business_name": "Category Identifier"
+        },
+        {
+          "name": "sku",
           "data_type": "TEXT",
           "is_nullable": false,
           "primary_key": false,
           "description": null,
-          "business_name": "Category"
+          "business_name": "Sku"
         },
         {
-          "name": "key",
+          "name": "name",
           "data_type": "TEXT",
           "is_nullable": false,
           "primary_key": false,
           "description": null,
-          "business_name": "Key"
+          "business_name": "Name"
         },
         {
-          "name": "value",
+          "name": "description",
           "data_type": "TEXT",
+          "is_nullable": true,
+          "primary_key": false,
+          "description": null,
+          "business_name": "Description"
+        },
+        {
+          "name": "price_cents",
+          "data_type": "INTEGER",
           "is_nullable": false,
           "primary_key": false,
           "description": null,
-          "business_name": "Value"
+          "business_name": "Price Cents"
         },
         {
-          "name": "sort_order",
+          "name": "stock_quantity",
           "data_type": "INTEGER",
           "is_nullable": true,
           "primary_key": false,
           "description": null,
-          "business_name": "Sort Order"
+          "business_name": "Stock Quantity"
         },
         {
           "name": "created_at",
-          "data_type": "TEXT",
+          "data_type": "DATETIME",
           "is_nullable": true,
           "primary_key": false,
           "description": null,
           "business_name": "Created At"
-        },
-        {
-          "name": "updated_at",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Updated At"
         }
       ],
-      "foreign_keys": [],
+      "foreign_keys": [
+        {
+          "column_name": "category_id",
+          "foreign_table_name": "categories",
+          "foreign_column_name": "id"
+        }
+      ],
       "hierarchy_tree": null
     },
     {
-      "name": "roots",
+      "name": "orders",
       "description": null,
-      "business_name": "Roots",
+      "business_name": "Orders",
       "columns": [
         {
           "name": "id",
-          "data_type": "TEXT",
+          "data_type": "INTEGER",
           "is_nullable": true,
           "primary_key": true,
           "description": null,
           "business_name": "Identifier"
         },
         {
-          "name": "consonants",
+          "name": "user_id",
+          "data_type": "INTEGER",
+          "is_nullable": false,
+          "primary_key": false,
+          "description": null,
+          "business_name": "User Identifier"
+        },
+        {
+          "name": "order_number",
           "data_type": "TEXT",
           "is_nullable": false,
           "primary_key": false,
           "description": null,
-          "business_name": "Consonants"
+          "business_name": "Order Number"
         },
         {
-          "name": "consonant_array",
+          "name": "status",
           "data_type": "TEXT",
           "is_nullable": false,
           "primary_key": false,
           "description": null,
-          "business_name": "Consonant Array"
+          "business_name": "Status"
         },
         {
-          "name": "notes",
+          "name": "total_cents",
+          "data_type": "INTEGER",
+          "is_nullable": false,
+          "primary_key": false,
+          "description": null,
+          "business_name": "Total Cents"
+        },
+        {
+          "name": "shipping_address",
           "data_type": "TEXT",
           "is_nullable": true,
           "primary_key": false,
           "description": null,
-          "business_name": "Notes"
+          "business_name": "Shipping Address"
         },
         {
           "name": "created_at",
-          "data_type": "TEXT",
-          "is_nullable": false,
+          "data_type": "DATETIME",
+          "is_nullable": true,
           "primary_key": false,
           "description": null,
           "business_name": "Created At"
-        },
-        {
-          "name": "updated_at",
-          "data_type": "TEXT",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Updated At"
-        },
-        {
-          "name": "strength",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Strength"
-        },
-        {
-          "name": "weak_class",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Weak Class"
-        },
-        {
-          "name": "gloss",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Gloss"
-        },
-        {
-          "name": "etymology",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Etymology"
-        },
-        {
-          "name": "source",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Source"
-        },
-        {
-          "name": "vowel_set_perf",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Vowel Set Perf"
-        },
-        {
-          "name": "vowel_set_impf",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Vowel Set Impf"
-        },
-        {
-          "name": "vowel_set_imp",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Vowel Set Imp"
-        },
-        {
-          "name": "is_geminate",
-          "data_type": "INTEGER",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Is Geminate"
-        },
-        {
-          "name": "synonyms",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Synonyms"
-        },
-        {
-          "name": "antonyms",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Antonyms"
-        },
-        {
-          "name": "related_entries",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Related Entries"
-        },
-        {
-          "name": "tags",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Tags"
-        },
-        {
-          "name": "is_imala_blocked",
-          "data_type": "BOOLEAN",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Is Imala Blocked"
         }
       ],
-      "foreign_keys": [],
+      "foreign_keys": [
+        {
+          "column_name": "user_id",
+          "foreign_table_name": "users",
+          "foreign_column_name": "id"
+        }
+      ],
       "hierarchy_tree": null
     },
     {
-      "name": "entry_diminutives",
+      "name": "order_items",
       "description": null,
-      "business_name": "Entry Diminutives",
+      "business_name": "Order Items",
       "columns": [
         {
           "name": "id",
-          "data_type": "TEXT",
+          "data_type": "INTEGER",
           "is_nullable": true,
           "primary_key": true,
           "description": null,
           "business_name": "Identifier"
         },
         {
-          "name": "entry_id",
-          "data_type": "TEXT",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Entry Identifier"
-        },
-        {
-          "name": "pos",
-          "data_type": "TEXT",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Pos"
-        },
-        {
-          "name": "gender",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Gender"
-        },
-        {
-          "name": "form",
-          "data_type": "TEXT",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Form"
-        },
-        {
-          "name": "pattern",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Pattern"
-        },
-        {
-          "name": "sort_order",
+          "name": "order_id",
           "data_type": "INTEGER",
           "is_nullable": false,
           "primary_key": false,
           "description": null,
-          "business_name": "Sort Order"
+          "business_name": "Order Identifier"
         },
         {
-          "name": "is_preferred",
+          "name": "product_id",
           "data_type": "INTEGER",
           "is_nullable": false,
           "primary_key": false,
           "description": null,
-          "business_name": "Is Preferred"
+          "business_name": "Product Identifier"
         },
         {
-          "name": "created_at",
-          "data_type": "TEXT",
+          "name": "quantity",
+          "data_type": "INTEGER",
           "is_nullable": false,
           "primary_key": false,
           "description": null,
-          "business_name": "Created At"
+          "business_name": "Quantity"
         },
         {
-          "name": "updated_at",
-          "data_type": "TEXT",
+          "name": "unit_price_cents",
+          "data_type": "INTEGER",
           "is_nullable": false,
           "primary_key": false,
           "description": null,
-          "business_name": "Updated At"
+          "business_name": "Unit Price Cents"
         }
       ],
-      "foreign_keys": [],
+      "foreign_keys": [
+        {
+          "column_name": "product_id",
+          "foreign_table_name": "products",
+          "foreign_column_name": "id"
+        },
+        {
+          "column_name": "order_id",
+          "foreign_table_name": "orders",
+          "foreign_column_name": "id"
+        }
+      ],
       "hierarchy_tree": null
     },
     {
-      "name": "site_submissions",
+      "name": "payments",
       "description": null,
-      "business_name": "Site Submissions",
+      "business_name": "Payments",
       "columns": [
         {
           "name": "id",
-          "data_type": "TEXT",
+          "data_type": "INTEGER",
           "is_nullable": true,
           "primary_key": true,
           "description": null,
           "business_name": "Identifier"
         },
         {
-          "name": "kind",
-          "data_type": "TEXT",
+          "name": "order_id",
+          "data_type": "INTEGER",
           "is_nullable": false,
           "primary_key": false,
           "description": null,
-          "business_name": "Kind"
+          "business_name": "Order Identifier"
         },
         {
-          "name": "category",
+          "name": "stripe_charge_id",
           "data_type": "TEXT",
+          "is_nullable": true,
+          "primary_key": false,
+          "description": null,
+          "business_name": "Stripe Charge Identifier"
+        },
+        {
+          "name": "amount_cents",
+          "data_type": "INTEGER",
           "is_nullable": false,
           "primary_key": false,
           "description": null,
-          "business_name": "Category"
-        },
-        {
-          "name": "subject",
-          "data_type": "TEXT",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Subject"
-        },
-        {
-          "name": "email",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Email"
-        },
-        {
-          "name": "message",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Message"
-        },
-        {
-          "name": "page_path",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Page Path"
-        },
-        {
-          "name": "page_url",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Page Uniform Resource Locator"
-        },
-        {
-          "name": "referer",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Referer"
-        },
-        {
-          "name": "user_agent",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "User Agent"
+          "business_name": "Amount Cents"
         },
         {
           "name": "status",
@@ -1265,2123 +347,30 @@
         },
         {
           "name": "created_at",
-          "data_type": "TEXT",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Created At"
-        },
-        {
-          "name": "updated_at",
-          "data_type": "TEXT",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Updated At"
-        }
-      ],
-      "foreign_keys": [],
-      "hierarchy_tree": null
-    },
-    {
-      "name": "suffix_catalog",
-      "description": null,
-      "business_name": "Suffix Catalog",
-      "columns": [
-        {
-          "name": "id",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": true,
-          "description": null,
-          "business_name": "Identifier"
-        },
-        {
-          "name": "kind",
-          "data_type": "TEXT",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Kind"
-        },
-        {
-          "name": "suffix",
-          "data_type": "TEXT",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Suffix"
-        },
-        {
-          "name": "label",
-          "data_type": "TEXT",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Label"
-        },
-        {
-          "name": "sort_order",
-          "data_type": "INTEGER",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Sort Order"
-        },
-        {
-          "name": "created_at",
-          "data_type": "TEXT",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Created At"
-        },
-        {
-          "name": "updated_at",
-          "data_type": "TEXT",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Updated At"
-        }
-      ],
-      "foreign_keys": [],
-      "hierarchy_tree": null
-    },
-    {
-      "name": "suffix_catalog_seed_state",
-      "description": null,
-      "business_name": "Suffix Catalog Seed State",
-      "columns": [
-        {
-          "name": "id",
-          "data_type": "INTEGER",
-          "is_nullable": true,
-          "primary_key": true,
-          "description": null,
-          "business_name": "Identifier"
-        },
-        {
-          "name": "seeded_at",
-          "data_type": "TEXT",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Seeded At"
-        }
-      ],
-      "foreign_keys": [],
-      "hierarchy_tree": null
-    },
-    {
-      "name": "verb_morphology",
-      "description": null,
-      "business_name": "Verb Morphology",
-      "columns": [
-        {
-          "name": "entry_id",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": true,
-          "description": null,
-          "business_name": "Entry Identifier"
-        },
-        {
-          "name": "form",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Form"
-        },
-        {
-          "name": "class",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Class"
-        },
-        {
-          "name": "weak_class",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Weak Class"
-        },
-        {
-          "name": "transitivity",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Transitivity"
-        },
-        {
-          "name": "perfective_3sgm",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Perfective 3sgm"
-        },
-        {
-          "name": "imperfective_3sgm",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Imperfective 3sgm"
-        },
-        {
-          "name": "verbal_noun",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Verbal Noun"
-        },
-        {
-          "name": "active_participle",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Active Participle"
-        },
-        {
-          "name": "passive_participle",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Passive Participle"
-        },
-        {
-          "name": "vowel_set_perf",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Vowel Set Perf"
-        },
-        {
-          "name": "vowel_set_impf",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Vowel Set Impf"
-        },
-        {
-          "name": "vowel_set_impv",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Vowel Set Impv"
-        },
-        {
-          "name": "type",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Type"
-        },
-        {
-          "name": "created_at",
-          "data_type": "TEXT",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Created At"
-        },
-        {
-          "name": "updated_at",
-          "data_type": "TEXT",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Updated At"
-        },
-        {
-          "name": "is_imala_blocked",
-          "data_type": "BOOLEAN",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Is Imala Blocked"
-        }
-      ],
-      "foreign_keys": [
-        {
-          "column_name": "entry_id",
-          "foreign_table_name": "entries",
-          "foreign_column_name": "id"
-        }
-      ],
-      "hierarchy_tree": null
-    },
-    {
-      "name": "numeral_morphology",
-      "description": null,
-      "business_name": "Numeral Morphology",
-      "columns": [
-        {
-          "name": "entry_id",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": true,
-          "description": null,
-          "business_name": "Entry Identifier"
-        },
-        {
-          "name": "numeral_type",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Numeral Type"
-        },
-        {
-          "name": "form_attributive_short",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Form Attributive Short"
-        },
-        {
-          "name": "form_attributive_long",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Form Attributive Long"
-        },
-        {
-          "name": "ordinal_form",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Ordinal Form"
-        },
-        {
-          "name": "adverbial_form",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Adverbial Form"
-        },
-        {
-          "name": "fractional_form",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Fractional Form"
-        },
-        {
-          "name": "multiplier_form",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Multiplier Form"
-        },
-        {
-          "name": "distributive_form",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Distributive Form"
-        },
-        {
-          "name": "created_at",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Created At"
-        },
-        {
-          "name": "updated_at",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Updated At"
-        },
-        {
-          "name": "is_inflectable",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Is Inflectable"
-        },
-        {
-          "name": "form_plural_pattern",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Form Plural Pattern"
-        },
-        {
-          "name": "vowel_set_sg",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Vowel Set Sg"
-        },
-        {
-          "name": "vowel_set_pl",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Vowel Set Pl"
-        },
-        {
-          "name": "vowel_set_opp",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Vowel Set Opp"
-        },
-        {
-          "name": "vowel_set_dual",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Vowel Set Dual"
-        },
-        {
-          "name": "plural_forms",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Plural Forms"
-        },
-        {
-          "name": "form_attributive_short_pattern",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Form Attributive Short Pattern"
-        },
-        {
-          "name": "feminine_form",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Feminine Form"
-        },
-        {
-          "name": "masculine_form",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Masculine Form"
-        }
-      ],
-      "foreign_keys": [],
-      "hierarchy_tree": null
-    },
-    {
-      "name": "entry_relationships",
-      "description": null,
-      "business_name": "Entry Relationships",
-      "columns": [
-        {
-          "name": "id",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": true,
-          "description": null,
-          "business_name": "Identifier"
-        },
-        {
-          "name": "entry_id",
-          "data_type": "TEXT",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Entry Identifier"
-        },
-        {
-          "name": "target_entry_id",
-          "data_type": "TEXT",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Target Entry Identifier"
-        },
-        {
-          "name": "relationship_type",
-          "data_type": "TEXT",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Relationship Type"
-        },
-        {
-          "name": "sort_order",
-          "data_type": "INTEGER",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Sort Order"
-        },
-        {
-          "name": "created_at",
-          "data_type": "TEXT",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Created At"
-        }
-      ],
-      "foreign_keys": [
-        {
-          "column_name": "target_entry_id",
-          "foreign_table_name": "entries",
-          "foreign_column_name": "id"
-        },
-        {
-          "column_name": "entry_id",
-          "foreign_table_name": "entries",
-          "foreign_column_name": "id"
-        }
-      ],
-      "hierarchy_tree": null
-    },
-    {
-      "name": "alternative_forms",
-      "description": null,
-      "business_name": "Alternative Forms",
-      "columns": [
-        {
-          "name": "id",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": true,
-          "description": null,
-          "business_name": "Identifier"
-        },
-        {
-          "name": "entry_id",
-          "data_type": "TEXT",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Entry Identifier"
-        },
-        {
-          "name": "headword",
-          "data_type": "TEXT",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Headword"
-        },
-        {
-          "name": "type",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Type"
-        },
-        {
-          "name": "sort_order",
-          "data_type": "INTEGER",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Sort Order"
-        },
-        {
-          "name": "created_at",
-          "data_type": "TEXT",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Created At"
-        }
-      ],
-      "foreign_keys": [
-        {
-          "column_name": "entry_id",
-          "foreign_table_name": "entries",
-          "foreign_column_name": "id"
-        }
-      ],
-      "hierarchy_tree": null
-    },
-    {
-      "name": "tags",
-      "description": null,
-      "business_name": "Tags",
-      "columns": [
-        {
-          "name": "id",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": true,
-          "description": null,
-          "business_name": "Identifier"
-        },
-        {
-          "name": "name",
-          "data_type": "TEXT",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Name"
-        },
-        {
-          "name": "category",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Category"
-        },
-        {
-          "name": "description",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Description"
-        },
-        {
-          "name": "created_at",
-          "data_type": "TEXT",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Created At"
-        },
-        {
-          "name": "updated_at",
-          "data_type": "TEXT",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Updated At"
-        }
-      ],
-      "foreign_keys": [],
-      "hierarchy_tree": null
-    },
-    {
-      "name": "entry_tags",
-      "description": null,
-      "business_name": "Entry Tags",
-      "columns": [
-        {
-          "name": "entry_id",
-          "data_type": "TEXT",
-          "is_nullable": false,
-          "primary_key": true,
-          "description": null,
-          "business_name": "Entry Identifier"
-        },
-        {
-          "name": "tag_id",
-          "data_type": "TEXT",
-          "is_nullable": false,
-          "primary_key": true,
-          "description": null,
-          "business_name": "Tag Identifier"
-        }
-      ],
-      "foreign_keys": [
-        {
-          "column_name": "tag_id",
-          "foreign_table_name": "tags",
-          "foreign_column_name": "id"
-        },
-        {
-          "column_name": "entry_id",
-          "foreign_table_name": "entries",
-          "foreign_column_name": "id"
-        }
-      ],
-      "hierarchy_tree": null
-    },
-    {
-      "name": "stems",
-      "description": null,
-      "business_name": "Stems",
-      "columns": [
-        {
-          "name": "stem_string",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": true,
-          "description": null,
-          "business_name": "Stem String"
-        },
-        {
-          "name": "class_type",
-          "data_type": "TEXT",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Class Type"
-        },
-        {
-          "name": "is_hybrid",
-          "data_type": "BOOLEAN",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Is Hybrid"
-        },
-        {
-          "name": "root",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Root"
-        },
-        {
-          "name": "agentive_suffix",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Agentive Suffix"
-        },
-        {
-          "name": "tags",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Tags"
-        },
-        {
-          "name": "source",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Source"
-        },
-        {
-          "name": "glosses",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Glosses"
-        },
-        {
-          "name": "etymology",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Etymology"
-        },
-        {
-          "name": "synonyms",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Synonyms"
-        },
-        {
-          "name": "antonyms",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Antonyms"
-        },
-        {
-          "name": "related_stems",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Related Stems"
-        },
-        {
-          "name": "created_at",
-          "data_type": "TEXT",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Created At"
-        },
-        {
-          "name": "updated_at",
-          "data_type": "TEXT",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Updated At"
-        }
-      ],
-      "foreign_keys": [],
-      "hierarchy_tree": null
-    },
-    {
-      "name": "pattern_applicability",
-      "description": null,
-      "business_name": "Pattern Applicability",
-      "columns": [
-        {
-          "name": "id",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": true,
-          "description": null,
-          "business_name": "Identifier"
-        },
-        {
-          "name": "pattern_id",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Pattern Identifier"
-        },
-        {
-          "name": "category",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Category"
-        },
-        {
-          "name": "pos",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Pos"
-        },
-        {
-          "name": "stress",
-          "data_type": "INTEGER",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Stress"
-        },
-        {
-          "name": "is_active",
-          "data_type": "BOOLEAN",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Is Active"
-        },
-        {
-          "name": "sort_order",
-          "data_type": "INTEGER",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Sort Order"
-        },
-        {
-          "name": "created_at",
           "data_type": "DATETIME",
           "is_nullable": true,
           "primary_key": false,
           "description": null,
           "business_name": "Created At"
-        },
-        {
-          "name": "updated_at",
-          "data_type": "DATETIME",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Updated At"
-        },
-        {
-          "name": "linguistic_role",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Linguistic Role"
-        },
-        {
-          "name": "target_gender",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Target Gender"
-        },
-        {
-          "name": "gender",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Gender"
-        },
-        {
-          "name": "metadata",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Metadata"
         }
       ],
       "foreign_keys": [
         {
-          "column_name": "pattern_id",
-          "foreign_table_name": "patterns",
+          "column_name": "order_id",
+          "foreign_table_name": "orders",
           "foreign_column_name": "id"
         }
       ],
       "hierarchy_tree": null
     },
     {
-      "name": "entries",
+      "name": "reviews",
       "description": null,
-      "business_name": "Entries",
-      "columns": [
-        {
-          "name": "id",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": true,
-          "description": null,
-          "business_name": "Identifier"
-        },
-        {
-          "name": "headword",
-          "data_type": "TEXT",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Headword"
-        },
-        {
-          "name": "pos",
-          "data_type": "TEXT",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Pos"
-        },
-        {
-          "name": "gender",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Gender"
-        },
-        {
-          "name": "root_consonants",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Root Consonants"
-        },
-        {
-          "name": "stem",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Stem"
-        },
-        {
-          "name": "is_loanword",
-          "data_type": "BOOLEAN",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Is Loanword"
-        },
-        {
-          "name": "is_inflectable",
-          "data_type": "BOOLEAN",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Is Inflectable"
-        },
-        {
-          "name": "source_language",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Source Language"
-        },
-        {
-          "name": "source_id",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Source Identifier"
-        },
-        {
-          "name": "source_citation",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Source Citation"
-        },
-        {
-          "name": "source_title",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Source Title"
-        },
-        {
-          "name": "source_year",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Source Year"
-        },
-        {
-          "name": "source_page",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Source Page"
-        },
-        {
-          "name": "source_publisher",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Source Publisher"
-        },
-        {
-          "name": "etymology_chain",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Etymology Chain"
-        },
-        {
-          "name": "etymology_notes",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Etymology Notes"
-        },
-        {
-          "name": "created_at",
-          "data_type": "TEXT",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Created At"
-        },
-        {
-          "name": "updated_at",
-          "data_type": "TEXT",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Updated At"
-        },
-        {
-          "name": "cv_pattern",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Cv Pattern"
-        },
-        {
-          "name": "definitions",
-          "data_type": "TEXT",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Definitions"
-        },
-        {
-          "name": "usage_examples",
-          "data_type": "TEXT",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Usage Examples"
-        },
-        {
-          "name": "verb_class",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Verb Class"
-        },
-        {
-          "name": "verb_transitivity",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Verb Transitivity"
-        },
-        {
-          "name": "verb_perfective_3sgm",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Verb Perfective 3sgm"
-        },
-        {
-          "name": "verb_imperfective_3sgm",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Verb Imperfective 3sgm"
-        },
-        {
-          "name": "verb_verbal_noun",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Verb Verbal Noun"
-        },
-        {
-          "name": "verb_vowel_perf",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Verb Vowel Perf"
-        },
-        {
-          "name": "verb_vowel_impf",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Verb Vowel Impf"
-        },
-        {
-          "name": "verb_vowel_impv",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Verb Vowel Impv"
-        },
-        {
-          "name": "verb_active_ptcp",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Verb Active Ptcp"
-        },
-        {
-          "name": "verb_passive_ptcp",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Verb Passive Ptcp"
-        },
-        {
-          "name": "verb_form",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Verb Form"
-        },
-        {
-          "name": "verb_type",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Verb Type"
-        },
-        {
-          "name": "verb_weak_class",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Verb Weak Class"
-        },
-        {
-          "name": "elative_form",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Elative Form"
-        },
-        {
-          "name": "participle_type",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Participle Type"
-        },
-        {
-          "name": "numeral_type",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Numeral Type"
-        },
-        {
-          "name": "form_attributive_short",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Form Attributive Short"
-        },
-        {
-          "name": "form_attributive_long",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Form Attributive Long"
-        },
-        {
-          "name": "numeral_ordinal",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Numeral Ordinal"
-        },
-        {
-          "name": "numeral_adverbial",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Numeral Adverbial"
-        },
-        {
-          "name": "numeral_fractional",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Numeral Fractional"
-        },
-        {
-          "name": "numeral_multiplier",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Numeral Multiplier"
-        },
-        {
-          "name": "numeral_distributive",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Numeral Distributive"
-        },
-        {
-          "name": "source_display",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Source Display"
-        },
-        {
-          "name": "source_tooltip",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Source Tooltip"
-        },
-        {
-          "name": "morph_pattern",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Morph Pattern"
-        },
-        {
-          "name": "sound_suffix",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Sound Suffix"
-        },
-        {
-          "name": "zokk_morphology",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Zokk Morphology"
-        },
-        {
-          "name": "zokk_class",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Zokk Class"
-        },
-        {
-          "name": "zokk_is_hybrid",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Zokk Is Hybrid"
-        },
-        {
-          "name": "zokk_agentive_suffix",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Zokk Agentive Suffix"
-        }
-      ],
-      "foreign_keys": [
-        {
-          "column_name": "source_id",
-          "foreign_table_name": "lexical_sources",
-          "foreign_column_name": "id"
-        }
-      ],
-      "hierarchy_tree": null
-    },
-    {
-      "name": "entries_fts",
-      "description": null,
-      "business_name": "Entries Fts",
-      "columns": [
-        {
-          "name": "headword",
-          "data_type": "",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Headword"
-        }
-      ],
-      "foreign_keys": [],
-      "hierarchy_tree": null
-    },
-    {
-      "name": "entries_fts_data",
-      "description": null,
-      "business_name": "Entries Fts Data",
+      "business_name": "Reviews",
       "columns": [
         {
           "name": "id",
           "data_type": "INTEGER",
-          "is_nullable": true,
-          "primary_key": true,
-          "description": null,
-          "business_name": "Identifier"
-        },
-        {
-          "name": "block",
-          "data_type": "BLOB",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Block"
-        }
-      ],
-      "foreign_keys": [],
-      "hierarchy_tree": null
-    },
-    {
-      "name": "entries_fts_idx",
-      "description": null,
-      "business_name": "Entries Fts Index",
-      "columns": [
-        {
-          "name": "segid",
-          "data_type": "",
-          "is_nullable": false,
-          "primary_key": true,
-          "description": null,
-          "business_name": "Segid"
-        },
-        {
-          "name": "term",
-          "data_type": "",
-          "is_nullable": false,
-          "primary_key": true,
-          "description": null,
-          "business_name": "Term"
-        },
-        {
-          "name": "pgno",
-          "data_type": "",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Pgno"
-        }
-      ],
-      "foreign_keys": [],
-      "hierarchy_tree": null
-    },
-    {
-      "name": "entries_fts_docsize",
-      "description": null,
-      "business_name": "Entries Fts Docsize",
-      "columns": [
-        {
-          "name": "id",
-          "data_type": "INTEGER",
-          "is_nullable": true,
-          "primary_key": true,
-          "description": null,
-          "business_name": "Identifier"
-        },
-        {
-          "name": "sz",
-          "data_type": "BLOB",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Sz"
-        }
-      ],
-      "foreign_keys": [],
-      "hierarchy_tree": null
-    },
-    {
-      "name": "entries_fts_config",
-      "description": null,
-      "business_name": "Entries Fts Config",
-      "columns": [
-        {
-          "name": "k",
-          "data_type": "",
-          "is_nullable": false,
-          "primary_key": true,
-          "description": null,
-          "business_name": "K"
-        },
-        {
-          "name": "v",
-          "data_type": "",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "V"
-        }
-      ],
-      "foreign_keys": [],
-      "hierarchy_tree": null
-    },
-    {
-      "name": "noun_morphology",
-      "description": null,
-      "business_name": "Noun Morphology",
-      "columns": [
-        {
-          "name": "entry_id",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": true,
-          "description": null,
-          "business_name": "Entry Identifier"
-        },
-        {
-          "name": "gender",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Gender"
-        },
-        {
-          "name": "noun_type",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Noun Type"
-        },
-        {
-          "name": "singular_form",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Singular Form"
-        },
-        {
-          "name": "plural_forms",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Plural Forms"
-        },
-        {
-          "name": "sound_plural",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Sound Plural"
-        },
-        {
-          "name": "dual_form",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Dual Form"
-        },
-        {
-          "name": "diminutive_form",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Diminutive Form"
-        },
-        {
-          "name": "collective_form",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Collective Form"
-        },
-        {
-          "name": "singulative_form",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Singulative Form"
-        },
-        {
-          "name": "paucal_form",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Paucal Form"
-        },
-        {
-          "name": "augmentative_form",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Augmentative Form"
-        },
-        {
-          "name": "paucal_pattern",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Paucal Pattern"
-        },
-        {
-          "name": "augmentative_pattern",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Augmentative Pattern"
-        },
-        {
-          "name": "feminine_form",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Feminine Form"
-        },
-        {
-          "name": "masculine_form",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Masculine Form"
-        },
-        {
-          "name": "is_collective",
-          "data_type": "BOOLEAN",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Is Collective"
-        },
-        {
-          "name": "is_singulative",
-          "data_type": "BOOLEAN",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Is Singulative"
-        },
-        {
-          "name": "created_at",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Created At"
-        },
-        {
-          "name": "updated_at",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Updated At"
-        },
-        {
-          "name": "vowel_set_sg",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Vowel Set Sg"
-        },
-        {
-          "name": "vowel_set_opp",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Vowel Set Opp"
-        },
-        {
-          "name": "vowel_set_dual",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Vowel Set Dual"
-        },
-        {
-          "name": "vowel_set_pl",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Vowel Set Pl"
-        },
-        {
-          "name": "form_plural_pattern",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Form Plural Pattern"
-        },
-        {
-          "name": "form_fem_pattern",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Form Fem Pattern"
-        },
-        {
-          "name": "form_masc_pattern",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Form Masc Pattern"
-        },
-        {
-          "name": "dual_pattern",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Dual Pattern"
-        },
-        {
-          "name": "diminutive_pattern",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Diminutive Pattern"
-        },
-        {
-          "name": "morph_pattern",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Morph Pattern"
-        },
-        {
-          "name": "is_inflectable_singular",
-          "data_type": "BOOLEAN",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Is Inflectable Singular"
-        },
-        {
-          "name": "is_inflectable_plural",
-          "data_type": "BOOLEAN",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Is Inflectable Plural"
-        },
-        {
-          "name": "verbal_form",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Verbal Form"
-        }
-      ],
-      "foreign_keys": [],
-      "hierarchy_tree": null
-    },
-    {
-      "name": "adj_morphology",
-      "description": null,
-      "business_name": "Adj Morphology",
-      "columns": [
-        {
-          "name": "entry_id",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": true,
-          "description": null,
-          "business_name": "Entry Identifier"
-        },
-        {
-          "name": "masculine_form",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Masculine Form"
-        },
-        {
-          "name": "feminine_form",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Feminine Form"
-        },
-        {
-          "name": "plural_form",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Plural Form"
-        },
-        {
-          "name": "elative_form",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Elative Form"
-        },
-        {
-          "name": "elative_pattern",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Elative Pattern"
-        },
-        {
-          "name": "gender",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Gender"
-        },
-        {
-          "name": "created_at",
-          "data_type": "TEXT",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Created At"
-        },
-        {
-          "name": "updated_at",
-          "data_type": "TEXT",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Updated At"
-        },
-        {
-          "name": "form_plural_pattern",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Form Plural Pattern"
-        },
-        {
-          "name": "form_fem_pattern",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Form Fem Pattern"
-        },
-        {
-          "name": "form_masc_pattern",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Form Masc Pattern"
-        },
-        {
-          "name": "vowel_set_sg",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Vowel Set Sg"
-        },
-        {
-          "name": "vowel_set_pl",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Vowel Set Pl"
-        },
-        {
-          "name": "vowel_set_opp",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Vowel Set Opp"
-        },
-        {
-          "name": "pattern",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Pattern"
-        },
-        {
-          "name": "has_elative",
-          "data_type": "INTEGER",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Has Elative"
-        },
-        {
-          "name": "is_inflectable",
-          "data_type": "BOOLEAN",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Is Inflectable"
-        },
-        {
-          "name": "dual_form",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Dual Form"
-        },
-        {
-          "name": "dual_pattern",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Dual Pattern"
-        },
-        {
-          "name": "vowel_set_dual",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Vowel Set Dual"
-        },
-        {
-          "name": "diminutive_form",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Diminutive Form"
-        },
-        {
-          "name": "diminutive_pattern",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Diminutive Pattern"
-        }
-      ],
-      "foreign_keys": [
-        {
-          "column_name": "entry_id",
-          "foreign_table_name": "entries",
-          "foreign_column_name": "id"
-        }
-      ],
-      "hierarchy_tree": null
-    },
-    {
-      "name": "participle_morphology",
-      "description": null,
-      "business_name": "Participle Morphology",
-      "columns": [
-        {
-          "name": "entry_id",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": true,
-          "description": null,
-          "business_name": "Entry Identifier"
-        },
-        {
-          "name": "type",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Type"
-        },
-        {
-          "name": "gender",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Gender"
-        },
-        {
-          "name": "is_inflectable",
-          "data_type": "BOOLEAN",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Is Inflectable"
-        },
-        {
-          "name": "created_at",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Created At"
-        },
-        {
-          "name": "updated_at",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Updated At"
-        },
-        {
-          "name": "form_plural_pattern",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Form Plural Pattern"
-        },
-        {
-          "name": "form_fem_pattern",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Form Fem Pattern"
-        },
-        {
-          "name": "form_masc_pattern",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Form Masc Pattern"
-        },
-        {
-          "name": "verbal_form",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Verbal Form"
-        }
-      ],
-      "foreign_keys": [],
-      "hierarchy_tree": null
-    },
-    {
-      "name": "audio_files",
-      "description": null,
-      "business_name": "Audio Files",
-      "columns": [
-        {
-          "name": "id",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": true,
-          "description": null,
-          "business_name": "Identifier"
-        },
-        {
-          "name": "entry_id",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Entry Identifier"
-        },
-        {
-          "name": "subentry_id",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Subentry Identifier"
-        },
-        {
-          "name": "r2_object_key",
-          "data_type": "TEXT",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "R2 Object Key"
-        },
-        {
-          "name": "dialect",
-          "data_type": "TEXT",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Dialect"
-        },
-        {
-          "name": "is_ai_generated",
-          "data_type": "BOOLEAN",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Is Ai Generated"
-        },
-        {
-          "name": "duration_seconds",
-          "data_type": "REAL",
-          "is_nullable": true,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Duration Seconds"
-        },
-        {
-          "name": "generated_at",
-          "data_type": "TEXT",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Generated At"
-        }
-      ],
-      "foreign_keys": [
-        {
-          "column_name": "subentry_id",
-          "foreign_table_name": "subentries",
-          "foreign_column_name": "id"
-        },
-        {
-          "column_name": "entry_id",
-          "foreign_table_name": "entries",
-          "foreign_column_name": "id"
-        }
-      ],
-      "hierarchy_tree": null
-    },
-    {
-      "name": "subscriptions",
-      "description": null,
-      "business_name": "Subscriptions",
-      "columns": [
-        {
-          "name": "id",
-          "data_type": "TEXT",
           "is_nullable": true,
           "primary_key": true,
           "description": null,
@@ -3389,54 +378,51 @@
         },
         {
           "name": "user_id",
-          "data_type": "TEXT",
+          "data_type": "INTEGER",
           "is_nullable": false,
           "primary_key": false,
           "description": null,
           "business_name": "User Identifier"
         },
         {
-          "name": "tier",
-          "data_type": "TEXT",
+          "name": "product_id",
+          "data_type": "INTEGER",
           "is_nullable": false,
           "primary_key": false,
           "description": null,
-          "business_name": "Tier"
+          "business_name": "Product Identifier"
         },
         {
-          "name": "started_at",
-          "data_type": "TEXT",
+          "name": "rating",
+          "data_type": "INTEGER",
           "is_nullable": false,
           "primary_key": false,
           "description": null,
-          "business_name": "Started At"
+          "business_name": "Rating"
         },
         {
-          "name": "expires_at",
+          "name": "review_text",
           "data_type": "TEXT",
           "is_nullable": true,
           "primary_key": false,
           "description": null,
-          "business_name": "Expires At"
+          "business_name": "Review Text"
         },
         {
-          "name": "stripe_subscription_id",
-          "data_type": "TEXT",
+          "name": "created_at",
+          "data_type": "DATETIME",
           "is_nullable": true,
           "primary_key": false,
           "description": null,
-          "business_name": "Stripe Subscription Identifier"
-        },
-        {
-          "name": "is_lifetime",
-          "data_type": "BOOLEAN",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Is Lifetime"
+          "business_name": "Created At"
         }
       ],
       "foreign_keys": [
+        {
+          "column_name": "product_id",
+          "foreign_table_name": "products",
+          "foreign_column_name": "id"
+        },
         {
           "column_name": "user_id",
           "foreign_table_name": "users",
@@ -3446,98 +432,44 @@
       "hierarchy_tree": null
     },
     {
-      "name": "api_keys",
+      "name": "coupon_codes",
       "description": null,
-      "business_name": "Api Keys",
+      "business_name": "Coupon Codes",
       "columns": [
         {
           "name": "id",
-          "data_type": "TEXT",
+          "data_type": "INTEGER",
           "is_nullable": true,
           "primary_key": true,
           "description": null,
           "business_name": "Identifier"
         },
         {
-          "name": "user_id",
+          "name": "code",
           "data_type": "TEXT",
           "is_nullable": false,
           "primary_key": false,
           "description": null,
-          "business_name": "User Identifier"
+          "business_name": "Code"
         },
         {
-          "name": "name",
-          "data_type": "TEXT",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Name"
-        },
-        {
-          "name": "key_hash",
-          "data_type": "TEXT",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Key Hash"
-        },
-        {
-          "name": "key_prefix",
-          "data_type": "TEXT",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Key Prefix"
-        },
-        {
-          "name": "usage_count",
+          "name": "discount_percent",
           "data_type": "INTEGER",
           "is_nullable": false,
           "primary_key": false,
           "description": null,
-          "business_name": "Usage Count"
-        },
-        {
-          "name": "rate_limit_per_month",
-          "data_type": "INTEGER",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Rate Limit Per Month"
+          "business_name": "Discount Percent"
         },
         {
           "name": "is_active",
-          "data_type": "BOOLEAN",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Is Active"
-        },
-        {
-          "name": "created_at",
-          "data_type": "TEXT",
-          "is_nullable": false,
-          "primary_key": false,
-          "description": null,
-          "business_name": "Created At"
-        },
-        {
-          "name": "last_used_at",
-          "data_type": "TEXT",
+          "data_type": "INTEGER",
           "is_nullable": true,
           "primary_key": false,
           "description": null,
-          "business_name": "Last Used At"
+          "business_name": "Is Active"
         }
       ],
-      "foreign_keys": [
-        {
-          "column_name": "user_id",
-          "foreign_table_name": "users",
-          "foreign_column_name": "id"
-        }
-      ],
+      "foreign_keys": [],
       "hierarchy_tree": null
     }
   ],

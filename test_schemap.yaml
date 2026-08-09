@@ -2,7 +2,7 @@ database:
   connection_url: "sqlite:///test.db"
   exclude_tables: []
   license_key: ""
-  license_endpoint: "https://api.lemonsqueezy.com/v1/licenses/validate"
+  license_endpoint: "https://api.stripe.com/v1/licenses/verify"
 output:
   file_path: "./test_llm_data_context.md"
   format: "markdown"

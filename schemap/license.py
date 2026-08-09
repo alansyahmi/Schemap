@@ -58,7 +58,7 @@ def _write_cache(license_key: str):
 
 def verify_license_online(license_key: str, endpoint: str) -> Dict[str, Any]:
     """
-    Pings Lemon Squeezy to validate and activate the license key for this instance.
+    Pings Stripe to validate and activate the license key for this instance.
     """
     instance_name = os.getenv("GITHUB_RUN_ID", platform.node())
     payload = {
@@ -111,9 +111,9 @@ def verify_tier(tables_count: int, license_key: str | None, endpoint: str | None
                 return # allowed via cached validation
                 
     # 4. Perform Online Verification
-    endpoint = endpoint or "https://api.lemonsqueezy.com/v1/licenses/activate"
-    if endpoint.endswith("/validate"):
-        endpoint = "https://api.lemonsqueezy.com/v1/licenses/activate"
+    endpoint = endpoint or "https://api.stripe.com/v1/licenses/verify"
+    if endpoint.endswith("/validate") or "lemonsqueezy" in endpoint:
+        endpoint = "https://api.stripe.com/v1/licenses/verify"
         
     verification = verify_license_online(license_key, endpoint)
     if verification.get("activated"):

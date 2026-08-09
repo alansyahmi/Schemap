@@ -172,4 +172,82 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
+
+    // Dynamic Subscription Interval Switcher
+    const subData = {
+        monthly: {
+            title: "Pro Subscription",
+            price: "$7.99",
+            period: "/mo",
+            desc: '2026 Founder Price <span style="text-decoration: line-through; color: var(--text-secondary);">$9.99/mo</span>',
+            badge: "Flexible Monthly",
+            discount: "20% OFF",
+            saveTag: "Cancel anytime",
+            link: "https://buy.stripe.com/dRm00jeG13kpfoA131dIA01"
+        },
+        quarterly: {
+            title: "Pro Subscription",
+            price: "$21.99",
+            period: "/3mo",
+            desc: '2026 Founder Price <span style="text-decoration: line-through; color: var(--text-secondary);">$27.99 / 3mo</span>',
+            badge: "Save 21%",
+            discount: "21% OFF",
+            saveTag: "Billed every 3 months",
+            link: "https://buy.stripe.com/9B6bJ1gO94otekw275dIA02"
+        },
+        semiannual: {
+            title: "Pro Subscription",
+            price: "$39.99",
+            period: "/6mo",
+            desc: '2026 Founder Price <span style="text-decoration: line-through; color: var(--text-secondary);">$49.99 / 6mo</span>',
+            badge: "Save 20%",
+            discount: "20% OFF",
+            saveTag: "Billed every 6 months",
+            link: "https://buy.stripe.com/9B6fZh0Pb6wB0tG5jhdIA03"
+        },
+        annual: {
+            title: "Pro Subscription",
+            price: "$79.99",
+            period: "/yr",
+            desc: '2026 Founder Price <span style="text-decoration: line-through; color: var(--text-secondary);">$99.99/yr</span>',
+            badge: "Best Value (Save 20%)",
+            discount: "20% OFF",
+            saveTag: "<strong>2 months free</strong>&nbsp;equivalent",
+            link: "https://buy.stripe.com/6oU8wP9lH3kpgsE275dIA04"
+        }
+    };
+
+    window.switchSubInterval = function(interval, btnElement) {
+        const subBtns = document.querySelectorAll('.sub-btn');
+        const subTitle = document.getElementById('sub-title');
+        const subPrice = document.getElementById('sub-price');
+        const subDesc = document.getElementById('sub-desc');
+        const subBadge = document.getElementById('sub-badge');
+        const subDiscountTag = document.getElementById('sub-discount-tag');
+        const subSaveTag = document.getElementById('sub-save-tag');
+        const subCheckoutBtn = document.getElementById('sub-checkout-btn');
+
+        subBtns.forEach(b => {
+            b.classList.remove('active');
+            b.style.backgroundColor = 'transparent';
+            b.style.color = 'var(--text-secondary)';
+        });
+
+        if (btnElement) {
+            btnElement.classList.add('active');
+            btnElement.style.backgroundColor = 'var(--accent)';
+            btnElement.style.color = '#ffffff';
+        }
+
+        const data = subData[interval];
+        if (data) {
+            if (subTitle) subTitle.textContent = data.title;
+            if (subPrice) subPrice.innerHTML = `${data.price}<span class="period">${data.period}</span>`;
+            if (subDesc) subDesc.innerHTML = data.desc;
+            if (subBadge) subBadge.textContent = data.badge;
+            if (subDiscountTag) subDiscountTag.textContent = data.discount;
+            if (subSaveTag) subSaveTag.innerHTML = data.saveTag;
+            if (subCheckoutBtn) subCheckoutBtn.href = data.link;
+        }
+    };
 });

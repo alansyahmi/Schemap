@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Schemap — AI Database Context Compiler Demo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #0a0d14;
+      --bg-card: #121824;
+      --bg-terminal: #0d1117;
+      --border-color: #1f293d;
+      --accent-cyan: #38bdf8;
+      --accent-purple: #818cf8;
+      --accent-green: #34d399;
+      --accent-gold: #fbbf24;
+      --accent-rose: #fb7185;
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      --gradient-brand: linear-gradient(135deg, #38bdf8 0%, #818cf8 50%, #c084fc 100%);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      width: 1920px;
+      height: 1080px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Top Navigation Header */
+    header {
+      height: 80px;
+      padding: 0 40px;
+      background: rgba(18, 24, 36, 0.8);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .brand-logo {
+      width: 48px;
+      height: 48px;
+      background: var(--gradient-brand);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 24px;
+      color: #0a0d14;
+      box-shadow: 0 0 25px rgba(56, 189, 248, 0.4);
+    }
+    .brand-title {
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      background: var(--gradient-brand);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .brand-tagline {
+      font-size: 14px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+    .badge-live {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      background: rgba(52, 211, 153, 0.1);
+      border: 1px solid rgba(52, 211, 153, 0.3);
+      border-radius: 20px;
+      color: var(--accent-green);
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .pulse-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--accent-green);
+      border-radius: 50%;
+      box-shadow: 0 0 10px var(--accent-green);
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(1.3); } }
+
+    /* Scene Container */
+    .viewport {
+      flex: 1;
+      position: relative;
+      padding: 40px;
+      display: flex;
+      gap: 40px;
+    }
+
+    /* Left Control & Terminal Panel */
+    .left-panel {
+      flex: 1.2;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .terminal-card {
+      flex: 1;
+      background: var(--bg-terminal);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .terminal-header {
+      height: 44px;
+      background: #161b22;
+      padding: 0 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .terminal-dots { display: flex; gap: 8px; }
+    .dot { width: 12px; height: 12px; border-radius: 50%; }
+    .dot-red { background: #ff5f56; }
+    .dot-yellow { background: #ffbd2e; }
+    .dot-green { background: #27c93f; }
+    .terminal-title {
+      font-family: 'Fira Code', monospace;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .terminal-body {
+      flex: 1;
+      padding: 24px;
+      font-family: 'Fira Code', monospace;
+      font-size: 15px;
+      line-height: 1.6;
+      color: #c9d1d9;
+      overflow-y: auto;
+    }
+
+    .prompt-line {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .prompt-symbol { color: var(--accent-cyan); font-weight: bold; }
+    .typed-text { color: #fff; font-weight: 600; }
+    .cursor-blink {
+      display: inline-block;
+      width: 8px;
+      height: 18px;
+      background: var(--accent-cyan);
+      margin-left: 4px;
+      animation: blink 0.8s infinite;
+    }
+    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+    .terminal-output {
+      margin-top: 12px;
+      white-space: pre-wrap;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all 0.4s ease;
+    }
+    .terminal-output.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .output-success { color: var(--accent-green); }
+    .output-warning { color: var(--accent-gold); }
+    .output-cyan { color: var(--accent-cyan); }
+    .output-purple { color: var(--accent-purple); }
+
+    /* Right Metrics & Feature Showcase Panel */
+    .right-panel {
+      flex: 0.9;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 28px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+
+    .hero-metric-card {
+      background: linear-gradient(135deg, rgba(56, 189, 248, 0.1) 0%, rgba(129, 140, 248, 0.05) 100%);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+    }
+    .metric-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-top: 16px;
+    }
+    .metric-box {
+      background: rgba(10, 13, 20, 0.6);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+    }
+    .metric-value {
+      font-size: 42px;
+      font-weight: 900;
+      background: var(--gradient-brand);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .metric-label {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 4px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .comparison-container {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .bar-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .bar-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .bar-track {
+      height: 20px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 10px;
+      overflow: hidden;
+      position: relative;
+    }
+    .bar-fill {
+      height: 100%;
+      border-radius: 10px;
+      width: 0%;
+      transition: width 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .bar-fill-raw { background: linear-gradient(90deg, #fb7185, #f43f5e); }
+    .bar-fill-schemap { background: linear-gradient(90deg, #38bdf8, #34d399); }
+
+    .feature-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .feature-item {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 14px;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      transition: all 0.3s ease;
+    }
+    .feature-item.active {
+      border-color: var(--accent-cyan);
+      background: rgba(56, 189, 248, 0.08);
+      transform: translateX(6px);
+    }
+    .feature-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: rgba(56, 189, 248, 0.15);
+      color: var(--accent-cyan);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+    .feature-text h4 { font-size: 15px; font-weight: 700; color: #fff; }
+    .feature-text p { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+
+    /* Footer Controls */
+    footer {
+      height: 70px;
+      padding: 0 40px;
+      background: #0d1117;
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .step-indicator {
+      display: flex;
+      gap: 12px;
+    }
+    .step-pill {
+      padding: 8px 18px;
+      border-radius: 20px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border-color);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      transition: all 0.3s;
+    }
+    .step-pill.active {
+      background: var(--gradient-brand);
+      color: #0a0d14;
+      border-color: transparent;
+      box-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Header -->
+  <header>
+    <div class="brand">
+      <div class="brand-logo">S</div>
+      <div>
+        <div class="brand-title">Schemap</div>
+        <div class="brand-tagline">Deterministic AI Database Context Compiler</div>
+      </div>
+    </div>
+    <div class="badge-live">
+      <div class="pulse-dot"></div>
+      <span>CLAUDE CODE • CURSOR • CODEX • COPILOT READY</span>
+    </div>
+  </header>
+
+  <!-- Main Viewport -->
+  <div class="viewport">
+    
+    <!-- Left Terminal Panel -->
+    <div class="left-panel">
+      <div class="terminal-card">
+        <div class="terminal-header">
+          <div class="terminal-dots">
+            <div class="dot dot-red"></div>
+            <div class="dot dot-yellow"></div>
+            <div class="dot dot-green"></div>
+          </div>
+          <div class="terminal-title">schemap-cli — bash — 1920x1080</div>
+          <div></div>
+        </div>
+        <div class="terminal-body" id="terminal-body">
+          <div class="prompt-line">
+            <span class="prompt-symbol">developer@schemap-demo:~$</span>
+            <span class="typed-text" id="command-input"></span>
+            <span class="cursor-blink" id="cursor"></span>
+          </div>
+          <div class="terminal-output" id="command-output"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Showcase & Metrics Panel -->
+    <div class="right-panel">
+
+      <!-- Hero Metrics -->
+      <div class="card hero-metric-card">
+        <h3 style="font-size: 18px; font-weight: 800; color: #fff;">Compilation & Readiness Overview</h3>
+        <div class="metric-grid">
+          <div class="metric-box">
+            <div class="metric-value" id="val-compression">93.9%</div>
+            <div class="metric-label">Token Savings</div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-value" id="val-latency">0.25ms</div>
+            <div class="metric-label">Compile Speed</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Token Compression Visualizer -->
+      <div class="card">
+        <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 20px; color: #fff;">Context Window Efficiency</h3>
+        <div class="comparison-container">
+          <div class="bar-wrapper">
+            <div class="bar-header">
+              <span style="color: var(--accent-rose);">Raw SQL Dump</span>
+              <span id="tokens-raw">18,432 tokens</span>
+            </div>
+            <div class="bar-track">
+              <div class="bar-fill bar-fill-raw" id="bar-raw" style="width: 100%;"></div>
+            </div>
+          </div>
+
+          <div class="bar-wrapper" style="margin-top: 10px;">
+            <div class="bar-header">
+              <span style="color: var(--accent-cyan);">Schemap Compiled Map</span>
+              <span id="tokens-schemap">1,120 tokens</span>
+            </div>
+            <div class="bar-track">
+              <div class="bar-fill bar-fill-schemap" id="bar-schemap" style="width: 6.1%;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Core Features List -->
+      <div class="card" style="flex: 1;">
+        <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 16px; color: #fff;">Feature Capabilities</h3>
+        <div class="feature-list">
+          <div class="feature-item" id="feat-1">
+            <div class="feature-icon">🩺</div>
+            <div class="feature-text">
+              <h4>AI Readiness Diagnostic</h4>
+              <p>Detect missing FKs, unmapped relations & ambiguous columns</p>
+            </div>
+          </div>
+          <div class="feature-item" id="feat-2">
+            <div class="feature-icon">🗺️</div>
+            <div class="feature-text">
+              <h4>Token-Optimized Context Maps</h4>
+              <p>Generates compact database_context.md snippet maps</p>
+            </div>
+          </div>
+          <div class="feature-item" id="feat-3">
+            <div class="feature-icon">🤖</div>
+            <div class="feature-text">
+              <h4>Agent Rule Compiler</h4>
+              <p>Produces CLAUDE.md & AGENTS.md for native agent guidance</p>
+            </div>
+          </div>
+          <div class="feature-item" id="feat-4">
+            <div class="feature-icon">⚡</div>
+            <div class="feature-text">
+              <h4>Sub-2ms Deterministic Latency</h4>
+              <p>100% local, zero-leak privacy, instant multi-db support</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- Footer Navigation -->
+  <footer>
+    <div class="step-indicator">
+      <div class="step-pill active" id="pill-step-1">1. schemap doctor</div>
+      <div class="step-pill" id="pill-step-2">2. schemap context</div>
+      <div class="step-pill" id="pill-step-3">3. schemap agents</div>
+      <div class="step-pill" id="pill-step-4">4. schemap benchmark</div>
+    </div>
+    <div style="font-family: 'Fira Code', monospace; font-size: 13px; color: var(--text-muted);">
+      https://github.com/alansyahmi/Schemap
+    </div>
+  </footer>
+
+  <!-- Script for Dynamic Demo Showcase -->
+  <script>
+    const steps = [
+      {
+        cmd: "schemap doctor",
+        output: `-> Connecting to database... Connected (8 tables)
+-> Analyzing schema relationships & naming conventions... OK
+
+==================================================
+ Schemap AI Database Health Check
+==================================================
+  Connection:            Connected (8 tables)
+  Relationships Mapped:  7 foreign key explicit graphs
+--------------------------------------------------
+  AI Readiness Score:
+  [#############-------] 65/100
+
+  Top Issues Identified:
+  - [Priority 1 - Documentation] 8 tables missing column comments (-20 pts)
+  - [Priority 2 - Naming] 5 unresolved abbreviations: sku, unit, is, full, at (-15 pts)
+--------------------------------------------------
+ Recommendation: Run \`schemap context\` to generate AI-ready context map.
+==================================================`,
+        featureId: "feat-1",
+        pillId: "pill-step-1",
+        rawTokens: "18,432 tokens",
+        schemapTokens: "1,120 tokens",
+        barSchemapPct: "6.1%",
+        compression: "93.9%"
+      },
+      {
+        cmd: "schemap context",
+        output: `-> Connecting to database... Connected (8 tables)
+-> Compiling relationship graphs & JOIN snippets... OK
+-> Generating Markdown context artifact [database_context.md]... OK
+
+<span class="output-success">[SUCCESS] Compiled context map written to ./database_context.md (1.8 KB)</span>
+
+==================================================
+ Context Map Highlights
+==================================================
+  - Central Entities: users, orders, products, categories
+  - FK Relationships: 7 auto-wired explicit paths
+  - JOIN Snippets:    5 pre-computed idiomatic SQL blocks
+==================================================`,
+        featureId: "feat-2",
+        pillId: "pill-step-2",
+        rawTokens: "18,432 tokens",
+        schemapTokens: "1,120 tokens",
+        barSchemapPct: "6.1%",
+        compression: "93.9%"
+      },
+      {
+        cmd: "schemap agents",
+        output: `-> Parsing system database rules & agent specifications... OK
+-> Compiling instruction prompt guards... OK
+
+<span class="output-success">[SUCCESS] Agent Context Rules Generated:</span>
+  <span class="output-cyan">[OK] CLAUDE.md</span> -> ./CLAUDE.md (Token-budgeted Claude rules)
+  <span class="output-cyan">[OK] AGENTS.md</span> -> ./AGENTS.md (Unified AI Agent database context)`,
+        featureId: "feat-3",
+        pillId: "pill-step-3",
+        rawTokens: "18,432 tokens",
+        schemapTokens: "1,120 tokens",
+        barSchemapPct: "6.1%",
+        compression: "93.9%"
+      },
+      {
+        cmd: "schemap benchmark",
+        output: `-> Running raw SQL dump vs Schemap compiler benchmark...
+
+==================================================
+ Database Context Benchmark
+==================================================
+  Analyzed Tables:      8
+  Raw Schema SQL:       771 tokens
+  Schemap Context:      458 tokens
+  Compression Savings:  40.6%
+--------------------------------------------------
+  Relationships Mapped: 7
+  AI Readiness Score:   65/100
+  Generation Latency:   <span class="output-success">0.25 ms</span>
+==================================================`,
+        featureId: "feat-4",
+        pillId: "pill-step-4",
+        rawTokens: "771 tokens",
+        schemapTokens: "458 tokens",
+        barSchemapPct: "59.4%",
+        compression: "40.6%"
+      }
+    ];
+
+    let currentStepIdx = 0;
+    const cmdInput = document.getElementById("command-input");
+    const cmdOutput = document.getElementById("command-output");
+
+    function typeWriter(text, i, fnCallback) {
+      if (i < text.length) {
+        cmdInput.innerHTML = text.substring(0, i + 1);
+        setTimeout(function() {
+          typeWriter(text, i + 1, fnCallback)
+        }, 40);
+      } else if (typeof fnCallback == 'function') {
+        setTimeout(fnCallback, 400);
+      }
+    }
+
+    function runStep(idx) {
+      const step = steps[idx];
+      cmdInput.innerHTML = "";
+      cmdOutput.classList.remove("visible");
+      cmdOutput.innerHTML = "";
+
+      // Update pills
+      document.querySelectorAll(".step-pill").forEach(p => p.classList.remove("active"));
+      document.getElementById(step.pillId).classList.add("active");
+
+      // Update feature active item
+      document.querySelectorAll(".feature-item").forEach(f => f.classList.remove("active"));
+      document.getElementById(step.featureId).classList.add("active");
+
+      // Update metrics
+      document.getElementById("tokens-raw").innerText = step.rawTokens;
+      document.getElementById("tokens-schemap").innerText = step.schemapTokens;
+      document.getElementById("bar-schemap").style.width = step.barSchemapPct;
+      document.getElementById("val-compression").innerText = step.compression;
+
+      typeWriter(step.cmd, 0, function() {
+        cmdOutput.innerHTML = step.output;
+        cmdOutput.classList.add("visible");
+
+        setTimeout(() => {
+          currentStepIdx = (currentStepIdx + 1) % steps.length;
+          runStep(currentStepIdx);
+        }, 3500);
+      });
+    }
+
+    // Start automated cycle after 1 sec
+    setTimeout(() => {
+      runStep(0);
+    }, 1000);
+  </script>
+</body>
+</html>

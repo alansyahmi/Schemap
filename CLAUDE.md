@@ -3,34 +3,30 @@
 This project relies on the database schema outlined below. Refer to this context when writing queries, migrations, or database-related business logic.
 
 ## Core Statistics
-- **Active Tables**: 39
-- **Key Hub Entities**: entries, users, subentries, attestation_scores, patterns
+- **Active Tables**: 8
+- **Key Hub Entities**: products, orders, users, order_items, reviews
 
 ## Central Tables Overview
-- **`entries`**: No description
-  Columns: `id` (TEXT), `headword` (TEXT), `pos` (TEXT), `gender` (TEXT), `root_consonants` (TEXT), `stem` (TEXT) ...+47 more
+- **`products`**: No description
+  Columns: `id` (INTEGER), `category_id` (INTEGER), `sku` (TEXT), `name` (TEXT), `description` (TEXT), `price_cents` (INTEGER) ...+2 more
+- **`orders`**: No description
+  Columns: `id` (INTEGER), `user_id` (INTEGER), `order_number` (TEXT), `status` (TEXT), `total_cents` (INTEGER), `shipping_address` (TEXT) ...+1 more
 - **`users`**: No description
-  Columns: `id` (TEXT), `clerk_id` (TEXT), `email` (TEXT), `display_name` (TEXT), `tier` (TEXT), `ads_disabled` (INTEGER) ...+2 more
-- **`subentries`**: No description
-  Columns: `id` (TEXT), `entry_id` (TEXT), `headword` (TEXT), `pos` (TEXT), `tags` (TEXT), `sort_order` (INTEGER)
-- **`attestation_scores`**: No description
-  Columns: `id` (TEXT), `attestation_id` (TEXT), `source_id` (TEXT), `attested` (INTEGER), `notes` (TEXT)
-- **`patterns`**: No description
-  Columns: `id` (TEXT), `cv_notation` (TEXT), `wizen_notation` (TEXT), `example_word` (TEXT), `tags` (TEXT), `created_at` (TEXT) ...+1 more
+  Columns: `id` (INTEGER), `email` (TEXT), `full_name` (TEXT), `role` (TEXT), `created_at` (DATETIME)
+- **`order_items`**: No description
+  Columns: `id` (INTEGER), `order_id` (INTEGER), `product_id` (INTEGER), `quantity` (INTEGER), `unit_price_cents` (INTEGER)
+- **`reviews`**: No description
+  Columns: `id` (INTEGER), `user_id` (INTEGER), `product_id` (INTEGER), `rating` (INTEGER), `review_text` (TEXT), `created_at` (DATETIME)
 
 ## Schema Relationships
 ```
-attestation_scores (source_id) ──> lexical_sources (id)
-attestation_scores (attestation_id) ──> attestation_reliability (id)
-root_pattern_forms (pattern_id) ──> patterns (id)
-root_pattern_forms (root_id) ──> roots_old (id)
-subentries (entry_id) ──> entries (id)
-phonetics (subentry_id) ──> subentries (id)
-phonetics (entry_id) ──> entries (id)
-attestation_reliability (entry_id) ──> entries (id)
-dialect_variants (entry_id) ──> entries (id)
-flashcard_lists (user_id) ──> users (id)
-... and 16 more relationships.
+products (category_id) ──> categories (id)
+orders (user_id) ──> users (id)
+order_items (product_id) ──> products (id)
+order_items (order_id) ──> orders (id)
+payments (order_id) ──> orders (id)
+reviews (product_id) ──> products (id)
+reviews (user_id) ──> users (id)
 ```
 
 ## Query Guidelines

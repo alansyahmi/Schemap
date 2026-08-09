@@ -52,7 +52,7 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://schemap-tool.pages.dev/
+Homepage = "https://schemap-tool.pages.dev/"
 Documentation = "https://schemap-tool.pages.dev/#features"
 Repository = "https://github.com/alansyahmi/Schemap"
 Changelog = "https://github.com/alansyahmi/Schemap/releases"

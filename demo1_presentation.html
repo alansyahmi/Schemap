@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Schemap Demo 1 — The AI Hallucinated My SQL</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #07090e;
+      --bg-card: #0d121d;
+      --bg-terminal: #0b0f17;
+      --border: #1a2333;
+      --accent-cyan: #38bdf8;
+      --accent-purple: #a855f7;
+      --accent-rose: #f43f5e;
+      --accent-green: #10b981;
+      --accent-amber: #f59e0b;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      width: 1920px;
+      height: 1080px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Top Navigation Header */
+    header {
+      height: 80px;
+      padding: 0 48px;
+      background: rgba(13, 18, 29, 0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .brand-logo {
+      width: 46px;
+      height: 46px;
+      background: linear-gradient(135deg, #38bdf8 0%, #a855f7 100%);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 24px;
+      color: #07090e;
+      box-shadow: 0 0 30px rgba(56, 189, 248, 0.3);
+    }
+    .brand-title {
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      background: linear-gradient(135deg, #38bdf8 0%, #a855f7 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .brand-tagline {
+      font-size: 13px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+    .badge-demo {
+      padding: 8px 18px;
+      background: rgba(168, 85, 247, 0.12);
+      border: 1px solid rgba(168, 85, 247, 0.3);
+      border-radius: 30px;
+      color: #c084fc;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    /* Main Scene Layout */
+    .stage {
+      flex: 1;
+      display: flex;
+      padding: 40px 48px;
+      gap: 40px;
+      position: relative;
+    }
+
+    /* Left Panel - Story Scene View */
+    .left-panel {
+      flex: 1.25;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .scene-card {
+      flex: 1;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .scene-header {
+      height: 52px;
+      background: #0f1522;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+    }
+    .scene-title-box {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .scene-step-num {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: rgba(56, 189, 248, 0.2);
+      color: var(--accent-cyan);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 800;
+    }
+    .scene-name {
+      font-size: 16px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .scene-body {
+      flex: 1;
+      padding: 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      font-family: 'Fira Code', monospace;
+    }
+
+    /* Prompt Container */
+    .prompt-box {
+      background: #0b0f17;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px 24px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .user-avatar {
+      width: 36px;
+      height: 36px;
+      background: #1e293b;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+    }
+    .prompt-text {
+      font-size: 16px;
+      color: #38bdf8;
+      font-weight: 600;
+    }
+
+    /* Code Container */
+    .code-box {
+      flex: 1;
+      background: #0b0f17;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 24px;
+      font-size: 15px;
+      line-height: 1.7;
+      color: #e2e8f0;
+      position: relative;
+      white-space: pre-wrap;
+      overflow: hidden;
+    }
+
+    .code-hl-keyword { color: #f43f5e; font-weight: bold; }
+    .code-hl-func { color: #38bdf8; }
+    .code-hl-table { color: #a855f7; font-weight: bold; }
+    .code-hl-comment { color: #64748b; font-style: italic; }
+    .code-hl-green { color: #10b981; font-weight: bold; }
+
+    /* Right Panel — Story Status, Narration & Result Comparison */
+    .right-panel {
+      flex: 0.85;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 32px;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    .narration-box {
+      background: linear-gradient(135deg, rgba(56, 189, 248, 0.08) 0%, rgba(168, 85, 247, 0.08) 100%);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+    }
+    .narration-label {
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--accent-cyan);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+    }
+    .narration-quote {
+      font-size: 18px;
+      font-weight: 700;
+      line-height: 1.5;
+      color: #fff;
+    }
+
+    /* Result Comparison Card */
+    .result-display {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 30px;
+      border-radius: 16px;
+      transition: all 0.5s ease;
+    }
+    .result-display.bad {
+      background: rgba(244, 63, 94, 0.08);
+      border: 2px solid rgba(244, 63, 94, 0.4);
+    }
+    .result-display.good {
+      background: rgba(16, 185, 129, 0.08);
+      border: 2px solid rgba(16, 185, 129, 0.4);
+    }
+
+    .status-badge {
+      font-size: 64px;
+      margin-bottom: 12px;
+      animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    @keyframes popIn { 0% { transform: scale(0); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+
+    .stat-val-bad {
+      font-size: 44px;
+      font-weight: 900;
+      color: #f43f5e;
+    }
+    .stat-val-good {
+      font-size: 44px;
+      font-weight: 900;
+      color: #10b981;
+    }
+    .stat-sub {
+      font-size: 15px;
+      color: var(--text-muted);
+      margin-top: 6px;
+      font-weight: 600;
+    }
+
+    /* Final Screen Banner */
+    .final-banner {
+      position: absolute;
+      inset: 0;
+      background: rgba(7, 9, 14, 0.95);
+      backdrop-filter: blur(20px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      z-index: 100;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.8s ease;
+    }
+    .final-banner.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .final-title {
+      font-size: 56px;
+      font-weight: 900;
+      background: linear-gradient(135deg, #38bdf8 0%, #a855f7 50%, #10b981 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 24px;
+      line-height: 1.2;
+      max-width: 1000px;
+    }
+    .final-subtitle {
+      font-size: 24px;
+      color: var(--text-muted);
+      margin-bottom: 40px;
+    }
+    .cta-btn {
+      padding: 18px 42px;
+      background: linear-gradient(135deg, #38bdf8 0%, #a855f7 100%);
+      border-radius: 40px;
+      color: #07090e;
+      font-size: 20px;
+      font-weight: 800;
+      box-shadow: 0 0 40px rgba(56, 189, 248, 0.5);
+    }
+
+    /* Timeline Footer */
+    footer {
+      height: 72px;
+      padding: 0 48px;
+      background: #090d15;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .timeline-steps {
+      display: flex;
+      gap: 16px;
+    }
+    .t-step {
+      padding: 8px 20px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border);
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-muted);
+      transition: all 0.3s;
+    }
+    .t-step.active {
+      background: linear-gradient(135deg, #38bdf8 0%, #a855f7 100%);
+      color: #07090e;
+      border-color: transparent;
+      box-shadow: 0 0 20px rgba(56, 189, 248, 0.4);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Header -->
+  <header>
+    <div class="brand">
+      <div class="brand-logo">S</div>
+      <div>
+        <div class="brand-title">Schemap</div>
+        <div class="brand-tagline">AI Database Context Compiler</div>
+      </div>
+    </div>
+    <div class="badge-demo">
+      <span>DEMO 1: THE AI HALLUCINATED MY SQL</span>
+    </div>
+  </header>
+
+  <!-- Stage -->
+  <div class="stage">
+    
+    <!-- Left Scene Panel -->
+    <div class="left-panel">
+      <div class="scene-card">
+        <div class="scene-header">
+          <div class="scene-title-box">
+            <div class="scene-step-num" id="step-num">1</div>
+            <div class="scene-name" id="step-title">Hook: Raw AI SQL Generation</div>
+          </div>
+          <div style="font-family: 'Fira Code', monospace; font-size: 13px; color: var(--text-muted);" id="step-timer">00:05 / 01:00</div>
+        </div>
+        <div class="scene-body">
+          <div class="prompt-box">
+            <div class="user-avatar">💬</div>
+            <div>
+              <div style="font-size: 12px; color: var(--text-muted); font-weight: 600;">USER PROMPT</div>
+              <div class="prompt-text">"Calculate monthly revenue by customer segment."</div>
+            </div>
+          </div>
+
+          <div class="code-box" id="code-content">
+            <!-- Dynamic Code Content inserted via JS -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Story & Result Panel -->
+    <div class="right-panel">
+      <!-- Narration Quote Card -->
+      <div class="card narration-box">
+        <div class="narration-label">Voiceover / Narration</div>
+        <div class="narration-quote" id="narration-text">
+          "Show ChatGPT or Claude generating SQL. It looks completely clean and correct at first glance..."
+        </div>
+      </div>
+
+      <!-- Result Comparison Card -->
+      <div class="card" style="flex: 1; display: flex; align-items: center; justify-content: center;">
+        <div class="result-display bad" id="result-card">
+          <div class="status-badge" id="status-icon">❌</div>
+          <div class="stat-val-bad" id="stat-main">RM 1,200,000</div>
+          <div class="stat-sub" id="stat-sub">Calculated Revenue (Overcounted by RM 330k!)</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Final Screen Banner -->
+  <div class="final-banner" id="final-screen">
+    <div class="final-title">Give AI the business context behind your database.</div>
+    <div class="final-subtitle">Schemap compiles deterministic business rules & schemas for Claude Code, Cursor, and Copilot.</div>
+    <div class="cta-btn">pip install schemap-tool</div>
+  </div>
+
+  <!-- Footer Timeline -->
+  <footer>
+    <div class="timeline-steps">
+      <div class="t-step active" id="pill-1">1. Hook (0-10s)</div>
+      <div class="t-step" id="pill-2">2. The Problem (10-25s)</div>
+      <div class="t-step" id="pill-3">3. Schemap Solution (25-45s)</div>
+      <div class="t-step" id="pill-4">4. Correct Result (45-60s)</div>
+    </div>
+    <div style="font-family: 'Fira Code', monospace; font-size: 13px; color: var(--text-muted);">
+      https://github.com/alansyahmi/Schemap
+    </div>
+  </footer>
+
+  <!-- Script to Control Demo Story Flow -->
+  <script>
+    const storySteps = [
+      {
+        num: "1",
+        title: "Hook: Raw AI SQL Generation (0-10s)",
+        timer: "00:08",
+        code: `<span class="code-hl-comment">-- AI Generated Query (Looks perfect at first glance)</span>
+<span class="code-hl-keyword">SELECT</span> 
+    c.segment,
+    <span class="code-hl-func">SUM</span>(o.total_cents) / 100.0 <span class="code-hl-keyword">AS</span> revenue_rm
+<span class="code-hl-keyword">FROM</span> <span class="code-hl-table">orders</span> o
+<span class="code-hl-keyword">JOIN</span> <span class="code-hl-table">users</span> c <span class="code-hl-keyword">ON</span> o.user_id = c.id
+<span class="code-hl-keyword">GROUP BY</span> c.segment;`,
+        narration: '"Calculate monthly revenue by customer segment." The AI produces standard SQL instantly. It looks completely clean.',
+        bad: true,
+        icon: "⚡",
+        val: "Generating...",
+        sub: "AI executing query on production DB",
+        showFinal: false,
+        pillId: "pill-1"
+      },
+      {
+        num: "2",
+        title: "Problem: Business Logic Mismatch (10-25s)",
+        timer: "00:20",
+        code: `<span class="code-hl-comment">-- CRITICAL BUG: AI double-joined refunds!</span>
+<span class="code-hl-keyword">SELECT</span> c.segment, <span class="code-hl-func">SUM</span>(o.total_cents)
+<span class="code-hl-keyword">FROM</span> <span class="code-hl-table">orders</span> o
+<span class="code-hl-keyword">JOIN</span> <span class="code-hl-table">payments</span> p <span class="code-hl-keyword">ON</span> o.id = p.order_id
+<span class="code-hl-keyword">JOIN</span> <span class="code-hl-table">refunds</span> r <span class="code-hl-keyword">ON</span> o.id = r.order_id  <span class="code-hl-comment">-- ⚠️ Double counting!</span>
+
+<span class="code-hl-comment">-- REVEAL: Revenue table already includes refunds!</span>`,
+        narration: '"The SQL wasn\'t wrong syntax-wise. But the AI didn\'t understand the business meaning behind the tables. Revenue table already includes refunds!"',
+        bad: true,
+        icon: "❌",
+        val: "RM 1,200,000",
+        sub: "Actual: RM 870,000 (Overcounted by RM 330k!)",
+        showFinal: false,
+        pillId: "pill-2"
+      },
+      {
+        num: "3",
+        title: "Solution: Schemap Context Compiler (25-45s)",
+        timer: "00:35",
+        code: `<span class="code-hl-comment"># schemap.yaml - Business Context Compiler</span>
+<span class="code-hl-table">tables:</span>
+  <span class="code-hl-func">orders:</span>
+    <span class="code-hl-keyword">description:</span> <span class="code-hl-green">"Net revenue table. Already deducts refunds."</span>
+  <span class="code-hl-func">refunds:</span>
+    <span class="code-hl-keyword">description:</span> <span class="code-hl-green">"Historical audit log only. DO NOT JOIN for revenue."</span>
+
+<span class="code-hl-comment"># Run: schemap context -> Compiled into CLAUDE.md & AGENTS.md</span>`,
+        narration: 'Enter Schemap. `schemap context` compiles your database structure AND business meanings into token-optimized context maps.',
+        bad: false,
+        icon: "🛠️",
+        val: "schemap context",
+        sub: "Compiling business domain rules into AGENTS.md",
+        showFinal: false,
+        pillId: "pill-3"
+      },
+      {
+        num: "4",
+        title: "Result: 100% Accurate AI SQL (45-60s)",
+        timer: "00:55",
+        code: `<span class="code-hl-comment">-- AI Query with Schemap Context Active</span>
+<span class="code-hl-keyword">SELECT</span> 
+    u.segment,
+    <span class="code-hl-func">SUM</span>(o.total_cents) / 100.0 <span class="code-hl-keyword">AS</span> net_revenue_rm
+<span class="code-hl-keyword">FROM</span> <span class="code-hl-table">orders</span> o
+<span class="code-hl-keyword">JOIN</span> <span class="code-hl-table">users</span> u <span class="code-hl-keyword">ON</span> o.user_id = u.id
+<span class="code-hl-keyword">WHERE</span> o.status = <span class="code-hl-green">'completed'</span>
+<span class="code-hl-keyword">GROUP BY</span> u.segment;`,
+        narration: 'Now with Schemap context, the AI understands the exact business rules. Accurate metrics every single time.',
+        bad: false,
+        icon: "✅",
+        val: "RM 870,000",
+        sub: "100% Verified Match with Accounting Data!",
+        showFinal: false,
+        pillId: "pill-4"
+      }
+    ];
+
+    let currentIdx = 0;
+
+    function renderStoryStep(idx) {
+      const step = storySteps[idx];
+
+      document.getElementById("step-num").innerText = step.num;
+      document.getElementById("step-title").innerText = step.title;
+      document.getElementById("step-timer").innerText = step.timer;
+      document.getElementById("code-content").innerHTML = step.code;
+      document.getElementById("narration-text").innerText = step.narration;
+
+      // Update pills
+      document.querySelectorAll(".t-step").forEach(p => p.classList.remove("active"));
+      document.getElementById(step.pillId).classList.add("active");
+
+      // Update Result Card
+      const resCard = document.getElementById("result-card");
+      const statMain = document.getElementById("stat-main");
+      const statSub = document.getElementById("stat-sub");
+      const statIcon = document.getElementById("status-icon");
+
+      statIcon.innerText = step.icon;
+      statMain.innerText = step.val;
+      statSub.innerText = step.sub;
+
+      if (step.bad) {
+        resCard.className = "result-display bad";
+        statMain.className = "stat-val-bad";
+      } else {
+        resCard.className = "result-display good";
+        statMain.className = "stat-val-good";
+      }
+
+      if (idx === storySteps.length - 1) {
+        // Show final banner after 3.5s
+        setTimeout(() => {
+          document.getElementById("final-screen").classList.add("visible");
+        }, 3500);
+      } else {
+        document.getElementById("final-screen").classList.remove("visible");
+      }
+    }
+
+    function startCycle() {
+      renderStoryStep(currentIdx);
+      setInterval(() => {
+        currentIdx = (currentIdx + 1) % storySteps.length;
+        renderStoryStep(currentIdx);
+      }, 4000);
+    }
+
+    setTimeout(startCycle, 800);
+  </script>
+</body>
+</html>
