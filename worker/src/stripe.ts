@@ -120,7 +120,7 @@ export async function processStripeEvent(event: any, env: Env): Promise<{ status
   }
 }
 
-async function handleCheckoutCompleted(session: any, env: Env): Promise<void> {
+export async function handleCheckoutCompleted(session: any, env: Env): Promise<void> {
   const sessionId = session.id;
   const stripeCustomerId = session.customer || session.customer_id || `cus_anon_${sessionId}`;
   const customerDetails = session.customer_details || {};
@@ -165,7 +165,20 @@ async function handleCheckoutCompleted(session: any, env: Env): Promise<void> {
         billingMode: billingMode
       });
     } catch (e) {
-      console.log(`[EMAIL DISPATCH NOTICE] Email sending skipped/deferred: ${e}`);
+      // Throw so Stripe retries the webhook. The existing license contains the
+      // raw key, and the retry path below will resend that same key.
+      console.log(`[EMAIL DISPATCH ERROR] Email sending failed: ${e}`);
+      throw e;
     }
+  } else if (existingLicense.raw_key_temp) {
+    // Webhook retries must never generate a replacement key. Reuse the key
+    // created for this checkout session when delivery previously failed.
+    await sendLicenseEmail({
+      apiKey: env.RESEND_API_KEY || "",
+      fromEmail: env.FROM_EMAIL || "Schemap <onboarding@resend.dev>",
+      toEmail: email,
+      licenseKey: existingLicense.raw_key_temp,
+      billingMode: existingLicense.billing_mode
+    });
   }
 }

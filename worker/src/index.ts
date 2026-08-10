@@ -29,10 +29,13 @@ export default {
       if (!sessionId) {
         return jsonResponse({ error: "Missing session_id parameter." }, 400);
       }
+
       const license = await getLicenseBySessionId(env.DB, sessionId);
+
       if (!license) {
         return jsonResponse({ status: "pending", message: "License is being generated..." }, 200);
       }
+
       return jsonResponse({
         status: "ready",
         license_key: license.raw_key_temp || `${license.key_prefix}...`,

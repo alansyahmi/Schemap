@@ -90,7 +90,7 @@
             <div class="success-card">
                 <span class="badge-success">✓ Payment Confirmed</span>
                 <h2>Welcome to Schemap Pro</h2>
-                <p class="section-lead" style="margin-bottom:0">Your license key has been generated and is ready for activation.</p>
+                <p class="section-lead" style="margin-bottom:0">We’re confirming your purchase and preparing your license key.</p>
 
                 <div id="key-container">
                     <div class="key-display"><span class="loader">Fetching your Pro license key...</span></div>
@@ -128,7 +128,8 @@
             let attempts = 0;
             const poll = async () => {
                 try {
-                    const res = await fetch(`${WORKER_URL}/v1/licenses/session-key?session_id=${sessionId}`);
+                    const res = await fetch(`${WORKER_URL}/v1/licenses/session-key?session_id=${encodeURIComponent(sessionId)}`);
+                    if (!res.ok) throw new Error(`License lookup failed (${res.status})`);
                     const data = await res.json();
 
                     if (data.status === "ready" && data.license_key) {
@@ -138,7 +139,7 @@
                             <button class="btn btn-secondary copy-btn" onclick="copyKey('${key}')">Copy License Key</button>`;
                         cmdText.innerText = `schemap activate ${key}`;
                         cmdBlock.hidden = false;
-                    } else if (attempts < 10) {
+                    } else if (attempts < 20) {
                         attempts++;
                         setTimeout(poll, 1500);
                     } else {
@@ -148,10 +149,15 @@
                             </div>`;
                     }
                 } catch (err) {
-                    container.innerHTML = `
-                        <div class="key-display" style="color:#f87171">
-                            Unable to fetch key online. Please check your confirmation email.
-                        </div>`;
+                    if (attempts < 20) {
+                        attempts++;
+                        setTimeout(poll, 1500);
+                    } else {
+                        container.innerHTML = `
+                            <div class="key-display" style="color:#f87171">
+                                Unable to fetch key online. Please check your confirmation email.
+                            </div>`;
+                    }
                 }
             };
 
