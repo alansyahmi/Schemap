@@ -10,7 +10,7 @@ import platform
 from pathlib import Path
 from typing import Dict, Any, Tuple
 
-DEFAULT_LICENSE_ENDPOINT = "https://api.schemap.com/v1/licenses/verify"
+DEFAULT_LICENSE_ENDPOINT = "https://schemap-license-api.alansyahmi2004.workers.dev/v1/licenses/verify"
 FREE_TABLE_LIMIT = 100
 CACHE_VALID_SECONDS = 7 * 24 * 60 * 60 # 7 days
 
@@ -208,7 +208,7 @@ def verify_tier(tables_count: int, license_key: str | None, endpoint: str | None
         endpoint = DEFAULT_LICENSE_ENDPOINT
         
     verification = verify_license_online(license_key, endpoint)
-    if verification.get("activated"):
+    if verification.get("activated") or verification.get("valid"):
         _write_cache(license_key)
         return
     else:

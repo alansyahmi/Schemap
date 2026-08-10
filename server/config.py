@@ -14,7 +14,8 @@ class ServerSettings(BaseSettings):
     ALLOWED_ORIGINS: List[str] = [
         "https://schemap-tool.pages.dev",
         "https://schemap.com",
-        "https://api.schemap.com"
+        "https://api.schemap.com",
+        "https://schemap-license-api.alansyahmi2004.workers.dev"
     ] + (["http://localhost:8080", "http://127.0.0.1:8080"] if os.getenv("ENVIRONMENT", "development").lower() != "production" else [])
     
     # Mapping Stripe Price IDs to (billing_mode, plan_tier)

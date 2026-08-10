@@ -1,0 +1,12 @@
+name = "schemap-license-api"
+main = "src/index.ts"
+compatibility_date = "2024-03-01"
+
+[vars]
+ENVIRONMENT = "production"
+FROM_EMAIL = "Schemap <onboarding@resend.dev>"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "schemap-licenses-db"
+database_id = "8798d0fa-afba-43b8-81ae-9611512c32ea"

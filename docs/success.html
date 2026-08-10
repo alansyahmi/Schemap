@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Payment Successful | Schemap Pro</title>
+    <link rel="icon" href="assets/Icon Dark.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400&family=Red+Hat+Display:wght@400;500;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css?v=7">
+    <style>
+        .success-card {
+            max-width: 640px;
+            margin: 60px auto;
+            background: #111827;
+            border: 1px solid #1f2937;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            text-align: center;
+        }
+
+        .badge-success {
+            display: inline-block;
+            background: rgba(34, 197, 94, 0.15);
+            color: #4ade80;
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            font-size: 13px;
+            font-weight: 600;
+            padding: 6px 14px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+        }
+
+        .key-display {
+            background: #030712;
+            border: 1px solid #374151;
+            border-radius: 8px;
+            padding: 18px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 15px;
+            color: #38bdf8;
+            word-break: break-all;
+            margin: 24px 0;
+            position: relative;
+        }
+
+        .copy-btn {
+            margin-top: 12px;
+            cursor: pointer;
+        }
+
+        .cmd-block {
+            background: #030712;
+            border: 1px solid #1f2937;
+            border-radius: 8px;
+            padding: 16px 20px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            color: #4ade80;
+            text-align: left;
+            margin-top: 20px;
+        }
+
+        .loader {
+            color: #9ca3af;
+            font-style: italic;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a class="logo" href="index.html">
+                <img src="assets/Text_Logo__Dark_-removebg-preview2.png" alt="Schemap">
+            </a>
+            <div class="nav-links">
+                <a href="index.html#features">Features</a>
+                <a class="nav-btn" href="https://github.com/alansyahmi/Schemap" target="_blank" rel="noopener">GitHub</a>
+            </div>
+        </div>
+    </nav>
+    <main>
+        <div class="section-container">
+            <div class="success-card">
+                <span class="badge-success">✓ Payment Confirmed</span>
+                <h2>Welcome to Schemap Pro</h2>
+                <p class="section-lead" style="margin-bottom:0">Your license key has been generated and is ready for activation.</p>
+
+                <div id="key-container">
+                    <div class="key-display"><span class="loader">Fetching your Pro license key...</span></div>
+                </div>
+
+                <div class="cmd-block" id="cmd-container" hidden>
+                    <b style="color:#6b7280">$</b> <span id="cmd-text">schemap activate ...</span>
+                </div>
+
+                <div style="margin-top:32px">
+                    <a class="btn btn-secondary" href="index.html">Return to Homepage</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const WORKER_URL = "https://schemap-license-api.alansyahmi2004.workers.dev";
+
+        async function loadLicenseKey() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const sessionId = urlParams.get("session_id");
+            const container = document.getElementById("key-container");
+            const cmdBlock = document.getElementById("cmd-container");
+            const cmdText = document.getElementById("cmd-text");
+
+            if (!sessionId) {
+                container.innerHTML = `
+                    <div class="key-display" style="color:#f87171">
+                        No session ID found. Check your email receipt for your license key.
+                    </div>`;
+                return;
+            }
+
+            let attempts = 0;
+            const poll = async () => {
+                try {
+                    const res = await fetch(`${WORKER_URL}/v1/licenses/session-key?session_id=${sessionId}`);
+                    const data = await res.json();
+
+                    if (data.status === "ready" && data.license_key) {
+                        const key = data.license_key;
+                        container.innerHTML = `
+                            <div class="key-display" id="key-text">${key}</div>
+                            <button class="btn btn-secondary copy-btn" onclick="copyKey('${key}')">Copy License Key</button>`;
+                        cmdText.innerText = `schemap activate ${key}`;
+                        cmdBlock.hidden = false;
+                    } else if (attempts < 10) {
+                        attempts++;
+                        setTimeout(poll, 1500);
+                    } else {
+                        container.innerHTML = `
+                            <div class="key-display" style="color:#facc15">
+                                License key generation is taking a moment. Please check your email receipt.
+                            </div>`;
+                    }
+                } catch (err) {
+                    container.innerHTML = `
+                        <div class="key-display" style="color:#f87171">
+                            Unable to fetch key online. Please check your confirmation email.
+                        </div>`;
+                }
+            };
+
+            poll();
+        }
+
+        function copyKey(key) {
+            navigator.clipboard.writeText(key);
+            alert("License key copied to clipboard!");
+        }
+
+        window.addEventListener("DOMContentLoaded", loadLicenseKey);
+    </script>
+</body>
+
+</html>
