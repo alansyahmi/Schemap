@@ -1,9 +1,9 @@
 services:
   - type: web
-    name: schemap-license-api
-    runtime: docker
-    dockerfilePath: ./server/Dockerfile
-    dockerContext: .
+    name: schemap-license-server
+    runtime: python
+    buildCommand: pip install -r server/requirements.txt
+    startCommand: uvicorn server.app:app --host 0.0.0.0 --port $PORT
     healthCheckPath: /health
     envVars:
       - key: ENVIRONMENT
@@ -20,13 +20,3 @@ services:
         generateValue: true
       - key: FROM_EMAIL
         value: Schemap <licenses@schemap.com>
-      - key: PRICE_MONTHLY_ID
-        sync: false
-      - key: PRICE_QUARTERLY_ID
-        sync: false
-      - key: PRICE_SEMIANNUAL_ID
-        sync: false
-      - key: PRICE_ANNUAL_ID
-        sync: false
-      - key: PRICE_LIFETIME_ID
-        sync: false
