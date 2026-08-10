@@ -8,10 +8,11 @@ class ServerSettings(BaseSettings):
     STRIPE_SECRET_KEY: str = os.getenv("STRIPE_SECRET_KEY", "sk_test_mock")
     STRIPE_WEBHOOK_SECRET: str = os.getenv("STRIPE_WEBHOOK_SECRET", "whsec_mock")
     RESEND_API_KEY: str = os.getenv("RESEND_API_KEY", "")
-    FROM_EMAIL: str = os.getenv("FROM_EMAIL", "Schemap <licenses@schemap.com>")
+    FROM_EMAIL: str = os.getenv("FROM_EMAIL", "Schemap <onboarding@resend.dev>")
     SERVER_PEPPER: str = os.getenv("SERVER_PEPPER", "schemap_prod_pepper_v1_secret")
     IS_TEST_MODE: bool = os.getenv("IS_TEST_MODE", "false").lower() == "true"
     ALLOWED_ORIGINS: List[str] = [
+        "https://schemap-tool.pages.dev",
         "https://schemap.com",
         "https://api.schemap.com"
     ] + (["http://localhost:8080", "http://127.0.0.1:8080"] if os.getenv("ENVIRONMENT", "development").lower() != "production" else [])

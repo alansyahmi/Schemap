@@ -19,4 +19,4 @@ services:
       - key: SERVER_PEPPER
         generateValue: true
       - key: FROM_EMAIL
-        value: Schemap <licenses@schemap.com>
+        value: Schemap <onboarding@resend.dev>
