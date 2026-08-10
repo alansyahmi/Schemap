@@ -13,6 +13,7 @@ from .renderer import render_output, write_output
 from .license import (
     verify_tier,
     verify_license_online,
+    deactivate_license_online,
     resolve_license_key,
     resolve_license_endpoint,
     save_credentials,
@@ -33,6 +34,7 @@ from .doctor import get_doctor_report
 from .benchmark import calculate_benchmark
 
 @click.group()
+@click.version_option(package_name="schemap-tool", message="Schemap %(version)s")
 def cli():
     """Schemap: AI Database Context Compiler — The fastest way to make your database AI-ready."""
     pass
@@ -54,13 +56,16 @@ database:
     - "spatial_ref_sys"
     - "alembic_version"
 output:
-  file_path: "./database_context.md"
+  file_path: "./schemap_database_context.md"
   format: "markdown"
 domain:
   name: "ecommerce"
   mappings:
-    inv: "Invoice"
     cust: "Customer"
+    tx: "Transaction"
+    inv: "Invoice"
+    acct: "Account"
+    amt: "Amount"
   ignore_abbreviations:
     - "slug"
     - "pos"
@@ -71,7 +76,7 @@ schema_descriptions:
       pos:
         description: "Position index of the element"
 license_key: ""
-license_endpoint: "https://api.schemap.com/v1/licenses/verify"
+license_endpoint: "https://schemap-license-api.alansyahmi2004.workers.dev/v1/licenses/verify"
 """
     else:
         boilerplate = """# Schemap Configuration
@@ -79,10 +84,14 @@ database:
   connection_url: "sqlite:///test.db"
 
 output:
-  file_path: "./database_context.md"
+  file_path: "./schemap_database_context.md"
 
 domain:
-  mappings: {}
+  mappings:
+    cust: "Customer"
+    tx: "Transaction"
+    inv: "Invoice"
+    acct: "Account"
 """
 
     with open(config_path, "w", encoding="utf-8") as f:
@@ -283,7 +292,7 @@ def inspect(config, json_output, verbose):
 @click.option('--enrich', is_flag=True, help="[BETA] Apply optional LLM enrichment for table descriptions.")
 @click.option('--track/--no-track', default=True, help="Track schema state for diff intelligence.")
 def context(config, verbose, fmt, enrich, track):
-    """Generate AI-optimized database context (database_context.md)."""
+    """Generate AI-optimized database context (schemap_database_context.md)."""
     try:
         cfg = load_config(config)
         schema_model, raw_tables, _ = _process_schema(cfg, enrich)
@@ -292,7 +301,7 @@ def context(config, verbose, fmt, enrich, track):
             save_current_state(schema_model)
             
         target_fmt = fmt if fmt else cfg.output.format
-        out_path = Path("database_context.md") if target_fmt == "markdown" else Path(cfg.output.file_path)
+        out_path = Path(cfg.output.file_path) if cfg.output.file_path else Path("schemap_database_context.md")
         
         click.echo(f"-> Compiling AI context engine [{target_fmt}]... ", nl=False)
         if target_fmt == "markdown":
@@ -508,7 +517,10 @@ def activate(key, endpoint):
     click.echo(f"-> Verifying license key '{key[:12]}...' with {endpoint_to_use}... ", nl=False)
 
     res = verify_license_online(key, endpoint_to_use)
-    if res.get("activated"):
+    # The license API may return either `activated` or `valid` for a
+    # successful verification. Accept both so activation matches the normal
+    # license verification path.
+    if res.get("activated") or res.get("valid"):
         saved_path = save_credentials(key, endpoint)
         click.secho("OK", fg="green")
         click.secho(f"\n[SUCCESS] License activated successfully! Credentials saved to {saved_path}", fg="green", bold=True)
@@ -548,7 +560,7 @@ def license_status(config, verify):
         if verify:
             endpoint = resolve_license_endpoint(config_endpoint=cfg.license_endpoint if 'cfg' in locals() else None)
             result = verify_license_online(active_key, endpoint)
-            if result.get("activated"):
+            if result.get("activated") or result.get("valid"):
                 click.secho("  Verification:     Active", fg="green")
                 if result.get("plan"):
                     click.echo(f"  Plan:             {result['plan']}")
@@ -571,6 +583,30 @@ def license_status(config, verify):
 
     click.echo(f"  Credentials File: {CREDENTIALS_FILE}")
     click.secho("=" * 50 + "\n", fg="cyan", bold=True)
+
+@cli.command()
+@click.option('--config', default="schemap.yaml", help="Path to configuration file.")
+def deactivate(config):
+    """Deactivate Schemap Pro license on this device to free up a seat."""
+    config_key = None
+    try:
+        cfg = load_config(config)
+        config_key = cfg.license_key
+    except Exception:
+        pass
+
+    active_key, source = resolve_license_key(config_key=config_key)
+    if not active_key:
+        click.secho("[INFO] No active license configured on this machine.", fg="yellow")
+        sys.exit(0)
+
+    endpoint = resolve_license_endpoint(config_endpoint=cfg.license_endpoint if 'cfg' in locals() else None)
+    click.echo(f"-> Deactivating seat for active license key '{active_key[:12]}...'... ", nl=False)
+
+    deactivate_license_online(active_key, endpoint)
+    clear_credentials()
+    click.secho("OK", fg="green")
+    click.secho("\n[SUCCESS] License deactivated on this device. (1 seat freed)", fg="green", bold=True)
 
 @cli.command()
 def logout():

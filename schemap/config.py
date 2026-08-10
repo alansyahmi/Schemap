@@ -7,7 +7,7 @@ class DatabaseConfig(BaseModel):
     exclude_tables: list[str] = Field(default_factory=list)
 
 class OutputConfig(BaseModel):
-    file_path: str = "./llm_data_context.md"
+    file_path: str = "./schemap_database_context.md"
     format: str = "markdown"
 
 class LLMConfig(BaseModel):

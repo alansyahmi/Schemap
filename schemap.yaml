@@ -5,5 +5,12 @@ database:
     - "spatial_ref_sys"
     - "alembic_version"
 output:
-  file_path: "./llm_data_context.md"
+  file_path: "./schemap_database_context.md"
   format: "markdown"
+
+domain:
+  mappings:
+    cust: "Customer"
+    tx: "Transaction"
+    inv: "Invoice"
+    acct: "Account"

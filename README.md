@@ -23,7 +23,7 @@ Modern **AI coding agents** (Claude Code, Cursor, GitHub Copilot, Codex) struggl
 
 Raw `pg_dump` SQL dumps waste **10,000+ tokens**, introduce noisy system metadata, cause broken multi-table JOINs, and force LLMs to guess business relationships.
 
-**Schemap solves this.** Schemap is a deterministic CLI compiler that extracts database schemas, computes **AI Readiness Scores**, and generates compressed, token-optimized context maps (`database_context.md`, `CLAUDE.md`, `AGENTS.md`).
+**Schemap solves this.** Schemap is a deterministic CLI compiler that extracts database schemas, computes **AI Readiness Scores**, and generates compressed, token-optimized context maps (`schemap_database_context.md`, `CLAUDE.md`, `AGENTS.md`).
 
 - **Token-optimized context:** Run `schemap benchmark` against your own schema to measure the raw-vs-compiled token footprint.
 - **Local-first & deterministic:** Schema extraction and compilation run locally by default. Optional `--enrich` uses the configured OpenAI API, and licensed CI/CD usage performs an online license check.
@@ -47,25 +47,59 @@ Compression varies by schema. Run `schemap benchmark` to measure the token footp
 
 ## Installation & Quick Start
 
-Install Schemap via PyPI (or `uv`):
+Install Schemap globally as a developer CLI via **`pipx`** (recommended) or `uv` / `pip`:
 
 ```bash
-pip install schemap-tool
+pipx install schemap-tool
 ```
 
-### 1. Initialize Configuration
-Generate a lightweight `schemap.yaml` config file:
+> **Alternative package managers:**
+> - **uv:** `uv tool install schemap-tool`
+> - **pip:** `pip install schemap-tool`
+
+### 1. Verify Installation
+```bash
+schemap --version
+# Schemap 2.2.0
+```
+
+### 2. Upgrading Schemap
+To upgrade an existing installation to the latest release:
+
+```bash
+pipx upgrade schemap-tool
+```
+*(Or `uv tool upgrade schemap-tool` / `pip install --upgrade schemap-tool`)*
+
+### 3. Initialize Configuration
+Generate a lightweight `schemap.yaml` config file with predefined domain mappings:
 
 ```bash
 schemap init
 ```
 
-*For full boilerplate options (domain mappings, schema overrides):*
+Example `schemap.yaml` with domain mappings:
+```yaml
+database:
+  connection_url: "sqlite:///test.db"
+
+output:
+  file_path: "./schemap_database_context.md"
+
+domain:
+  mappings:
+    cust: "Customer"
+    tx: "Transaction"
+    inv: "Invoice"
+    acct: "Account"
+```
+
+*For full boilerplate options (schema descriptions, table exclusions):*
 ```bash
 schemap init --full
 ```
 
-### 2. Run Database Health Diagnostic (`schemap doctor`)
+### 4. Run Database Health Diagnostic (`schemap doctor`)
 Diagnose database readiness and identify missing foreign keys, undocumented tables, or ambiguous column names:
 
 ```bash
@@ -92,8 +126,8 @@ schemap doctor
 ==================================================
 ```
 
-### 3. Compile AI Database Context (`schemap context`)
-Compile `database_context.md` containing relationship maps, central tables, and standard SQL JOIN snippets:
+### 5. Compile AI Database Context (`schemap context`)
+Compile `schemap_database_context.md` containing relationship maps, central tables, and standard SQL JOIN snippets:
 
 ```bash
 schemap context

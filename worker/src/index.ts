@@ -1,5 +1,5 @@
-import { Env, getLicenseByHash, getLicenseBySessionId, updateLicenseAudit } from "./db";
-import { hashLicenseKey } from "./security";
+import { Env, getLicenseByHash, getLicenseBySessionId, updateLicenseAudit, registerDeviceActivation, removeDeviceActivation } from "./db";
+import { hashLicenseKey, hashDeviceFingerprint } from "./security";
 import { verifyStripeSignature, processStripeEvent } from "./stripe";
 
 const CORS_HEADERS = {
@@ -105,6 +105,27 @@ export default {
           }
         }
 
+        // Device Fingerprint & Seat Limit Registration
+        const deviceId = body.device_id || body.instance_name || "default_device";
+        const deviceFingerprint = await hashDeviceFingerprint(deviceId);
+        const maxSeats = 3; // Pro & Founder Lifetime = 3 seats
+
+        const activation = await registerDeviceActivation(
+          env.DB,
+          license.id,
+          deviceFingerprint,
+          body.instance_name,
+          maxSeats
+        );
+
+        if (!activation.success) {
+          return jsonResponse({
+            valid: false,
+            activated: false,
+            error: activation.error || "Seat limit reached."
+          }, 200);
+        }
+
         // Audit log
         ctx.waitUntil(updateLicenseAudit(env.DB, license.id, body.instance_name));
 
@@ -113,6 +134,8 @@ export default {
           activated: true,
           tier: license.plan_tier,
           plan: license.billing_mode,
+          seats_used: activation.seatsUsed,
+          max_seats: activation.maxSeats,
           expires_at: license.expires_at || null
         }, 200);
 
@@ -123,7 +146,24 @@ export default {
 
     // 5. POST /v1/licenses/deactivate
     if (url.pathname === "/v1/licenses/deactivate" && method === "POST") {
-      return jsonResponse({ valid: true, deactivated: true });
+      try {
+        const body: any = await request.json();
+        const rawKey = body.license_key ? body.license_key.trim() : "";
+        const deviceId = body.device_id || body.instance_name || "";
+
+        if (rawKey && deviceId) {
+          const pepper = env.SERVER_PEPPER || "schemap_prod_pepper_v1_secret";
+          const keyHash = await hashLicenseKey(rawKey, pepper);
+          const license = await getLicenseByHash(env.DB, keyHash);
+          if (license) {
+            const deviceFingerprint = await hashDeviceFingerprint(deviceId);
+            await removeDeviceActivation(env.DB, license.id, deviceFingerprint);
+          }
+        }
+        return jsonResponse({ valid: true, deactivated: true });
+      } catch (err: any) {
+        return jsonResponse({ valid: true, deactivated: true });
+      }
     }
 
     return jsonResponse({ error: "Not found" }, 404);

@@ -50,7 +50,7 @@
                         <p><b class="ok">✓</b> Connected to database</p>
                         <p><b class="ok">✓</b> Relationships analyzed</p>
                         <p><b class="ok">✓</b> Context compiled</p>
-                        <p class="terminal-result">→ database_context.md</p>
+                        <p class="terminal-result">→ schemap_database_context.md</p>
                     </div>
                 </div>
             </div>
@@ -141,7 +141,7 @@
                         <p class="muted">→ Inspecting schema...</p>
                         <p class="muted">→ Mapping foreign-key relationships...</p>
                         <p class="muted">→ Compiling AI context...</p>
-                        <p><b class="ok">✓</b> Context written to <strong>database_context.md</strong></p>
+                        <p><b class="ok">✓</b> Context written to <strong>schemap_database_context.md</strong></p>
                         <hr>
                         <p><b class="prompt">$</b> schemap benchmark</p>
                         <p class="ok">Measure raw vs compiled tokens on your schema.</p>
@@ -217,15 +217,48 @@
         </section>
         <section id="installation" class="section section-dark">
             <div class="section-container narrow install-content">
-                <p class="eyebrow">Start locally</p>
-                <h2>Add a context layer in minutes.</h2>
-                <p class="section-lead">Install the CLI, point it at your database, and compile a context file for your
-                    agent.</p>
-                <div class="install-steps">
-                    <pre><code>pip install schemap-tool</code></pre>
-                    <pre><code>schemap init</code></pre>
-                    <pre><code>schemap context</code></pre>
-                </div><button id="copy-install-btn" class="btn btn-secondary">Copy install command</button>
+                <p class="eyebrow">Start locally in 60 seconds</p>
+                <h2>Add an AI database context layer.</h2>
+                <p class="section-lead">Install the CLI, point it at your schema, and compile instant AI-ready context.</p>
+                
+                <div class="pm-toggle" style="display: flex; justify-content: center; gap: 6px; margin: -1rem auto 2rem; max-width: 320px; background: var(--surface2); padding: 4px; border: 1px solid var(--line); border-radius: var(--radius);">
+                    <button class="pm-btn is-active" data-pm="pipx" style="flex: 1; padding: 6px 12px; border: 0; background: transparent; color: var(--muted); font: 600 0.8rem 'JetBrains Mono', monospace; border-radius: var(--radius); cursor: pointer;">pipx</button>
+                    <button class="pm-btn" data-pm="uv" style="flex: 1; padding: 6px 12px; border: 0; background: transparent; color: var(--muted); font: 600 0.8rem 'JetBrains Mono', monospace; border-radius: var(--radius); cursor: pointer;">uv</button>
+                    <button class="pm-btn" data-pm="pip" style="flex: 1; padding: 6px 12px; border: 0; background: transparent; color: var(--muted); font: 600 0.8rem 'JetBrains Mono', monospace; border-radius: var(--radius); cursor: pointer;">pip</button>
+                </div>
+
+                <div class="install-card">
+                    <div class="install-flow-header">
+                        <span class="flow-badge free">Free (Works immediately)</span>
+                    </div>
+                    <div class="install-steps">
+                        <p class="step-comment"># 1. Install developer CLI globally</p>
+                        <pre><code id="install-cmd-code">pipx install schemap-tool</code></pre>
+                        <p class="step-comment"># 2. Verify installation</p>
+                        <pre><code>schemap --version</code></pre>
+                        <p class="step-comment"># 3. Initialize &amp; compile context</p>
+                        <pre><code>schemap init</code></pre>
+                        <pre><code>schemap context</code></pre>
+                    </div>
+                </div>
+
+                <div class="install-card pro-card" style="margin-top: 1.5rem; opacity: 0.9;">
+                    <div class="install-flow-header">
+                        <span class="flow-badge pro">Pro (Optional activation)</span>
+                    </div>
+                    <div class="install-steps">
+                        <p class="step-comment"># Activate Pro key anytime for unlimited tables &amp; CI/CD</p>
+                        <pre><code>schemap activate YOUR_LICENSE_KEY</code></pre>
+                    </div>
+                </div>
+
+                <div style="margin-top: 2rem; display: flex; align-items: center; justify-content: center; gap: 1rem; flex-wrap: wrap;">
+                    <button id="copy-install-btn" class="btn btn-primary">Copy pipx install</button>
+                    <span class="muted" style="font-size: 0.875rem;">Requirements: Python 3.10+</span>
+                </div>
+                <div style="margin-top: 1rem; color: var(--subtle); font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; text-align: center;">
+                    Already installed? Upgrade anytime: <code id="upgrade-cmd-code" style="color: var(--blue);">pipx upgrade schemap-tool</code>
+                </div>
             </div>
         </section>
         <section id="pricing" class="section pricing">
@@ -287,6 +320,10 @@
                 <p class="eyebrow">Developer FAQ</p>
                 <h2>A few practical answers.</h2>
                 <div class="faq-list">
+                    <details>
+                        <summary>How do I update Schemap to the latest version?</summary>
+                        <p>Run <code>pipx upgrade schemap-tool</code> (or <code>uv tool upgrade schemap-tool</code> / <code>pip install --upgrade schemap-tool</code>). You can verify your active CLI version anytime with <code>schemap --version</code>.</p>
+                    </details>
                     <details>
                         <summary>Does Schemap send my database data to an AI?</summary>
                         <p>Not by default. Extraction and compilation run locally. Optional <code>--enrich</code> sends

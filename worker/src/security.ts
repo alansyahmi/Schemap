@@ -23,6 +23,15 @@ export function getKeyPrefix(licenseKey: string): string {
   return cleanKey.slice(0, 16);
 }
 
+export async function hashDeviceFingerprint(deviceId: string): Promise<string> {
+  const cleanId = deviceId.trim();
+  const encoder = new TextEncoder();
+  const data = encoder.encode(`device::${cleanId}`);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
 function license_key_clean(key: string): string {
   return key.trim();
 }

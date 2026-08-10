@@ -35,13 +35,56 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
+    const pmCommands = {
+        pipx: {
+            install: "pipx install schemap-tool",
+            upgrade: "pipx upgrade schemap-tool",
+            copyText: "Copy pipx install"
+        },
+        uv: {
+            install: "uv tool install schemap-tool",
+            upgrade: "uv tool upgrade schemap-tool",
+            copyText: "Copy uv install"
+        },
+        pip: {
+            install: "pip install schemap-tool",
+            upgrade: "pip install --upgrade schemap-tool",
+            copyText: "Copy pip install"
+        }
+    };
+    let currentPm = "pipx";
+
+    document.querySelectorAll("[data-pm]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+            currentPm = btn.dataset.pm;
+            const pmData = pmCommands[currentPm];
+            if (!pmData) return;
+
+            document.querySelectorAll("[data-pm]").forEach((b) => {
+                const active = b === btn;
+                b.classList.toggle("is-active", active);
+                b.style.background = active ? "var(--blue)" : "transparent";
+                b.style.color = active ? "var(--bg)" : "var(--muted)";
+            });
+
+            const installCode = document.getElementById("install-cmd-code");
+            const upgradeCode = document.getElementById("upgrade-cmd-code");
+            const copyBtn = document.getElementById("copy-install-btn");
+
+            if (installCode) installCode.textContent = pmData.install;
+            if (upgradeCode) upgradeCode.textContent = pmData.upgrade;
+            if (copyBtn) copyBtn.textContent = pmData.copyText;
+        });
+    });
+
     const copy = document.getElementById("copy-install-btn");
     if (copy) {
         copy.addEventListener("click", async () => {
             try {
-                await navigator.clipboard.writeText("pip install schemap-tool");
+                const textToCopy = pmCommands[currentPm]?.install || "pipx install schemap-tool";
+                await navigator.clipboard.writeText(textToCopy);
                 const original = copy.textContent;
-                copy.textContent = "Copied to clipboard";
+                copy.textContent = "Copied to clipboard!";
                 setTimeout(() => copy.textContent = original, 1800);
             } catch {
                 copy.textContent = "Copy unavailable";

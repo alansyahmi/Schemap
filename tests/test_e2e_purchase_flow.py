@@ -18,17 +18,17 @@ def clean_env_and_db():
     clear_credentials()
     Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
-    if Path("database_context.md").exists():
+    if Path("schemap_database_context.md").exists():
         try:
-            Path("database_context.md").unlink()
+            Path("schemap_database_context.md").unlink()
         except Exception:
             pass
     yield
     clear_credentials()
     Base.metadata.drop_all(bind=engine)
-    if Path("database_context.md").exists():
+    if Path("schemap_database_context.md").exists():
         try:
-            Path("database_context.md").unlink()
+            Path("schemap_database_context.md").unlink()
         except Exception:
             pass
 
@@ -149,7 +149,7 @@ def test_full_end_to_end_purchase_and_cli_activation(mocker, tmp_path):
     config_content = f"""database:
   connection_url: "sqlite:///{str(db_path).replace('\\', '/')}"
 output:
-  file_path: "./database_context.md"
+  file_path: "./schemap_database_context.md"
   format: "markdown"
 """
     config_path.write_text(config_content, encoding="utf-8")
@@ -158,7 +158,7 @@ output:
     context_res = runner.invoke(cli, ["context", "--config", str(config_path)])
     assert context_res.exit_code == 0
     assert "Verifying license tier... OK" in context_res.output
-    assert Path("database_context.md").exists()
+    assert Path("schemap_database_context.md").exists()
 
     # -------------------------------------------------------------------------
     # STEP 7: Verify Subscription Lifecycle (Revocation)

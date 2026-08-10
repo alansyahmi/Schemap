@@ -3,6 +3,7 @@ import sys
 import stat
 import time
 import json
+import uuid
 import hashlib
 import urllib.request
 import urllib.error
@@ -24,6 +25,28 @@ def get_app_dir() -> Path:
 CACHE_DIR = get_app_dir()
 CACHE_FILE = CACHE_DIR / "license.cache"
 CREDENTIALS_FILE = CACHE_DIR / "credentials.json"
+DEVICE_ID_FILE = CACHE_DIR / "device_id"
+
+def get_or_create_device_id() -> str:
+    """
+    Returns a stable, persistent UUID for this installation/device.
+    Stored in ~/.config/schemap/device_id or APPDATA/Schemap/device_id.
+    """
+    try:
+        if DEVICE_ID_FILE.exists():
+            content = DEVICE_ID_FILE.read_text(encoding="utf-8").strip()
+            if content:
+                return content
+    except Exception:
+        pass
+
+    device_id = str(uuid.uuid4())
+    try:
+        CACHE_DIR.mkdir(parents=True, exist_ok=True)
+        DEVICE_ID_FILE.write_text(device_id, encoding="utf-8")
+    except Exception:
+        pass
+    return device_id
 
 class LicenseError(Exception):
     pass
@@ -148,15 +171,21 @@ def verify_license_online(license_key: str, endpoint: str) -> Dict[str, Any]:
     Pings Schemap license server to validate and activate the license key for this instance.
     """
     instance_name = os.getenv("GITHUB_RUN_ID", platform.node())
+    device_id = get_or_create_device_id()
     payload = {
         "license_key": license_key,
-        "instance_name": instance_name
+        "instance_name": instance_name,
+        "device_id": device_id
     }
     
     req = urllib.request.Request(
         endpoint,
         data=json.dumps(payload).encode("utf-8"),
-        headers={"Accept": "application/json", "Content-Type": "application/json"},
+        headers={
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36 SchemapCLI/2.1"
+        },
         method="POST"
     )
     
@@ -171,6 +200,45 @@ def verify_license_online(license_key: str, endpoint: str) -> Dict[str, Any]:
             return {"activated": False, "error": f"HTTP Error {e.code}"}
     except Exception as e:
         return {"activated": False, "error": f"Network unreachable. Cannot verify license. Details: {str(e)}"}
+
+def deactivate_license_online(license_key: str, endpoint: str) -> Dict[str, Any]:
+    """
+    Notifies Schemap license server to remove device seat activation for this instance.
+    """
+    deactivate_endpoint = endpoint.replace("/v1/licenses/verify", "/v1/licenses/deactivate")
+    if not deactivate_endpoint.endswith("/v1/licenses/deactivate"):
+        deactivate_endpoint = "https://schemap-license-api.alansyahmi2004.workers.dev/v1/licenses/deactivate"
+
+    instance_name = os.getenv("GITHUB_RUN_ID", platform.node())
+    device_id = get_or_create_device_id()
+    payload = {
+        "license_key": license_key,
+        "instance_name": instance_name,
+        "device_id": device_id
+    }
+    
+    req = urllib.request.Request(
+        deactivate_endpoint,
+        data=json.dumps(payload).encode("utf-8"),
+        headers={
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36 SchemapCLI/2.1"
+        },
+        method="POST"
+    )
+    
+    try:
+        with urllib.request.urlopen(req, timeout=5) as response:
+            res_data = json.loads(response.read().decode("utf-8"))
+            return res_data
+    except urllib.error.HTTPError as e:
+        try:
+            return json.loads(e.read().decode("utf-8"))
+        except Exception:
+            return {"deactivated": False, "error": f"HTTP Error {e.code}"}
+    except Exception as e:
+        return {"deactivated": False, "error": f"Network unreachable. Details: {str(e)}"}
 
 def verify_tier(tables_count: int, license_key: str | None, endpoint: str | None = None):
     """

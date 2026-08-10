@@ -112,6 +112,68 @@ export async function revokeLicenseByCustomerOrPayment(db: D1Database, stripeCus
   }
 }
 
+export interface ActivationRecord {
+  id: number;
+  license_id: number;
+  device_fingerprint: string;
+  instance_name?: string;
+  created_at: string;
+  last_seen_at: string;
+}
+
 export async function updateLicenseAudit(db: D1Database, licenseId: number, instanceName?: string): Promise<void> {
   await db.prepare("UPDATE licenses SET last_verified_at = datetime('now'), last_instance_name = ? WHERE id = ?").bind(instanceName || null, licenseId).run();
 }
+
+export async function getActivationsCount(db: D1Database, licenseId: number): Promise<number> {
+  const result = await db.prepare("SELECT COUNT(*) as count FROM license_activations WHERE license_id = ?").bind(licenseId).first<{ count: number }>();
+  return result?.count || 0;
+}
+
+export async function registerDeviceActivation(
+  db: D1Database,
+  licenseId: number,
+  deviceFingerprint: string,
+  instanceName?: string,
+  maxSeats: number = 3
+): Promise<{ success: boolean; seatsUsed: number; maxSeats: number; error?: string }> {
+  const existing = await db.prepare(
+    "SELECT id FROM license_activations WHERE license_id = ? AND device_fingerprint = ?"
+  ).bind(licenseId, deviceFingerprint).first<ActivationRecord>();
+
+  if (existing) {
+    await db.prepare(
+      "UPDATE license_activations SET last_seen_at = datetime('now'), instance_name = ? WHERE id = ?"
+    ).bind(instanceName || null, existing.id).run();
+    const count = await getActivationsCount(db, licenseId);
+    return { success: true, seatsUsed: count, maxSeats };
+  }
+
+  const currentCount = await getActivationsCount(db, licenseId);
+  if (currentCount >= maxSeats) {
+    return {
+      success: false,
+      seatsUsed: currentCount,
+      maxSeats,
+      error: `Seat limit reached (${currentCount}/${maxSeats} devices activated). Run 'schemap deactivate' on an unused device.`
+    };
+  }
+
+  await db.prepare(
+    "INSERT INTO license_activations (license_id, device_fingerprint, instance_name) VALUES (?, ?, ?)"
+  ).bind(licenseId, deviceFingerprint, instanceName || null).run();
+
+  return { success: true, seatsUsed: currentCount + 1, maxSeats };
+}
+
+export async function removeDeviceActivation(
+  db: D1Database,
+  licenseId: number,
+  deviceFingerprint: string
+): Promise<boolean> {
+  const result = await db.prepare(
+    "DELETE FROM license_activations WHERE license_id = ? AND device_fingerprint = ?"
+  ).bind(licenseId, deviceFingerprint).run();
+  return (result.meta?.changes ?? 0) > 0;
+}
+

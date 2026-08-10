@@ -90,7 +90,7 @@ def generate_query_examples(schema_model: DatabaseSchemaModel) -> List[str]:
     return queries
 
 def generate_database_context(schema_model: DatabaseSchemaModel) -> str:
-    """Generate the full database_context.md content."""
+    """Generate the full schemap_database_context.md content."""
     total_tables = len(schema_model.tables)
     total_cols = sum(len(t.columns) for t in schema_model.tables)
     total_fks = sum(len(t.foreign_keys) for t in schema_model.tables)

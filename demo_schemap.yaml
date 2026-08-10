@@ -2,5 +2,13 @@ database:
   connection_url: "sqlite:///demo_ecommerce.db"
   exclude_tables: []
 output:
-  file_path: "./database_context.md"
+  file_path: "./schemap_database_context.md"
   format: "markdown"
+
+domain:
+  mappings:
+    cust: "Customer"
+    tx: "Transaction"
+    inv: "Invoice"
+    acct: "Account"
+
