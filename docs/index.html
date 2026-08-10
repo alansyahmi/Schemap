@@ -1,34 +1,335 @@
 <!doctype html>
 <html lang="en">
+
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Give AI the Context It Needs to Understand Your Database | Schemap</title>
-<meta name="description" content="Schemap compiles your database schema into compact, deterministic context for AI coding agents, SQL workflows, and developer tools.">
-<link rel="icon" href="assets/Icon Dark.png"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@400;500;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"><link rel="stylesheet" href="style.css?v=7">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Give AI the Context It Needs to Understand Your Database | Schemap</title>
+    <meta name="description"
+        content="Schemap compiles your database schema into compact, deterministic context for AI coding agents, SQL workflows, and developer tools.">
+    <link rel="icon" href="assets/Icon Dark.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400&family=Red+Hat+Display:wght@400;500;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css?v=7">
 </head>
+
 <body>
-<nav class="navbar"><div class="nav-container"><a class="logo" href="#" aria-label="Schemap home"><img src="assets/Text_Logo__Dark_-removebg-preview2.png" alt="Schemap"></a><div class="nav-links"><a href="#how-it-works">How it works</a><a href="#features">Features</a><a href="#pricing">Pricing</a><a class="nav-btn" href="https://github.com/alansyahmi/Schemap" target="_blank" rel="noopener">GitHub</a></div><a class="mobile-cta" href="#installation">Install free</a></div></nav>
-<main>
-<header class="hero" style="position:relative;overflow:hidden"><canvas id="matrix-bg" aria-hidden="true"></canvas><div class="hero-content" style="position:relative;z-index:1"><p class="eyebrow">AI Database Context Compiler</p><h1>AI can write SQL.<br><span>It can’t know your database.</span></h1><p class="hero-subtitle">Schemap compiles your database schema into compact, deterministic context for AI coding agents, SQL workflows, and developer tools.</p><div class="hero-actions"><a class="btn btn-primary" href="#installation">Install Schemap Free</a><a class="btn btn-secondary" href="https://github.com/alansyahmi/Schemap" target="_blank" rel="noopener">View on GitHub</a></div><p class="trust-line"><span>Local-first</span><span>PostgreSQL</span><span>SQLite</span><span>MySQL</span><span>Oracle</span><span>CLI-first</span></p></div>
-<div class="terminal hero-terminal" style="position:relative;z-index:1"><div class="terminal-bar"><i class="dot red"></i><i class="dot yellow"></i><i class="dot green"></i><span>terminal</span></div><div class="terminal-body"><p><b class="prompt">$</b> <span id="type-cmd"></span><i class="cursor"></i></p><div id="terminal-output" hidden><p><b class="ok">✓</b> Connected to database</p><p><b class="ok">✓</b> Relationships analyzed</p><p><b class="ok">✓</b> Context compiled</p><p class="terminal-result">→ database_context.md</p></div></div></div></header>
-<section class="section proof"><div class="section-container"><p class="eyebrow">The dangerous kind of wrong</p><h2>Looks right. Isn’t.</h2><p class="section-lead">AI can confidently generate a query that matches familiar naming patterns—but misses the relationships that are true in your database.</p><div class="proof-switcher"><div class="proof-tabs" role="tablist"><button class="proof-tab is-active" role="tab" aria-selected="true" data-proof-tab="without">Without Schemap</button><button class="proof-tab" role="tab" aria-selected="false" data-proof-tab="with">With Schemap context</button></div><div class="proof-panel is-active" data-proof-panel="without"><strong><span class="status-dot bad"></span>Plausible query, wrong relationship</strong><pre><code><em>SELECT</em> orders.id, users.email
+    <nav class="navbar">
+        <div class="nav-container"><a class="logo" href="#" aria-label="Schemap home"><img
+                    src="assets/Text_Logo__Dark_-removebg-preview2.png" alt="Schemap"></a>
+            <div class="nav-links"><a href="#how-it-works">How it works</a><a href="#features">Features</a><a
+                    href="#pricing">Pricing</a><a class="nav-btn" href="https://github.com/alansyahmi/Schemap"
+                    target="_blank" rel="noopener">GitHub</a></div><a class="mobile-cta" href="#installation">Install
+                free</a>
+        </div>
+    </nav>
+    <main>
+        <header class="hero" style="position:relative;overflow:hidden"><canvas id="matrix-bg"
+                aria-hidden="true"></canvas>
+            <div class="hero-content" style="position:relative;z-index:1">
+                <p class="eyebrow">AI Database Context Compiler</p>
+                <h1>AI can write SQL.<br><span>It can’t know your database.</span></h1>
+                <p class="hero-subtitle">Schemap compiles your database schema into compact, deterministic context for
+                    AI coding agents, SQL workflows, and developer tools.</p>
+                <div class="hero-actions"><a class="btn btn-primary" href="#installation">Install Schemap Free</a><a
+                        class="btn btn-secondary" href="https://github.com/alansyahmi/Schemap" target="_blank"
+                        rel="noopener">View on GitHub</a></div>
+                <p class="trust-line">
+                    <span>Local-first</span><span>PostgreSQL</span><span>SQLite</span><span>MySQL</span><span>Oracle</span><span>CLI-first</span>
+                </p>
+            </div>
+            <div class="terminal hero-terminal" style="position:relative;z-index:1">
+                <div class="terminal-bar"><i class="dot red"></i><i class="dot yellow"></i><i
+                        class="dot green"></i><span>terminal</span></div>
+                <div class="terminal-body">
+                    <p><b class="prompt">$</b> <span id="type-cmd"></span><i class="cursor"></i></p>
+                    <div id="terminal-output" hidden>
+                        <p><b class="ok">✓</b> Connected to database</p>
+                        <p><b class="ok">✓</b> Relationships analyzed</p>
+                        <p><b class="ok">✓</b> Context compiled</p>
+                        <p class="terminal-result">→ database_context.md</p>
+                    </div>
+                </div>
+            </div>
+        </header>
+        <section class="section proof">
+            <div class="section-container">
+                <p class="eyebrow">The dangerous kind of wrong</p>
+                <h2>Looks right. Is it or is it not?</h2>
+                <p class="section-lead">AI can confidently generate a query that matches familiar naming patterns—but
+                    misses the relationships that are true in your database.</p>
+                <div class="proof-switcher">
+                    <div class="proof-tabs" role="tablist"><button class="proof-tab is-active" role="tab"
+                            aria-selected="true" data-proof-tab="without">Without Schemap</button><button
+                            class="proof-tab" role="tab" aria-selected="false" data-proof-tab="with">With Schemap
+                            context</button></div>
+                    <div class="proof-panel is-active" data-proof-panel="without"><strong><span
+                                class="status-dot bad"></span>Plausible query, wrong relationship</strong>
+                        <pre><code><em>SELECT</em> orders.id, users.email
 <em>FROM</em> orders
 <em>JOIN</em> users
-  <em>ON</em> orders.customer_id = users.id;</code></pre><p class="bad-copy">The query looks reasonable. Your schema has no <code>orders.customer_id</code>.</p></div><div class="proof-panel" data-proof-panel="with" hidden><strong><span class="status-dot good"></span>Explicit relationship context</strong><pre><code><span class="schema-label">orders.account_id</span>
+  <em>ON</em> orders.customer_id = users.id;</code></pre>
+                        <p class="bad-copy">The query looks reasonable. Your schema has no
+                            <code>orders.customer_id</code>.</p>
+                    </div>
+                    <div class="proof-panel" data-proof-panel="with" hidden><strong><span
+                                class="status-dot good"></span>Explicit relationship context</strong>
+                        <pre><code><span class="schema-label">orders.account_id</span>
       ↓
 <span class="schema-label">accounts.id</span>
       ↓
-<span class="schema-label">users.account_id</span></code></pre><p class="good-copy">Schemap gives the agent the relationship map it was missing.</p></div></div></div></section>
-<section class="section section-muted"><div class="section-container narrow"><p class="eyebrow">The missing context</p><h2>Your AI doesn’t know what your tables mean.</h2><p class="section-lead">Raw dumps describe structure, but bury the context an agent needs to make reliable database decisions.</p><div class="pain-grid"><div><small>01</small><h3>Relationships are easy to miss</h3><p>Foreign keys and join paths disappear inside a wall of DDL.</p></div><div><small>02</small><h3>Names are not business context</h3><p><code>acct_id</code> may mean something completely different in your domain.</p></div><div><small>03</small><h3>More tokens are not more clarity</h3><p>Noise consumes the context window before the real problem begins.</p></div></div></div></section>
-<section id="how-it-works" class="section"><div class="section-container flow"><p class="eyebrow">A context layer for your database</p><h2>From raw structure to useful context.</h2><div class="flow-grid"><div class="flow-node"><small>01</small><strong>Your database</strong><span>Schema metadata</span></div><b>→</b><div class="flow-node featured-node"><small>02</small><strong>Schemap</strong><span>Inspect · score · compile</span></div><b>→</b><div class="flow-node"><small>03</small><strong>AI-ready context</strong><span>Maps · joins · rules</span></div></div><p class="flow-end">Claude Code · Cursor · Codex · Copilot · Custom agents</p></div></section>
-<section class="section section-dark"><div class="section-container split"><div><p class="eyebrow">One command</p><h2>Give your agent the database it actually has.</h2><p class="section-lead">Schemap runs locally, extracts the relationships that matter, and writes context files your existing workflow can use.</p><a class="text-link" href="#installation">Try it in your project ↗</a></div><div class="terminal"><div class="terminal-bar"><i class="dot red"></i><i class="dot yellow"></i><i class="dot green"></i><span>schemap context</span></div><div class="terminal-body"><p><b class="prompt">$</b> schemap context</p><p class="muted">→ Inspecting schema...</p><p class="muted">→ Mapping foreign-key relationships...</p><p class="muted">→ Compiling AI context...</p><p><b class="ok">✓</b> Context written to <strong>database_context.md</strong></p><hr><p><b class="prompt">$</b> schemap benchmark</p><p class="ok">Measure raw vs compiled tokens on your schema.</p></div></div></div></section>
-<section class="section"><div class="section-container split benchmark-card"><div><p class="eyebrow">Measure, don’t guess</p><h2>Make room for the problem you’re solving.</h2><p class="section-lead">Token savings vary by schema. The built-in benchmark reports your raw estimate, compiled context size, relationship coverage, readiness score, and compile latency.</p></div><div class="metric-stack"><p><b>↓</b><strong>Token footprint</strong><small>Measured per database</small></p><p><b>◎</b><strong>AI readiness</strong><small>Actionable schema score</small></p><p><b>↗</b><strong>Relationship clarity</strong><small>Explicit join paths</small></p></div></div></section>
-<section id="features" class="section section-muted"><div class="section-container"><p class="eyebrow">The workflow</p><h2>Everything your agent needs to stop guessing.</h2><div class="feature-grid"><article><small>01</small><h3>Inspect</h3><p>See tables, columns, keys, and relationships as a clean structural map.</p><code>schemap inspect</code></article><article><small>02</small><h3>Score</h3><p>Find missing keys, disconnected entities, and ambiguous names that hurt AI accuracy.</p><code>schemap score</code></article><article><small>03</small><h3>Context</h3><p>Compile compact Markdown, JSON, YAML, XML, MCP, or AI-ready context files.</p><code>schemap context</code></article><article><small>04</small><h3>Diff</h3><p>Track structural schema changes between runs and keep agent context current.</p><code>schemap diff</code></article><article><small>05</small><h3>Agents</h3><p>Generate CLAUDE.md and AGENTS.md files with the database rules your agents need.</p><code>schemap agents</code></article></div></div></section>
-<section class="section"><div class="section-container split"><div><p class="eyebrow">Built for developer workflows</p><h2>Your schema stays in your workflow.</h2><p class="section-lead">Extraction and compilation run locally by default. Schemap produces files you can inspect, commit, review, and inject into the tools you already use.</p></div><div class="trust-list"><p><strong>Supported databases</strong><br>PostgreSQL · SQLite · MySQL · Turso/libSQL · Oracle</p><p><strong>Optional enrichment</strong><br><code>--enrich</code> can use the configured OpenAI API to improve business descriptions.</p><p><strong>License checks</strong><br>Licensed CI/CD usage verifies a license online; local free usage does not require an external AI service.</p></div></div></section>
-<section id="installation" class="section section-dark"><div class="section-container narrow install-content"><p class="eyebrow">Start locally</p><h2>Add a context layer in minutes.</h2><p class="section-lead">Install the CLI, point it at your database, and compile a context file for your agent.</p><div class="install-steps"><pre><code>pip install schemap-tool</code></pre><pre><code>schemap init</code></pre><pre><code>schemap context</code></pre></div><button id="copy-install-btn" class="btn btn-secondary">Copy install command</button></div></section>
-<section id="pricing" class="section pricing"><div class="section-container"><p class="eyebrow">2026 Founder Program</p><h2>Start free. Upgrade when your workflow grows.</h2><p class="section-lead">Local schema inspection and context compilation are available for free. Pro unlocks larger schemas, CI/CD, and advanced exports.</p><div class="pricing-grid"><article class="price-card"><h3>Free</h3><div class="price">$0</div><p>For local projects and evaluation.</p><ul><li>Up to 50 tables</li><li>Local execution</li><li>Schema linting and basic exports</li><li>Token footprint metrics</li></ul><a class="btn btn-secondary full-width" href="#installation">Install free</a></article><article class="price-card featured"><span class="price-badge">Founder pricing</span><h3>Pro</h3><div class="price" id="sub-price">$7.99<span id="sub-period">/mo</span></div><p id="sub-desc">Flexible monthly billing.</p><div class="sub-toggle"><button class="sub-btn is-active" data-sub-interval="monthly">Monthly</button><button class="sub-btn" data-sub-interval="quarterly">Quarterly</button><button class="sub-btn" data-sub-interval="semiannual">6 months</button><button class="sub-btn" data-sub-interval="annual">Annual</button></div><ul><li>Unlimited tables</li><li>CI/CD execution</li><li>AI linter and schema diffing</li><li>All exporter formats</li></ul><a id="sub-checkout-btn" class="btn btn-primary full-width" href="https://buy.stripe.com/dRm00jeG13kpfoA131dIA01" target="_blank" rel="noopener">Get Pro</a></article><article class="price-card founder-card"><span class="price-badge founder-badge">Limited founders</span><h3>Founder Lifetime</h3><div class="price">$79.99<span> once</span></div><p>One payment for lifetime Pro access.</p><ul><li>Everything in Pro</li><li>Future Pro updates</li><li>Founder feature access</li><li>Available during 2026</li></ul><a class="btn btn-secondary full-width" href="https://buy.stripe.com/28EaEXgO9dZ36S44fddIA00" target="_blank" rel="noopener">Become a founder</a></article></div></div></section>
-<section class="section section-muted"><div class="section-container narrow"><p class="eyebrow">Developer FAQ</p><h2>A few practical answers.</h2><div class="faq-list"><details><summary>Does Schemap send my database data to an AI?</summary><p>Not by default. Extraction and compilation run locally. Optional <code>--enrich</code> sends compressed schema metadata to the configured OpenAI API. Licensed CI/CD usage also performs an online license check.</p></details><details><summary>Does Schemap replace my ORM?</summary><p>No. Schemap creates context for agents and SQL workflows. Your ORM, migrations, and application remain the source of truth for runtime behavior.</p></details><details><summary>Can I use it with Cursor, Claude Code, Codex, or Copilot?</summary><p>Yes. Generate Markdown context, CLAUDE.md, AGENTS.md, JSON, MCP, or framework exports for the workflow your agent already reads.</p></details><details><summary>Which databases are supported?</summary><p>PostgreSQL, SQLite, MySQL, Turso/libSQL, and Oracle are supported by the current extractors.</p></details></div></div></section>
-<section class="section final-cta"><div class="section-container narrow"><p class="eyebrow">Give your database a context layer</p><h2>Your AI is only as good as the context you give it.</h2><p class="section-lead">Make the relationships explicit before your agent starts writing SQL.</p><div class="hero-actions"><a class="btn btn-primary" href="#installation">Install Schemap Free</a><a class="btn btn-secondary" href="https://github.com/alansyahmi/Schemap" target="_blank" rel="noopener">View on GitHub</a></div></div></section>
-</main><footer><div class="footer-content"><img src="assets/Icon Dark.png" alt="Schemap" height="24"><p>© 2026 Schemap · Local-first database context for AI workflows.</p><a href="https://github.com/alansyahmi/Schemap" target="_blank" rel="noopener">GitHub</a></div></footer>
-<script src="app.js?v=9"></script></body></html>
+<span class="schema-label">users.account_id</span></code></pre>
+                        <p class="good-copy">Schemap gives the agent the relationship map it was missing.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section class="section section-muted">
+            <div class="section-container narrow">
+                <p class="eyebrow">The missing context</p>
+                <h2>Your AI doesn’t know what your tables mean.</h2>
+                <p class="section-lead">Raw dumps describe structure, but bury the context an agent needs to make
+                    reliable database decisions.</p>
+                <div class="pain-grid">
+                    <div><small>01</small>
+                        <h3>Relationships are easy to miss</h3>
+                        <p>Foreign keys and join paths disappear inside a wall of DDL.</p>
+                    </div>
+                    <div><small>02</small>
+                        <h3>Names are not business context</h3>
+                        <p><code>acct_id</code> may mean something completely different in your domain.</p>
+                    </div>
+                    <div><small>03</small>
+                        <h3>More tokens are not more clarity</h3>
+                        <p>Noise consumes the context window before the real problem begins.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section id="how-it-works" class="section">
+            <div class="section-container flow">
+                <p class="eyebrow">A context layer for your database</p>
+                <h2>From raw structure to useful context.</h2>
+                <div class="flow-grid">
+                    <div class="flow-node"><small>01</small><strong>Your database</strong><span>Schema metadata</span>
+                    </div><b>→</b>
+                    <div class="flow-node featured-node"><small>02</small><strong>Schemap</strong><span>Inspect · score
+                            · compile</span></div><b>→</b>
+                    <div class="flow-node"><small>03</small><strong>AI-ready context</strong><span>Maps · joins ·
+                            rules</span></div>
+                </div>
+                <p class="flow-end">Claude Code · Cursor · Codex · Copilot · Custom agents</p>
+            </div>
+        </section>
+        <section class="section section-dark">
+            <div class="section-container split">
+                <div>
+                    <p class="eyebrow">One command</p>
+                    <h2>Give your agent the database it actually has.</h2>
+                    <p class="section-lead">Schemap runs locally, extracts the relationships that matter, and writes
+                        context files your existing workflow can use.</p><a class="text-link" href="#installation">Try
+                        it in your project ↗</a>
+                </div>
+                <div class="terminal">
+                    <div class="terminal-bar"><i class="dot red"></i><i class="dot yellow"></i><i
+                            class="dot green"></i><span>schemap context</span></div>
+                    <div class="terminal-body">
+                        <p><b class="prompt">$</b> schemap context</p>
+                        <p class="muted">→ Inspecting schema...</p>
+                        <p class="muted">→ Mapping foreign-key relationships...</p>
+                        <p class="muted">→ Compiling AI context...</p>
+                        <p><b class="ok">✓</b> Context written to <strong>database_context.md</strong></p>
+                        <hr>
+                        <p><b class="prompt">$</b> schemap benchmark</p>
+                        <p class="ok">Measure raw vs compiled tokens on your schema.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section class="section">
+            <div class="section-container split benchmark-card">
+                <div>
+                    <p class="eyebrow">Measure, don’t guess</p>
+                    <h2>Make room for the problem you’re solving.</h2>
+                    <p class="section-lead">Token savings vary by schema. The built-in benchmark reports your raw
+                        estimate, compiled context size, relationship coverage, readiness score, and compile latency.
+                    </p>
+                </div>
+                <div class="metric-stack">
+                    <p><b>↓</b><strong>Token footprint</strong><small>Measured per database</small></p>
+                    <p><b>◎</b><strong>AI readiness</strong><small>Actionable schema score</small></p>
+                    <p><b>↗</b><strong>Relationship clarity</strong><small>Explicit join paths</small></p>
+                </div>
+            </div>
+        </section>
+        <section id="features" class="section section-muted">
+            <div class="section-container">
+                <p class="eyebrow">The workflow</p>
+                <h2>Everything your agent needs to stop guessing.</h2>
+                <div class="feature-grid">
+                    <article><small>01</small>
+                        <h3>Inspect</h3>
+                        <p>See tables, columns, keys, and relationships as a clean structural map.</p>
+                        <code>schemap inspect</code>
+                    </article>
+                    <article><small>02</small>
+                        <h3>Score</h3>
+                        <p>Find missing keys, disconnected entities, and ambiguous names that hurt AI accuracy.</p>
+                        <code>schemap score</code>
+                    </article>
+                    <article><small>03</small>
+                        <h3>Context</h3>
+                        <p>Compile compact Markdown, JSON, YAML, XML, MCP, or AI-ready context files.</p>
+                        <code>schemap context</code>
+                    </article>
+                    <article><small>04</small>
+                        <h3>Diff</h3>
+                        <p>Track structural schema changes between runs and keep agent context current.</p>
+                        <code>schemap diff</code>
+                    </article>
+                    <article><small>05</small>
+                        <h3>Agents</h3>
+                        <p>Generate CLAUDE.md and AGENTS.md files with the database rules your agents need.</p>
+                        <code>schemap agents</code>
+                    </article>
+                </div>
+            </div>
+        </section>
+        <section class="section">
+            <div class="section-container split">
+                <div>
+                    <p class="eyebrow">Built for developer workflows</p>
+                    <h2>Your schema stays in your workflow.</h2>
+                    <p class="section-lead">Extraction and compilation run locally by default. Schemap produces files
+                        you can inspect, commit, review, and inject into the tools you already use.</p>
+                </div>
+                <div class="trust-list">
+                    <p><strong>Supported databases</strong><br>PostgreSQL · SQLite · MySQL · Turso/libSQL · Oracle</p>
+                    <p><strong>Optional enrichment</strong><br><code>--enrich</code> can use the configured OpenAI API
+                        to improve business descriptions.</p>
+                    <p><strong>License checks</strong><br>Licensed CI/CD usage verifies a license online; local free
+                        usage does not require an external AI service.</p>
+                </div>
+            </div>
+        </section>
+        <section id="installation" class="section section-dark">
+            <div class="section-container narrow install-content">
+                <p class="eyebrow">Start locally</p>
+                <h2>Add a context layer in minutes.</h2>
+                <p class="section-lead">Install the CLI, point it at your database, and compile a context file for your
+                    agent.</p>
+                <div class="install-steps">
+                    <pre><code>pip install schemap-tool</code></pre>
+                    <pre><code>schemap init</code></pre>
+                    <pre><code>schemap context</code></pre>
+                </div><button id="copy-install-btn" class="btn btn-secondary">Copy install command</button>
+            </div>
+        </section>
+        <section id="pricing" class="section pricing">
+            <div class="section-container">
+                <p class="eyebrow">2026 Founder Program</p>
+                <h2>Start free. Upgrade when your workflow grows.</h2>
+                <p class="section-lead">The full local CLI is available for free. Pro unlocks larger schemas,
+                    CI/CD automation, and production workflow support.</p>
+                <div class="pricing-grid">
+                    <article class="price-card">
+                        <h3>Free</h3>
+                        <div class="price">$0</div>
+                        <p>For local projects and evaluation.</p>
+                        <ul>
+                            <li>Up to 100 tables</li>
+                            <li>Full local CLI</li>
+                            <li>Inspect, score, context, diffs, benchmarks, and exports</li>
+                            <li>No account or API key required</li>
+                        </ul><a class="btn btn-secondary full-width" href="#installation">Install free</a>
+                    </article>
+                    <article class="price-card featured"><span class="price-badge">Founder pricing</span>
+                        <h3>Pro</h3>
+                        <div class="price" id="sub-price">$7.99<span id="sub-period">/mo</span></div>
+                        <div class="price-anchor"><s id="sub-original">$9.99/mo</s><strong id="sub-discount">20% off</strong></div>
+                        <p id="sub-desc">Flexible monthly billing.</p>
+                        <div class="sub-toggle"><button class="sub-btn is-active"
+                                data-sub-interval="monthly">Monthly</button><button class="sub-btn"
+                                data-sub-interval="quarterly">Quarterly</button><button class="sub-btn"
+                                data-sub-interval="semiannual">6 months</button><button class="sub-btn"
+                                data-sub-interval="annual">Annual</button></div>
+                        <ul>
+                            <li>Unlimited tables</li>
+                            <li>CI/CD execution</li>
+                            <li>Production schema workflows</li>
+                            <li>Priority support and founder benefits</li>
+                        </ul><a id="sub-checkout-btn" class="btn btn-primary full-width"
+                            href="https://buy.stripe.com/dRm00jeG13kpfoA131dIA01" target="_blank" rel="noopener">Get
+                            Pro</a>
+                    </article>
+                    <article class="price-card founder-card"><span class="price-badge founder-badge">Limited
+                            founders</span>
+                        <h3>Founder Lifetime</h3>
+                        <div class="price">$79.99<span> once</span></div>
+                        <p>One payment for lifetime Pro access.</p>
+                        <ul>
+                            <li>Everything in Pro</li>
+                            <li>Future Pro updates</li>
+                            <li>Founder feature access</li>
+                            <li>Available during 2026</li>
+                        </ul><a class="btn btn-secondary full-width"
+                            href="https://buy.stripe.com/28EaEXgO9dZ36S44fddIA00" target="_blank" rel="noopener">Become
+                            a founder</a>
+                    </article>
+                </div>
+            </div>
+        </section>
+        <section class="section section-muted">
+            <div class="section-container narrow">
+                <p class="eyebrow">Developer FAQ</p>
+                <h2>A few practical answers.</h2>
+                <div class="faq-list">
+                    <details>
+                        <summary>Does Schemap send my database data to an AI?</summary>
+                        <p>Not by default. Extraction and compilation run locally. Optional <code>--enrich</code> sends
+                            compressed schema metadata to the configured OpenAI API. Licensed CI/CD usage also performs
+                            an online license check.</p>
+                    </details>
+                    <details>
+                        <summary>Does Schemap replace my ORM?</summary>
+                        <p>No. Schemap creates context for agents and SQL workflows. Your ORM, migrations, and
+                            application remain the source of truth for runtime behavior.</p>
+                    </details>
+                    <details>
+                        <summary>Can I use it with Cursor, Claude Code, Codex, or Copilot?</summary>
+                        <p>Yes. Generate Markdown context, CLAUDE.md, AGENTS.md, JSON, MCP, or framework exports for the
+                            workflow your agent already reads.</p>
+                    </details>
+                    <details>
+                        <summary>Which databases are supported?</summary>
+                        <p>PostgreSQL, SQLite, MySQL, Turso/libSQL, and Oracle are supported by the current extractors.
+                        </p>
+                    </details>
+                </div>
+            </div>
+        </section>
+        <section class="section final-cta">
+            <div class="section-container narrow">
+                <p class="eyebrow">Give your database a context layer</p>
+                <h2>Your AI is only as good as the context you give it.</h2>
+                <p class="section-lead">Make the relationships explicit before your agent starts writing SQL.</p>
+                <div class="hero-actions"><a class="btn btn-primary" href="#installation">Install Schemap Free</a><a
+                        class="btn btn-secondary" href="https://github.com/alansyahmi/Schemap" target="_blank"
+                        rel="noopener">View on GitHub</a></div>
+            </div>
+        </section>
+    </main>
+    <footer>
+        <div class="footer-content"><img src="assets/Icon Dark.png" alt="Schemap" height="24">
+            <p>© 2026 Schemap · Local-first database context for AI workflows.</p><a
+                href="https://github.com/alansyahmi/Schemap" target="_blank" rel="noopener">GitHub</a>
+            <p>Developed by <a href="https://swarty.pages.dev/" target="_blank" rel="noopener" class="logo-font">Swarty.</a></p>
+        </div>
+    </footer>
+    <script src="app.js?v=9"></script>
+</body>
+
+</html>

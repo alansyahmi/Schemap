@@ -25,13 +25,13 @@ def mock_env(monkeypatch):
     monkeypatch.delenv("GITHUB_ACTIONS", raising=False)
 
 def test_free_tier_allowed(mock_env):
-    # 50 tables, no license, not CI -> should pass
-    verify_tier(50, None)
+    # 100 tables, no license, not CI -> should pass
+    verify_tier(100, None)
 
 def test_free_tier_blocked_tables(mock_env):
-    # 51 tables, no license, not CI -> should fail
-    with pytest.raises(LicenseError, match="Free tier limited to 50 tables"):
-        verify_tier(51, None)
+    # 101 tables, no license, not CI -> should fail
+    with pytest.raises(LicenseError, match="Free tier limited to 100 tables"):
+        verify_tier(101, None)
 
 def test_ci_blocked_no_license(monkeypatch):
     monkeypatch.setenv("CI", "true")

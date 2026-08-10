@@ -36,7 +36,7 @@ class SchemapConfig(BaseModel):
     domain: DomainConfig = Field(default_factory=DomainConfig)
     schema_descriptions: dict[str, TableOverride] = Field(default_factory=dict)
     license_key: str | None = None
-    license_endpoint: str | None = "https://api.stripe.com/v1/licenses/verify"
+    license_endpoint: str | None = "https://api.schemap.com/v1/licenses/verify"
 
 def load_config(config_path: str = "schemap.yaml") -> SchemapConfig:
     """Loads and validates the schemap configuration."""

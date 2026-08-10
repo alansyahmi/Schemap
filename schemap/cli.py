@@ -10,7 +10,19 @@ from .config import load_config
 from .extractor import extract_schema
 from .models import DatabaseSchemaModel
 from .renderer import render_output, write_output
-from .license import verify_tier, LicenseError
+from .license import (
+    verify_tier,
+    verify_license_online,
+    resolve_license_key,
+    resolve_license_endpoint,
+    save_credentials,
+    load_credentials,
+    clear_credentials,
+    CREDENTIALS_FILE,
+    DEFAULT_LICENSE_ENDPOINT,
+    FREE_TABLE_LIMIT,
+    LicenseError
+)
 from .enrichment import apply_heuristics, apply_llm, apply_description_overrides
 from .linter import calculate_score
 from .diff import save_current_state, load_previous_state, calculate_diff
@@ -41,8 +53,6 @@ database:
   exclude_tables:
     - "spatial_ref_sys"
     - "alembic_version"
-  license_key: ""
-  license_endpoint: "https://api.stripe.com/v1/licenses/verify"
 output:
   file_path: "./database_context.md"
   format: "markdown"
@@ -60,6 +70,8 @@ schema_descriptions:
     columns:
       pos:
         description: "Position index of the element"
+license_key: ""
+license_endpoint: "https://api.schemap.com/v1/licenses/verify"
 """
     else:
         boilerplate = """# Schemap Configuration
@@ -82,10 +94,11 @@ def _process_schema(cfg, enrich: bool):
     click.echo("-> Connecting to database... ", nl=False)
     raw_tables = extract_schema(cfg.database.connection_url, cfg.database.exclude_tables)
     click.secho(f"Connected. Found {len(raw_tables)} active tables", fg="green")
-    
+
     click.echo("-> Verifying license tier... ", nl=False)
     try:
-        verify_tier(len(raw_tables), cfg.license_key, cfg.license_endpoint)
+        active_key, _ = resolve_license_key(config_key=cfg.license_key)
+        verify_tier(len(raw_tables), active_key, resolve_license_endpoint(cfg.license_endpoint))
         click.secho("OK", fg="green")
     except LicenseError as le:
         click.secho(f"\n[ERROR] {str(le)}", fg="red")
@@ -94,7 +107,7 @@ def _process_schema(cfg, enrich: bool):
     schema_model = DatabaseSchemaModel(tables=raw_tables)
     schema_model, unresolved = apply_heuristics(schema_model, cfg.domain.mappings, cfg.domain.ignore_abbreviations)
     schema_model = apply_description_overrides(schema_model, cfg.schema_descriptions)
-    
+
     if enrich:
         if cfg.llm.api_key:
             click.echo("-> Calling Beta LLM Enrichment Layer... ", nl=False)
@@ -115,7 +128,7 @@ def _process_schema(cfg, enrich: bool):
 def _display_token_savings(rendered_output: str, raw_tables: list, out_path: Path):
     enc = tiktoken.get_encoding("cl100k_base")
     final_token_count = len(enc.encode(rendered_output))
-    
+
     raw_sql_str = ""
     for t in raw_tables:
         raw_sql_str += f"CREATE TABLE {t['name']} (\n"
@@ -149,9 +162,9 @@ def doctor(config, json_output, verbose):
     try:
         cfg = load_config(config)
         schema_model, raw_tables, unresolved = _process_schema(cfg, enrich=False)
-        
+
         report = get_doctor_report(schema_model, raw_tables, unresolved)
-        
+
         if json_output:
             import json
             click.echo(json.dumps(report, indent=2))
@@ -166,7 +179,7 @@ def doctor(config, json_output, verbose):
         click.echo("  AI Readiness Score:")
         color = "green" if report['ai_readiness_score'] >= 80 else "yellow" if report['ai_readiness_score'] >= 50 else "red"
         click.secho(f"  {report['progress_bar']}", fg=color, bold=True)
-        
+
         if report['issues']:
             click.echo("\n  Top Issues Identified:")
             for issue in report['issues'][:5]:
@@ -485,6 +498,85 @@ def watch(watch_dir, config, verbose, fmt, enrich, track):
     except KeyboardInterrupt:
         observer.stop()
     observer.join()
+
+@cli.command()
+@click.argument('key')
+@click.option('--endpoint', default=None, help="Custom license verification endpoint.")
+def activate(key, endpoint):
+    """Activate a Schemap Pro license key and save credentials globally."""
+    endpoint_to_use = endpoint or DEFAULT_LICENSE_ENDPOINT
+    click.echo(f"-> Verifying license key '{key[:12]}...' with {endpoint_to_use}... ", nl=False)
+
+    res = verify_license_online(key, endpoint_to_use)
+    if res.get("activated"):
+        saved_path = save_credentials(key, endpoint)
+        click.secho("OK", fg="green")
+        click.secho(f"\n[SUCCESS] License activated successfully! Credentials saved to {saved_path}", fg="green", bold=True)
+    else:
+        err = res.get("error", "Invalid or expired license key.")
+        click.secho("FAILED", fg="red")
+        click.secho(f"\n[ERROR] License activation failed: {err}", fg="red")
+        sys.exit(1)
+
+@cli.command(name="status")
+@click.option('--config', default="schemap.yaml", help="Path to configuration file.")
+@click.option('--verify', is_flag=True, help="Verify the active key against the license service.")
+def license_status(config, verify):
+    """Display configured license state; optionally verify it online."""
+    config_key = None
+    try:
+        cfg = load_config(config)
+        config_key = cfg.license_key
+    except Exception:
+        pass
+
+    active_key, source = resolve_license_key(config_key=config_key)
+
+    click.secho("\n" + "=" * 50, fg="cyan", bold=True)
+    click.secho(" Schemap License Status", fg="cyan", bold=True)
+    click.secho("=" * 50, fg="cyan", bold=True)
+
+    if active_key:
+        masked_key = active_key[:8] + "..." + active_key[-4:] if len(active_key) > 12 else active_key
+        click.echo("  Tier:             ", nl=False)
+        click.secho("Pro (configured)", fg="green", bold=True)
+        click.echo(f"  Active Key:       {masked_key}")
+        click.echo(f"  Key Source:       {source}")
+
+        from .license import _read_cache
+        last_verified = _read_cache(active_key)
+        if verify:
+            endpoint = resolve_license_endpoint(config_endpoint=cfg.license_endpoint if 'cfg' in locals() else None)
+            result = verify_license_online(active_key, endpoint)
+            if result.get("activated"):
+                click.secho("  Verification:     Active", fg="green")
+                if result.get("plan"):
+                    click.echo(f"  Plan:             {result['plan']}")
+                if result.get("expires_at"):
+                    click.echo(f"  Expires:          {result['expires_at']}")
+            else:
+                click.secho("  Verification:     Failed", fg="red")
+                click.echo(f"  Verification error: {result.get('error', 'Invalid or expired license.')}")
+        elif last_verified:
+            age_days = (time.time() - last_verified) / 86400.0
+            click.echo(f"  Cache Status:     Valid (verified {age_days:.1f} days ago)")
+        else:
+            click.echo("  Verification:     Not checked (use --verify)")
+    else:
+        click.echo("  Tier:             ", nl=False)
+        click.secho("Free Tier", fg="yellow", bold=True)
+        click.echo(f"  Table Limit:      {FREE_TABLE_LIMIT} tables")
+        click.echo(f"  CI Automation:    Blocked on Free Tier")
+        click.echo(f"  Key Source:       None")
+
+    click.echo(f"  Credentials File: {CREDENTIALS_FILE}")
+    click.secho("=" * 50 + "\n", fg="cyan", bold=True)
+
+@cli.command()
+def logout():
+    """Clear global credentials and local license validation cache."""
+    clear_credentials()
+    click.secho("\n[SUCCESS] Successfully logged out. Cleared global credentials and license cache.", fg="green")
 
 if __name__ == "__main__":
     cli()

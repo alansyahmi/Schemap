@@ -19,10 +19,12 @@ jobs:
         with:
           version: "0.1.0"
           
-      - name: Run Schemap Generate
+      - name: Run Schemap Context
+        env:
+          SCHEMAP_LICENSE_KEY: ${{ secrets.SCHEMAP_LICENSE_KEY }}
         run: |
           # Note: Ensure your CI environment variables include your database credentials.
-          uv run schemap generate
+          uv run schemap context
           
       - name: Commit and Push Context Map
         run: |

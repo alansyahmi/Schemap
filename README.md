@@ -143,8 +143,16 @@ schemap benchmark
 
 Automate context map updates on every migration commit with GitHub Actions:
 
-- **Free Tier:** Inspect & compile database context locally for databases up to 50 tables.
-- **Pro Tier:** Unlimited tables, schema diff intelligence, and CI/CD GitHub Actions integration.
+- **Free Tier:** Full local CLI for databases up to 100 tables, including inspection, scoring, context, diffs, benchmarks, and exports.
+- **Pro Tier:** Unlimited tables, CI/CD GitHub Actions integration, and production workflow support.
+
+### License management
+
+Activate a purchased license globally with the schemap activate command.
+Use schemap status --verify to check it against the license service, and schemap logout
+to remove global credentials. The CLI resolves command-line, environment, global, and legacy
+project configuration credentials in that order. CI/CD should provide SCHEMAP_LICENSE_KEY
+through the repository secret store.
 
 ---
 
