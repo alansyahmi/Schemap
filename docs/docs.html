@@ -1,0 +1,397 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Schemap v3.0 Documentation & CLI Reference</title>
+    <meta name="description"
+        content="Complete CLI command reference, AI agent skill guide, and configuration documentation for Schemap v3.0.0.">
+    <link rel="icon" href="assets/Icon Dark.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400&family=Red+Hat+Display:wght@400;500;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css?v=10">
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a class="logo" href="index.html" aria-label="Schemap home">
+                <img src="assets/Text_Logo__Dark_-removebg-preview2.png" alt="Schemap">
+            </a>
+            <div class="nav-links">
+                <a href="index.html#how-it-works">How it works</a>
+                <a href="index.html#features">Features</a>
+                <a href="docs.html" class="is-active" style="color: var(--text);">Docs</a>
+                <a href="index.html#pricing">Pricing</a>
+                <a class="nav-btn" href="https://github.com/alansyahmi/Schemap" target="_blank" rel="noopener">GitHub</a>
+            </div>
+            <a class="mobile-cta" href="index.html#installation">Install free</a>
+        </div>
+    </nav>
+
+    <main class="docs-container">
+        <header class="docs-hero">
+            <a href="docs.html" class="v3-banner"><span class="v3-badge">v3.0.0</span> Documentation & Reference</a>
+            <h1>Schemap CLI Reference & Skill Guide</h1>
+            <p class="section-lead">Learn how to configure, score, explain, fix, and compile AI-ready database context maps for Claude Code, Cursor, Codex, and custom AI agents.</p>
+            <div class="docs-search-bar">
+                <input type="text" id="doc-search" class="docs-search-input" placeholder="Search commands, flags, or skills (e.g. quickstart, fix, join, --profile)...">
+            </div>
+        </header>
+
+        <div class="docs-grid">
+            <aside class="docs-sidebar">
+                <div class="docs-nav-group">
+                    <div class="docs-nav-title">Getting Started</div>
+                    <a href="#install" class="docs-nav-link">Installation</a>
+                    <a href="#quickstart" class="docs-nav-link">schemap quickstart <span class="doc-tag new">v3</span></a>
+                    <a href="#init" class="docs-nav-link">schemap init</a>
+                </div>
+
+                <div class="docs-nav-group">
+                    <div class="docs-nav-title">Context & Agents</div>
+                    <a href="#context" class="docs-nav-link">schemap context</a>
+                    <a href="#agents" class="docs-nav-link">schemap agents <span class="doc-tag new">v3</span></a>
+                    <a href="#sync" class="docs-nav-link">schemap sync <span class="doc-tag new">v3</span></a>
+                </div>
+
+                <div class="docs-nav-group">
+                    <div class="docs-nav-title">Diagnosis & Fixes</div>
+                    <a href="#doctor" class="docs-nav-link">schemap doctor <span class="doc-tag new">v3</span></a>
+                    <a href="#fix" class="docs-nav-link">schemap fix <span class="doc-tag new">v3</span></a>
+                    <a href="#score" class="docs-nav-link">schemap score</a>
+                    <a href="#inspect" class="docs-nav-link">schemap inspect</a>
+                </div>
+
+                <div class="docs-nav-group">
+                    <div class="docs-nav-title">Querying & Explainers</div>
+                    <a href="#explain" class="docs-nav-link">schemap explain <span class="doc-tag new">v3</span></a>
+                    <a href="#join" class="docs-nav-link">schemap join <span class="doc-tag new">v3</span></a>
+                </div>
+
+                <div class="docs-nav-group">
+                    <div class="docs-nav-title">CI & Advanced Options</div>
+                    <a href="#diff" class="docs-nav-link">schemap diff <span class="doc-tag new">v3</span></a>
+                    <a href="#export" class="docs-nav-link">schemap export</a>
+                    <a href="#global-flags" class="docs-nav-link">Global CLI Flags <span class="doc-tag new">v3</span></a>
+                </div>
+
+                <div class="docs-nav-group">
+                    <div class="docs-nav-title">AI Agent Skills</div>
+                    <a href="#skills-install" class="docs-nav-link">schemap skills install <span class="doc-tag new">v3</span></a>
+                </div>
+
+                <div class="docs-nav-group">
+                    <div class="docs-nav-title">Configuration</div>
+                    <a href="#config-schema" class="docs-nav-link">schemap.yaml Schema</a>
+                </div>
+            </aside>
+
+            <div class="docs-content">
+                <!-- Getting Started -->
+                <section id="install" class="doc-section">
+                    <h2>Getting Started</h2>
+                    <div class="doc-card">
+                        <div class="doc-card-header">
+                            <span class="doc-cmd">Installation</span>
+                            <span class="doc-tag">pipx / uv / pip</span>
+                        </div>
+                        <p>Install Schemap globally on your workstation using <code>pipx</code> or <code>uv</code>:</p>
+                        <pre><code># Recommended: Install globally via pipx
+pipx install schemap-tool
+
+# Or using uv
+uv tool install schemap-tool
+
+# Upgrade to latest version anytime
+pipx upgrade schemap-tool</code></pre>
+                    </div>
+                </section>
+
+                <section id="quickstart" class="doc-section">
+                    <div class="doc-card">
+                        <div class="doc-card-header">
+                            <span class="doc-cmd">schemap quickstart</span>
+                            <span class="doc-tag new">v3.0 New</span>
+                        </div>
+                        <p>Runs the interactive onboarding pipeline: auto-detects local SQLite databases and environment connection strings, creates <code>schemap.yaml</code>, compiles context, installs agent rules, and prints an <b>AI Readiness Summary Card</b>.</p>
+                        <pre><code>schemap quickstart
+
+# Non-interactive mode with specific database URL
+schemap quickstart --non-interactive --db "sqlite:///examples/demo_ecommerce.db"</code></pre>
+                        <table class="param-table">
+                            <thead>
+                                <tr><th>Option</th><th>Description</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td><code>--interactive / --non-interactive</code></td><td>Prompt for settings or auto-pick detected database sources.</td></tr>
+                                <tr><td><code>--db &lt;url&gt;</code></td><td>Override target database connection string.</td></tr>
+                                <tr><td><code>--output-path &lt;file&gt;</code></td><td>Destination for database context map (default <code>./schemap_database_context.md</code>).</td></tr>
+                                <tr><td><code>--targets &lt;list&gt;</code></td><td>Target AI agent frameworks (e.g. <code>codex,claude,cursor</code> or <code>all</code>).</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section id="init" class="doc-section">
+                    <div class="doc-card">
+                        <div class="doc-card-header">
+                            <span class="doc-cmd">schemap init</span>
+                            <span class="doc-tag">Config</span>
+                        </div>
+                        <p>Initializes a new <code>schemap.yaml</code> configuration asset in the current working directory.</p>
+                        <pre><code>schemap init
+schemap init --full   # Generate full configuration boilerplate</code></pre>
+                    </div>
+                </section>
+
+                <!-- Context & Agents -->
+                <section id="context" class="doc-section">
+                    <h2>Context & Agent Compilation</h2>
+                    <div class="doc-card">
+                        <div class="doc-card-header">
+                            <span class="doc-cmd">schemap context</span>
+                            <span class="doc-tag">Core</span>
+                        </div>
+                        <p>Compiles token-optimized database context files. Supports Markdown, JSON, YAML, XML, MCP, AI-prompt, and Mermaid ER diagram formats.</p>
+                        <pre><code>schemap context
+schemap context --format mermaid     # Generate Mermaid ER diagram (erDiagram)
+schemap context --format json        # Export machine-readable JSON context</code></pre>
+                        <table class="param-table">
+                            <thead>
+                                <tr><th>Option</th><th>Description</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td><code>--format &lt;fmt&gt;</code></td><td>Format override: <code>markdown</code>, <code>json</code>, <code>yaml</code>, <code>xml</code>, <code>mcp</code>, <code>ai</code>, <code>mermaid</code>.</td></tr>
+                                <tr><td><code>--enrich</code></td><td>[Beta] Apply LLM enrichment for table descriptions using OpenAI API.</td></tr>
+                                <tr><td><code>--track / --no-track</code></td><td>Track current schema state in <code>.schemap/cache.json</code> for diff intelligence.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section id="agents" class="doc-section">
+                    <div class="doc-card">
+                        <div class="doc-card-header">
+                            <span class="doc-cmd">schemap agents</span>
+                            <span class="doc-tag new">v3.0 Enhanced</span>
+                        </div>
+                        <p>Generates <code>CLAUDE.md</code>, <code>AGENTS.md</code>, and <code>.cursor/rules/schemap.mdc</code> files for AI coding agents. Uses safe marker preservation (<code>&lt;!-- schemap:start --&gt;</code>) to protect user-authored notes.</p>
+                        <pre><code>schemap agents --targets codex,claude,cursor
+schemap agents --dry-run               # Preview output without modifying files
+schemap agents --diff                  # Show unified git-style diff of changes
+schemap agents --force                 # Force overwrite existing files</code></pre>
+                    </div>
+                </section>
+
+                <section id="sync" class="doc-section">
+                    <div class="doc-card">
+                        <div class="doc-card-header">
+                            <span class="doc-cmd">schemap sync</span>
+                            <span class="doc-tag new">v3.0 New</span>
+                        </div>
+                        <p>Calculates a SHA256 database schema structure fingerprint. Regenerates context maps and agent files ONLY when the schema structure actually changes.</p>
+                        <pre><code>schemap sync
+schemap sync --force   # Force sync even if schema fingerprint is unchanged</code></pre>
+                    </div>
+                </section>
+
+                <!-- Diagnosis & Fixes -->
+                <section id="doctor" class="doc-section">
+                    <h2>Diagnosis & Automated Fixes</h2>
+                    <div class="doc-card">
+                        <div class="doc-card-header">
+                            <span class="doc-cmd">schemap doctor</span>
+                            <span class="doc-tag new">v3.0 Enhanced</span>
+                        </div>
+                        <p>Runs AI Database Health Check. Emits actionable remediation objects: inferred foreign key candidates with confidence scores (e.g. 95%), unresolved abbreviation mappings, and configuration snippets.</p>
+                        <pre><code>schemap doctor
+schemap doctor --json   # Output health check report in machine-readable JSON</code></pre>
+                    </div>
+                </section>
+
+                <section id="fix" class="doc-section">
+                    <div class="doc-card">
+                        <div class="doc-card-header">
+                            <span class="doc-cmd">schemap fix</span>
+                            <span class="doc-tag new">v3.0 New</span>
+                        </div>
+                        <p>Interactively prompts user to accept or reject inferred foreign key relationships and abbreviation mappings, automatically persisting accepted fixes back into <code>schemap.yaml</code>.</p>
+                        <pre><code>schemap fix --interactive
+schemap fix --accept-all   # Auto-accept all inferred FK candidates and mappings</code></pre>
+                    </div>
+                </section>
+
+                <section id="score" class="doc-section">
+                    <div class="doc-card">
+                        <div class="doc-card-header">
+                            <span class="doc-cmd">schemap score</span>
+                            <span class="doc-tag">Linter</span>
+                        </div>
+                        <p>Calculates the 0-100 AI Readiness Score for the schema based on primary keys, foreign key connectivity, documentation coverage, and naming consistency.</p>
+                        <pre><code>schemap score</code></pre>
+                    </div>
+                </section>
+
+                <section id="inspect" class="doc-section">
+                    <div class="doc-card">
+                        <div class="doc-card-header">
+                            <span class="doc-cmd">schemap inspect</span>
+                            <span class="doc-tag">Metadata</span>
+                        </div>
+                        <p>Extracts database metadata and displays a clean structural summary of tables, columns, foreign keys, and indexes.</p>
+                        <pre><code>schemap inspect
+schemap inspect --json</code></pre>
+                    </div>
+                </section>
+
+                <!-- Querying & Explainers -->
+                <section id="explain" class="doc-section">
+                    <h2>Querying & Explainers</h2>
+                    <div class="doc-card">
+                        <div class="doc-card-header">
+                            <span class="doc-cmd">schemap explain table &lt;name&gt;</span>
+                            <span class="doc-tag new">v3.0 New</span>
+                        </div>
+                        <p>Explains table architecture, primary keys, column data types, descriptions, incoming references, and centrality scores.</p>
+                        <pre><code>schemap explain table orders
+schemap explain table users --json</code></pre>
+                    </div>
+                </section>
+
+                <section id="join" class="doc-section">
+                    <div class="doc-card">
+                        <div class="doc-card-header">
+                            <span class="doc-cmd">schemap join &lt;table1&gt; &lt;table2&gt; [table3...]</span>
+                            <span class="doc-tag new">v3.0 New</span>
+                        </div>
+                        <p>Uses Breadth-First Search (BFS) over foreign key relationships to find the shortest joining path between tables and outputs a valid SQL <code>JOIN</code> clause.</p>
+                        <pre><code>schemap join users orders payments
+
+# Output snippet:
+# SELECT *
+# FROM users
+# JOIN orders ON users.id = orders.user_id
+# JOIN payments ON orders.id = payments.order_id;</code></pre>
+                    </div>
+                </section>
+
+                <!-- CI & Advanced Options -->
+                <section id="diff" class="doc-section">
+                    <h2>CI / CD & Advanced Options</h2>
+                    <div class="doc-card">
+                        <div class="doc-card-header">
+                            <span class="doc-cmd">schemap diff</span>
+                            <span class="doc-tag new">v3.0 Enhanced</span>
+                        </div>
+                        <p>Compares current schema against tracked state. Supports <code>--json</code> diff output and <code>--fail-on-breaking</code> for CI pipeline gates.</p>
+                        <pre><code>schemap diff
+schemap diff --json
+schemap diff --fail-on-breaking   # Exit status code 2 if breaking changes exist</code></pre>
+                    </div>
+                </section>
+
+                <section id="global-flags" class="doc-section">
+                    <div class="doc-card">
+                        <div class="doc-card-header">
+                            <span class="doc-cmd">Global CLI Flags & Profiles</span>
+                            <span class="doc-tag new">v3.0 New</span>
+                        </div>
+                        <p>Global options supported across all Schemap CLI commands:</p>
+                        <pre><code>schemap --profile staging context
+schemap --quiet doctor
+schemap --no-color score</code></pre>
+                        <table class="param-table">
+                            <thead>
+                                <tr><th>Global Flag</th><th>Description</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td><code>--profile &lt;name&gt;</code></td><td>Load named environment profile configuration from <code>schemap.yaml</code>.</td></tr>
+                                <tr><td><code>--quiet / -q</code></td><td>Suppress informational output messages.</td></tr>
+                                <tr><td><code>--no-color</code></td><td>Disable ANSI color rendering in terminal output.</td></tr>
+                                <tr><td><code>SCHEMAP_DATABASE_URL</code></td><td>Environment variable to override <code>database.connection_url</code>.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- AI Agent Skills -->
+                <section id="skills-install" class="doc-section">
+                    <h2>AI Agent Skills Integration</h2>
+                    <div class="doc-card">
+                        <div class="doc-card-header">
+                            <span class="doc-cmd">schemap skills install</span>
+                            <span class="doc-tag new">v3.0 New</span>
+                        </div>
+                        <p>Installs agent-native schemap AI skills for Codex, Claude Code, and Cursor. Decoupled from specific database facts so project rules stay in <code>AGENTS.md</code>.</p>
+                        <pre><code>schemap skills install --targets codex,claude,cursor
+
+# Installed skill paths:
+#   .codex/skills/schemap/SKILL.md
+#   .claude/skills/schemap/SKILL.md
+#   .cursor/rules/schemap.mdc</code></pre>
+                    </div>
+                </section>
+
+                <!-- Configuration -->
+                <section id="config-schema" class="doc-section">
+                    <h2>Configuration File (`schemap.yaml`)</h2>
+                    <div class="doc-card">
+                        <div class="doc-card-header">
+                            <span class="doc-cmd">schemap.yaml Reference</span>
+                            <span class="doc-tag">YAML</span>
+                        </div>
+                        <p>Complete configuration file options including named profiles and foreign key overrides:</p>
+                        <pre><code># Schemap Configuration Asset
+database:
+  connection_url: "sqlite:///examples/demo_ecommerce.db"
+  exclude_tables:
+    - "spatial_ref_sys"
+
+output:
+  file_path: "./schemap_database_context.md"
+  format: "markdown"
+
+domain:
+  mappings:
+    cust: "Customer"
+    tx: "Transaction"
+
+# Manual/inferred foreign key overrides
+foreign_key_overrides:
+  - table: "orders"
+    column: "user_id"
+    ref_table: "users"
+    ref_column: "id"
+
+# Named environment profiles
+profiles:
+  staging:
+    database:
+      connection_url: "postgresql://user:pass@staging-db:5432/mydb"
+  production:
+    database:
+      connection_url: "postgresql://user:pass@prod-db:5432/mydb"</code></pre>
+                    </div>
+                </section>
+
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <img src="assets/Icon Dark.png" alt="Schemap" height="24">
+            <p>© 2026 Schemap · Local-first database context for AI workflows.</p>
+            <a href="https://github.com/alansyahmi/Schemap" target="_blank" rel="noopener">GitHub</a>
+            <p>Developed by <a href="https://swarty.pages.dev/" target="_blank" rel="noopener" class="logo-font">Swarty.</a></p>
+        </div>
+    </footer>
+    <script src="app.js?v=10"></script>
+</body>
+
+</html>

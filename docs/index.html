@@ -21,7 +21,7 @@
         <div class="nav-container"><a class="logo" href="#" aria-label="Schemap home"><img
                     src="assets/Text_Logo__Dark_-removebg-preview2.png" alt="Schemap"></a>
             <div class="nav-links"><a href="#how-it-works">How it works</a><a href="#features">Features</a><a
-                    href="#pricing">Pricing</a><a class="nav-btn" href="https://github.com/alansyahmi/Schemap"
+                    href="docs.html">Docs</a><a href="#pricing">Pricing</a><a class="nav-btn" href="https://github.com/alansyahmi/Schemap"
                     target="_blank" rel="noopener">GitHub</a></div><a class="mobile-cta" href="#installation">Install
                 free</a>
         </div>
@@ -30,6 +30,7 @@
         <header class="hero" style="position:relative;overflow:hidden"><canvas id="matrix-bg"
                 aria-hidden="true"></canvas>
             <div class="hero-content" style="position:relative;z-index:1">
+                <a href="docs.html" class="v3-banner"><span class="v3-badge">v3.0.0</span> Interactive Quickstart, AI Agent Skills &amp; Auto-Fixes ↗</a>
                 <p class="eyebrow">AI Database Context Compiler</p>
                 <h1>AI can write SQL.<br><span>It can’t know your database.</span></h1>
                 <p class="hero-subtitle">Schemap compiles your database schema into compact, deterministic context for
@@ -171,29 +172,34 @@
                 <h2>Everything your agent needs to stop guessing.</h2>
                 <div class="feature-grid">
                     <article><small>01</small>
-                        <h3>Inspect</h3>
-                        <p>See tables, columns, keys, and relationships as a clean structural map.</p>
-                        <code>schemap inspect</code>
+                        <h3>Quickstart</h3>
+                        <p>Auto-detect local databases, configure rules, and generate agent context in one command.</p>
+                        <code>schemap quickstart</code>
                     </article>
                     <article><small>02</small>
-                        <h3>Score</h3>
-                        <p>Find missing keys, disconnected entities, and ambiguous names that hurt AI accuracy.</p>
-                        <code>schemap score</code>
+                        <h3>Auto-Fix</h3>
+                        <p>Interactively accept inferred foreign key candidates and abbreviation mappings.</p>
+                        <code>schemap fix --interactive</code>
                     </article>
                     <article><small>03</small>
-                        <h3>Context</h3>
-                        <p>Compile compact Markdown, JSON, YAML, XML, MCP, or AI-ready context files.</p>
-                        <code>schemap context</code>
+                        <h3>Explain &amp; Join</h3>
+                        <p>Inspect table architecture and auto-solve shortest foreign key join paths with SQL snippets.</p>
+                        <code>schemap explain / join</code>
                     </article>
                     <article><small>04</small>
-                        <h3>Diff</h3>
-                        <p>Track structural schema changes between runs and keep agent context current.</p>
-                        <code>schemap diff</code>
+                        <h3>Agent Skills</h3>
+                        <p>Install agent-native guardrail skills for Claude Code, Cursor rules, and Codex.</p>
+                        <code>schemap skills install</code>
                     </article>
                     <article><small>05</small>
-                        <h3>Agents</h3>
-                        <p>Generate CLAUDE.md and AGENTS.md files with the database rules your agents need.</p>
-                        <code>schemap agents</code>
+                        <h3>Context &amp; Sync</h3>
+                        <p>Compile Markdown, JSON, MCP, or Mermaid ER diagrams. Sync on schema changes.</p>
+                        <code>schemap context / sync</code>
+                    </article>
+                    <article><small>06</small>
+                        <h3>Diff &amp; CI Gate</h3>
+                        <p>Track schema changes and fail CI builds on breaking data type removals.</p>
+                        <code>schemap diff --fail-on-breaking</code>
                     </article>
                 </div>
             </div>

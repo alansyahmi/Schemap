@@ -190,4 +190,38 @@ document.addEventListener("DOMContentLoaded", () => {
 
         draw();
     }
+
+    // Documentation Page Live Search & Sidebar Active Link Highlighting
+    const docSearch = document.getElementById("doc-search");
+    if (docSearch) {
+        docSearch.addEventListener("input", (e) => {
+            const query = e.target.value.toLowerCase().strip ? e.target.value.toLowerCase().strip() : e.target.value.toLowerCase().trim();
+            const docCards = document.querySelectorAll(".doc-card");
+            docCards.forEach((card) => {
+                const text = card.textContent.toLowerCase();
+                const match = !query || text.includes(query);
+                card.style.display = match ? "block" : "none";
+            });
+        });
+    }
+
+    const docSections = document.querySelectorAll(".doc-section");
+    const docNavLinks = document.querySelectorAll(".docs-nav-link");
+    if (docSections.length && docNavLinks.length) {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    const id = entry.target.getAttribute("id");
+                    docNavLinks.forEach((link) => {
+                        const href = link.getAttribute("href");
+                        const active = href === `#${id}`;
+                        link.classList.toggle("is-active", active);
+                    });
+                }
+            });
+        }, { threshold: 0.2 });
+
+        docSections.forEach((section) => observer.observe(section));
+    }
 });
+
