@@ -44,15 +44,57 @@
                 </p>
             </div>
             <div class="terminal hero-terminal" style="position:relative;z-index:1">
-                <div class="terminal-bar"><i class="dot red"></i><i class="dot yellow"></i><i
-                        class="dot green"></i><span>terminal</span></div>
-                <div class="terminal-body">
-                    <p><b class="prompt">$</b> <span id="type-cmd"></span><i class="cursor"></i></p>
-                    <div id="terminal-output" hidden>
-                        <p><b class="ok">✓</b> Connected to database</p>
-                        <p><b class="ok">✓</b> Relationships analyzed</p>
-                        <p><b class="ok">✓</b> Context compiled</p>
-                        <p class="terminal-result">→ schemap_database_context.md</p>
+                <div class="terminal-bar" style="display:flex;align-items:center;justify-content:space-between;padding:8px 14px;border-bottom:1px solid var(--line);">
+                    <div style="display:flex;align-items:center;gap:7px;">
+                        <i class="dot red"></i><i class="dot yellow"></i><i class="dot green"></i>
+                        <span style="color:var(--subtle);font-size:.72rem;margin-left:4px;">schemap cli v3.0</span>
+                    </div>
+                    <div class="hero-cmd-tabs" style="display:flex;gap:4px;">
+                        <button class="hero-cmd-tab is-active" data-hero-cmd="context" style="padding:4px 10px;font:600 .72rem 'JetBrains Mono',monospace;border:1px solid var(--line);background:var(--surface2);color:var(--text);border-radius:var(--radius);cursor:pointer;">context</button>
+                        <button class="hero-cmd-tab" data-hero-cmd="doctor" style="padding:4px 10px;font:600 .72rem 'JetBrains Mono',monospace;border:1px solid var(--line);background:transparent;color:var(--muted);border-radius:var(--radius);cursor:pointer;">doctor</button>
+                        <button class="hero-cmd-tab" data-hero-cmd="join" style="padding:4px 10px;font:600 .72rem 'JetBrains Mono',monospace;border:1px solid var(--line);background:transparent;color:var(--muted);border-radius:var(--radius);cursor:pointer;">join</button>
+                        <button class="hero-cmd-tab" data-hero-cmd="agents" style="padding:4px 10px;font:600 .72rem 'JetBrains Mono',monospace;border:1px solid var(--line);background:transparent;color:var(--muted);border-radius:var(--radius);cursor:pointer;">agents</button>
+                    </div>
+                </div>
+                <div class="terminal-body" style="min-height:220px;padding:18px 20px;">
+                    <p style="margin-bottom:10px;"><b class="prompt">$</b> <span id="type-cmd">schemap context</span><i class="cursor"></i></p>
+                    
+                    <!-- Output: schemap context -->
+                    <div id="hero-output-context" class="hero-output-panel">
+                        <p class="muted">→ Inspecting schema metadata (8 tables)...</p>
+                        <p class="muted">→ Resolving 12 foreign-key relationships &amp; centrality scores...</p>
+                        <p><b class="ok">✓</b> Compiled 8 tables into <span style="color:var(--blue);">schemap_database_context.md</span> (482 tokens)</p>
+                        <hr style="border:0;border-top:1px solid var(--line);margin:10px 0;">
+                        <pre style="margin:0;padding:8px 12px;background:var(--bg);border:1px solid var(--line);border-radius:var(--radius);color:#a6e5c9;font-size:.78rem;line-height:1.5;"># Database Context Map (Compiled by Schemap)
+orders (account_id → accounts.id) [PK: id]
+  ├─ payments (order_id → orders.id)
+  └─ order_items (order_id → orders.id, product_id → products.id)</pre>
+                    </div>
+
+                    <!-- Output: schemap doctor -->
+                    <div id="hero-output-doctor" class="hero-output-panel" hidden>
+                        <p class="muted">→ Running AI database health check...</p>
+                        <p><b class="ok">✓</b> Calculated AI Readiness Score: <strong style="color:var(--green);">92/100</strong></p>
+                        <p style="color:var(--yellow);margin-top:6px;"><b>!</b> Inferred foreign key candidate found:</p>
+                        <pre style="margin:6px 0 0;padding:8px 12px;background:var(--bg);border:1px solid var(--line);border-radius:var(--radius);color:var(--blue);font-size:.78rem;line-height:1.5;">orders.user_id ──(95% confidence)──> users.id
+Run `schemap fix --interactive` to add override to schemap.yaml</pre>
+                    </div>
+
+                    <!-- Output: schemap join -->
+                    <div id="hero-output-join" class="hero-output-panel" hidden>
+                        <p class="muted">→ Solving shortest join path between <code style="color:var(--text);">users</code> and <code style="color:var(--text);">payments</code>...</p>
+                        <p><b class="ok">✓</b> Path found (2 hops): <span style="color:var(--blue);">users → orders → payments</span></p>
+                        <pre style="margin:8px 0 0;padding:8px 12px;background:var(--bg);border:1px solid var(--line);border-radius:var(--radius);color:#c69bff;font-size:.78rem;line-height:1.5;">SELECT * FROM users
+JOIN orders ON users.id = orders.user_id
+JOIN payments ON orders.id = payments.order_id;</pre>
+                    </div>
+
+                    <!-- Output: schemap agents -->
+                    <div id="hero-output-agents" class="hero-output-panel" hidden>
+                        <p class="muted">→ Generating framework rules for AI coding agents...</p>
+                        <p><b class="ok">✓</b> Written <span style="color:var(--blue);">CLAUDE.md</span> (Claude Code context)</p>
+                        <p><b class="ok">✓</b> Written <span style="color:var(--blue);">AGENTS.md</span> (Codex/General agent rules)</p>
+                        <p><b class="ok">✓</b> Written <span style="color:var(--blue);">.cursor/rules/schemap.mdc</span> (Cursor IDE rules)</p>
                     </div>
                 </div>
             </div>
@@ -198,8 +240,11 @@
                         <code>schemap context / sync</code>
                     </article>
                     <article><small>06</small>
-                        <h3>Diff &amp; CI Gate</h3>
-                        <p>Track schema changes and fail CI builds on breaking data type removals.</p>
+                        <div style="display:flex;align-items:center;justify-content:space-between;">
+                            <h3>Diff &amp; CI Gate</h3>
+                            <span class="flow-badge pro" style="font-size:0.65rem;padding:2px 6px;">PRO</span>
+                        </div>
+                        <p>Track schema changes and fail automated CI builds on breaking data type removals.</p>
                         <code>schemap diff --fail-on-breaking</code>
                     </article>
                 </div>
@@ -215,10 +260,8 @@
                 </div>
                 <div class="trust-list">
                     <p><strong>Supported databases</strong><br>PostgreSQL · SQLite · MySQL · Turso/libSQL · Oracle</p>
-                    <p><strong>Optional enrichment</strong><br><code>--enrich</code> can use the configured OpenAI API
-                        to improve business descriptions.</p>
-                    <p><strong>License checks</strong><br>Licensed CI/CD usage verifies a license online; local free
-                        usage does not require an external AI service.</p>
+                    <p><strong>LLM Enrichment <span class="flow-badge pro" style="font-size:0.65rem;padding:2px 6px;margin-left:4px;">PRO</span></strong><br><code>--enrich</code> applies LLM architecture descriptions &amp; analytical business journeys using OpenAI.</p>
+                    <p><strong>CI/CD License Checks <span class="flow-badge pro" style="font-size:0.65rem;padding:2px 6px;margin-left:4px;">PRO</span></strong><br>Licensed CI/CD builds verify your activated key online; free local usage does not require online checks.</p>
                 </div>
             </div>
         </section>
@@ -228,10 +271,10 @@
                 <h2>Add an AI database context layer.</h2>
                 <p class="section-lead">Install the CLI, point it at your schema, and compile instant AI-ready context.</p>
                 
-                <div class="pm-toggle" style="display: flex; justify-content: center; gap: 6px; margin: -1rem auto 2rem; max-width: 320px; background: var(--surface2); padding: 4px; border: 1px solid var(--line); border-radius: var(--radius);">
-                    <button class="pm-btn is-active" data-pm="pipx" style="flex: 1; padding: 6px 12px; border: 0; background: transparent; color: var(--muted); font: 600 0.8rem 'JetBrains Mono', monospace; border-radius: var(--radius); cursor: pointer;">pipx</button>
-                    <button class="pm-btn" data-pm="uv" style="flex: 1; padding: 6px 12px; border: 0; background: transparent; color: var(--muted); font: 600 0.8rem 'JetBrains Mono', monospace; border-radius: var(--radius); cursor: pointer;">uv</button>
-                    <button class="pm-btn" data-pm="pip" style="flex: 1; padding: 6px 12px; border: 0; background: transparent; color: var(--muted); font: 600 0.8rem 'JetBrains Mono', monospace; border-radius: var(--radius); cursor: pointer;">pip</button>
+                <div class="pm-toggle" style="display:flex;justify-content:center;gap:6px;margin:-1rem auto 2rem;max-width:320px;background:var(--surface2);padding:4px;border:1px solid var(--line);border-radius:var(--radius);">
+                    <button class="pm-btn is-active" data-pm="pipx" style="flex:1;padding:6px 12px;border:0;background:transparent;color:var(--muted);font-weight:600;font-size:0.8rem;border-radius:var(--radius);cursor:pointer;">pipx</button>
+                    <button class="pm-btn" data-pm="uv" style="flex:1;padding:6px 12px;border:0;background:transparent;color:var(--muted);font-weight:600;font-size:0.8rem;border-radius:var(--radius);cursor:pointer;">uv</button>
+                    <button class="pm-btn" data-pm="pip" style="flex:1;padding:6px 12px;border:0;background:transparent;color:var(--muted);font-weight:600;font-size:0.8rem;border-radius:var(--radius);cursor:pointer;">pip</button>
                 </div>
 
                 <div class="install-card">
@@ -297,19 +340,37 @@
                                 data-sub-interval="semiannual">6 months</button><button class="sub-btn"
                                 data-sub-interval="annual">Annual</button></div>
                         <ul>
-                            <li>Unlimited tables</li>
-                            <li>CI/CD execution</li>
-                            <li>Production schema workflows</li>
-                            <li>Priority support and founder benefits</li>
+                            <li>Unlimited tables (large DB support)</li>
+                            <li>CI/CD execution &amp; build gates</li>
+                            <li>LLM Schema Enrichment (<code>--enrich</code>)</li>
+                            <li>Production schema workflows &amp; profiles</li>
+                            <li>Priority support &amp; founder benefits</li>
                         </ul><a id="sub-checkout-btn" class="btn btn-primary full-width"
                             href="https://buy.stripe.com/dRm00jeG13kpfoA131dIA01" target="_blank" rel="noopener">Get
                             Pro</a>
                     </article>
-                    <article class="price-card founder-card"><span class="price-badge founder-badge">Limited
-                            founders</span>
+                    <article class="price-card founder-card">
+                        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+                            <span class="price-badge founder-badge" style="position:static;">Limited Founders</span>
+                            <span id="founder-seats-badge" style="font:600 .72rem 'JetBrains Mono',monospace;color:var(--yellow);background:rgba(245,200,101,.12);padding:3px 8px;border:1px solid rgba(245,200,101,.3);border-radius:var(--radius);">
+                                <span id="founder-claimed-count">0</span>/200 Claimed
+                            </span>
+                        </div>
                         <h3>Founder Lifetime</h3>
                         <div class="price">$79.99<span> once</span></div>
                         <p>One payment for lifetime Pro access.</p>
+
+                        <!-- Founder Seats Progress Bar -->
+                        <div style="margin:8px 0 16px;">
+                            <div style="width:100%;height:6px;background:var(--bg);border:1px solid var(--line);border-radius:3px;overflow:hidden;">
+                                <div id="founder-progress-bar" style="width:0%;height:100%;background:linear-gradient(90deg, var(--yellow), #ffae42);transition:width 0.4s ease;"></div>
+                            </div>
+                            <div style="display:flex;justify-content:space-between;margin-top:6px;font:.7rem 'JetBrains Mono',monospace;color:var(--subtle);">
+                                <span><strong id="founder-remaining-count" style="color:var(--yellow);">200</strong> seats remaining</span>
+                                <span>Cap: 200</span>
+                            </div>
+                        </div>
+
                         <ul>
                             <li>Everything in Pro</li>
                             <li>Future Pro updates</li>

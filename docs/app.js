@@ -1,23 +1,70 @@
 document.addEventListener("DOMContentLoaded", () => {
     const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const command = "schemap context";
-    const commandElement = document.getElementById("type-cmd");
-    const terminalOutput = document.getElementById("terminal-output");
 
-    if (commandElement && terminalOutput) {
+    const heroTabCommands = {
+        context: "schemap context",
+        doctor: "schemap doctor",
+        join: "schemap join users payments",
+        agents: "schemap agents --targets codex,claude,cursor"
+    };
+
+    const commandElement = document.getElementById("type-cmd");
+    let typeTimer = null;
+
+    function typeCommandText(cmdText, callback) {
+        if (typeTimer) clearTimeout(typeTimer);
+        if (!commandElement) return;
+
         if (reduced) {
-            commandElement.textContent = command;
-            terminalOutput.hidden = false;
-        } else {
-            let index = 0;
-            const type = () => {
-                commandElement.textContent = command.slice(0, index++);
-                if (index <= command.length) setTimeout(type, 55);
-                else setTimeout(() => terminalOutput.hidden = false, 350);
-            };
-            type();
+            commandElement.textContent = cmdText;
+            if (callback) callback();
+            return;
         }
+
+        let idx = 0;
+        commandElement.textContent = "";
+        const step = () => {
+            commandElement.textContent = cmdText.slice(0, idx++);
+            if (idx <= cmdText.length) {
+                typeTimer = setTimeout(step, 35);
+            } else if (callback) {
+                typeTimer = setTimeout(callback, 200);
+            }
+        };
+        step();
     }
+
+    // Initial typing
+    typeCommandText(heroTabCommands.context);
+
+    // Hero Command Tabs Click Handler
+    document.querySelectorAll("[data-hero-cmd]").forEach((tab) => {
+        tab.addEventListener("click", () => {
+            const targetCmdKey = tab.dataset.heroCmd;
+            const fullCmd = heroTabCommands[targetCmdKey] || `schemap ${targetCmdKey}`;
+
+            // Update Tab UI
+            document.querySelectorAll("[data-hero-cmd]").forEach((btn) => {
+                const isSelected = btn === tab;
+                btn.classList.toggle("is-active", isSelected);
+                btn.style.background = isSelected ? "var(--surface2)" : "transparent";
+                btn.style.color = isSelected ? "var(--text)" : "var(--muted)";
+            });
+
+            // Hide all panels initially
+            document.querySelectorAll(".hero-output-panel").forEach((panel) => {
+                panel.hidden = true;
+            });
+
+            // Type text and show corresponding output panel
+            typeCommandText(fullCmd, () => {
+                const targetPanel = document.getElementById(`hero-output-${targetCmdKey}`);
+                if (targetPanel) {
+                    targetPanel.hidden = false;
+                }
+            });
+        });
+    });
 
     document.querySelectorAll("[data-proof-tab]").forEach((tab) => {
         tab.addEventListener("click", () => {
@@ -222,6 +269,41 @@ document.addEventListener("DOMContentLoaded", () => {
         }, { threshold: 0.2 });
 
         docSections.forEach((section) => observer.observe(section));
+    }
+
+    // Dynamic Founder Seats Counter (200 Cap)
+    const claimedEl = document.getElementById("founder-claimed-count");
+    const remainingEl = document.getElementById("founder-remaining-count");
+    const progressBarEl = document.getElementById("founder-progress-bar");
+
+    if (claimedEl && remainingEl && progressBarEl) {
+        const TOTAL_CAP = 200;
+        
+        async function fetchFounderSeats() {
+            try {
+                const res = await fetch("https://schemap-license-api.alansyahmi2004.workers.dev/v1/stats/founders");
+                if (res.ok) {
+                    const data = await res.json();
+                    const claimed = Math.min(TOTAL_CAP, Math.max(0, data.claimed || 0));
+                    updateFounderUI(claimed);
+                    return;
+                }
+            } catch (e) {
+                // Fallback to initial seats count
+            }
+            updateFounderUI(0);
+        }
+
+        function updateFounderUI(claimedCount) {
+            const remaining = Math.max(0, TOTAL_CAP - claimedCount);
+            const percentage = Math.min(100, Math.max(5, (claimedCount / TOTAL_CAP) * 100));
+            
+            claimedEl.textContent = claimedCount;
+            remainingEl.textContent = remaining;
+            progressBarEl.style.width = `${percentage}%`;
+        }
+
+        fetchFounderSeats();
     }
 });
 

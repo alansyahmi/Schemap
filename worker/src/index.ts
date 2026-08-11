@@ -23,6 +23,19 @@ export default {
       return jsonResponse({ status: "ok", service: "schemap-worker-license-api", version: "1.0.0" });
     }
 
+    // 1b. GET /v1/stats/founders
+    if (url.pathname === "/v1/stats/founders" && method === "GET") {
+      try {
+        const row = await env.DB.prepare(
+          "SELECT COUNT(*) as claimed FROM licenses WHERE billing_mode = 'lifetime' AND status != 'revoked'"
+        ).first<{ claimed: number }>();
+        const claimed = Math.min(200, row?.claimed || 0);
+        return jsonResponse({ total_cap: 200, claimed, remaining: Math.max(0, 200 - claimed) }, 200);
+      } catch (err: any) {
+        return jsonResponse({ total_cap: 200, claimed: 0, remaining: 200 }, 200);
+      }
+    }
+
     // 2. GET /v1/licenses/session-key?session_id=cs_...
     if (url.pathname === "/v1/licenses/session-key" && method === "GET") {
       const sessionId = url.searchParams.get("session_id");

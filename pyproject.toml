@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "schemap-tool"
-version = "3.0.0"
+version = "3.0.1"
 description = "The AI Database Context Compiler for Claude Code, Cursor, Codex, and Copilot. Turn raw database structures into compact, AI-ready context maps."
 readme = "README.md"
 license = { text = "MIT" }

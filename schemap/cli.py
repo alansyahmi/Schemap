@@ -160,6 +160,11 @@ def _process_schema(cfg, enrich: bool):
     schema_model = apply_fk_overrides(schema_model, cfg.foreign_key_overrides)
 
     if enrich:
+        if not active_key:
+            click.secho("\n[ERROR] The --enrich LLM layer requires an active Schemap Pro license key.", fg="red")
+            click.secho("Run `schemap activate <LICENSE_KEY>` or upgrade at https://schemap.dev/#pricing", fg="yellow")
+            sys.exit(1)
+
         if cfg.llm.api_key:
             click.echo("-> Calling Beta LLM Enrichment Layer... ", nl=False)
             schema_model = apply_llm(schema_model, cfg.llm.api_key, cfg.llm.model)
