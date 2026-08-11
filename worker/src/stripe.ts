@@ -37,17 +37,103 @@ export async function verifyStripeSignature(rawBody: string, sigHeader: string |
   return expectedSig === v1Sig;
 }
 
-export function determineBillingInfo(priceId?: string): { billingMode: string; planTier: string; expiresAt: string | null } {
+export async function fetchStripeObject(path: string, apiKey: string): Promise<any | null> {
+  if (!path || !apiKey || apiKey === "whsec_mock") return null;
+  try {
+    const res = await fetch(`https://api.stripe.com/v1/${path}`, {
+      headers: { Authorization: `Bearer ${apiKey}` }
+    });
+    if (res.ok) {
+      return await res.json();
+    }
+  } catch (e) {
+    // ignore network errors
+  }
+  return null;
+}
+
+/**
+ * SCHEMAP LICENSING RESOLUTION PIPELINE (3-TIER ARCHITECTURE)
+ * -----------------------------------------------------------------------------
+ * When Stripe fires a checkout.session.completed webhook, determineBillingInfo()
+ * resolves the plan type (monthly, quarterly, semiannual, annual, lifetime)
+ * using a 3-tier fallback strategy so pricing or URL updates never break licensing:
+ *
+ * Tier 1: Explicit Metadata & Checkout Mode
+ * - Checks session.metadata.plan or plinkObj.metadata.plan ('monthly', 'quarterly', 'semiannual', 'annual', 'lifetime')
+ * - Checks session.mode === 'payment' -> Founder Lifetime Pro (expires_at = null)
+ *
+ * Tier 2: Stripe API Subscription Object Inspection
+ * - Calls /v1/subscriptions/{sub_id} via STRIPE_SECRET_KEY
+ * - Inspects recurring.interval & recurring.interval_count:
+ *     - 'year' or count >= 12  -> Annual Pro
+ *     - 'month' & count >= 5  -> 6-Month (Semiannual) Pro
+ *     - 'month' & count >= 3  -> Quarterly Pro
+ *     - 'month' & count == 1  -> Monthly Pro
+ *
+ * Tier 3: Price Amount Range Fallback (in Cents)
+ * - >= 7700 cents ($77+)  -> Lifetime Pro
+ * - >= 5500 cents ($55+)  -> Annual Pro
+ * - >= 3200 cents ($32+)  -> 6-Month Pro
+ * - >= 1600 cents ($16+)  -> Quarterly Pro (Matches $21.99 + tax/discounts)
+ * - < 1600 cents          -> Monthly Pro
+ * -----------------------------------------------------------------------------
+ */
+export function determineBillingInfo(session: any, extraData?: { lineItems?: any; subObj?: any; plinkObj?: any }): { billingMode: string; planTier: string; expiresAt: string | null } {
   const now = new Date();
   let billingMode = "monthly";
   const planTier = "pro";
 
-  if (priceId) {
-    const p = priceId.toLowerCase();
-    if (p.includes("lifetime")) billingMode = "lifetime";
-    else if (p.includes("annual") || p.includes("year")) billingMode = "annual";
-    else if (p.includes("quarter")) billingMode = "quarterly";
-    else if (p.includes("semiannual") || p.includes("halfyear")) billingMode = "semiannual";
+  const mode = (session.mode || "").toLowerCase();
+  const metaPlan = (
+    session.metadata?.plan || 
+    session.metadata?.billing_mode || 
+    extraData?.plinkObj?.metadata?.plan ||
+    extraData?.plinkObj?.metadata?.billing_mode ||
+    ""
+  ).toLowerCase();
+  
+  const amountCents = Number(session.amount_total || session.amount_subtotal || 0);
+
+  // 1. One-time payment in Stripe is ALWAYS Lifetime
+  if (mode === "payment" || metaPlan.includes("lifetime") || metaPlan.includes("founder")) {
+    billingMode = "lifetime";
+  } else if (metaPlan.includes("annual") || metaPlan.includes("year")) {
+    billingMode = "annual";
+  } else if (metaPlan.includes("semiannual") || metaPlan.includes("halfyear") || metaPlan.includes("6month")) {
+    billingMode = "semiannual";
+  } else if (metaPlan.includes("quarter") || metaPlan.includes("3month")) {
+    billingMode = "quarterly";
+  } else {
+    // 2. Check Subscription object interval from Stripe API
+    const subItem = extraData?.subObj?.items?.data?.[0];
+    const recurring = subItem?.plan || subItem?.price?.recurring;
+    
+    if (recurring) {
+      const interval = recurring.interval;
+      const count = recurring.interval_count || 1;
+
+      if (interval === "year" || count >= 12) {
+        billingMode = "annual";
+      } else if (interval === "month" && count >= 5) {
+        billingMode = "semiannual";
+      } else if (interval === "month" && count >= 3) {
+        billingMode = "quarterly";
+      } else {
+        billingMode = "monthly";
+      }
+    } else if (amountCents >= 7700) {
+      // 3. Amount Range Fallback (handles taxes/discounts seamlessly)
+      billingMode = "lifetime";
+    } else if (amountCents >= 5500) {
+      billingMode = "annual";
+    } else if (amountCents >= 3200) {
+      billingMode = "semiannual";
+    } else if (amountCents >= 1600) {
+      billingMode = "quarterly"; // Matches 2499 ($21.99 + tax)!
+    } else {
+      billingMode = "monthly";
+    }
   }
 
   let expiresAt: string | null = null;
@@ -90,6 +176,16 @@ export async function processStripeEvent(event: any, env: Env): Promise<{ status
     const dataObj = event.data?.object || {};
 
     if (eventType === "checkout.session.completed") {
+      const debugPayload = JSON.stringify({
+        mode: dataObj.mode,
+        amount_total: dataObj.amount_total,
+        payment_link: dataObj.payment_link,
+        metadata: dataObj.metadata,
+        subscription: dataObj.subscription,
+        price_id: dataObj.price_id,
+        keys: Object.keys(dataObj)
+      });
+      await env.DB.prepare("UPDATE stripe_events SET last_error = ? WHERE event_id = ?").bind(debugPayload, eventId).run();
       await handleCheckoutCompleted(dataObj, env);
     } else if (eventType === "customer.subscription.updated") {
       const subId = dataObj.id;
@@ -129,7 +225,17 @@ export async function handleCheckoutCompleted(session: any, env: Env): Promise<v
   const paymentIntentId = session.payment_intent;
   const priceId = session.price_id || session.metadata?.price_id;
 
-  const { billingMode, planTier, expiresAt } = determineBillingInfo(priceId);
+  const extraData: any = {};
+  if (env.STRIPE_SECRET_KEY) {
+    if (session.payment_link) {
+      extraData.plinkObj = await fetchStripeObject(`payment_links/${session.payment_link}`, env.STRIPE_SECRET_KEY);
+    }
+    if (session.subscription) {
+      extraData.subObj = await fetchStripeObject(`subscriptions/${session.subscription}`, env.STRIPE_SECRET_KEY);
+    }
+  }
+
+  const { billingMode, planTier, expiresAt } = determineBillingInfo(session, extraData);
   const customerId = await upsertCustomer(env.DB, stripeCustomerId, email);
 
   const existingLicense = await getLicenseBySessionId(env.DB, sessionId);

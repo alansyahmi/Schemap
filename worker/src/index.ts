@@ -49,7 +49,7 @@ export default {
       try {
         const rawBody = await request.text();
         const sigHeader = request.headers.get("stripe-signature");
-        const secret = env.STRIPE_WEBHOOK_SECRET || "whsec_mock";
+        const secret = env.STRIPE_WEBHOOK_SECRET || env.STRIPE_WEBHOOK_KEY || "whsec_mock";
 
         const isValidSig = await verifyStripeSignature(rawBody, sigHeader, secret);
         if (!isValidSig) {
