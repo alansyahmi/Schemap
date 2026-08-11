@@ -14,6 +14,7 @@ from .license import (
     verify_tier,
     verify_license_online,
     deactivate_license_online,
+    get_or_create_device_id,
     resolve_license_key,
     resolve_license_endpoint,
     save_credentials,
@@ -532,17 +533,20 @@ def activate(key, endpoint):
 
 @cli.command(name="status")
 @click.option('--config', default="schemap.yaml", help="Path to configuration file.")
-@click.option('--verify', is_flag=True, help="Verify the active key against the license service.")
+@click.option('--verify', is_flag=True, help="Force online license verification.")
 def license_status(config, verify):
-    """Display configured license state; optionally verify it online."""
+    """Display configured license status, active seats, device ID, and plan details."""
     config_key = None
+    cfg_endpoint = None
     try:
         cfg = load_config(config)
         config_key = cfg.license_key
+        cfg_endpoint = cfg.license_endpoint
     except Exception:
         pass
 
     active_key, source = resolve_license_key(config_key=config_key)
+    device_id = get_or_create_device_id()
 
     click.secho("\n" + "=" * 50, fg="cyan", bold=True)
     click.secho(" Schemap License Status", fg="cyan", bold=True)
@@ -550,36 +554,72 @@ def license_status(config, verify):
 
     if active_key:
         masked_key = active_key[:8] + "..." + active_key[-4:] if len(active_key) > 12 else active_key
-        click.echo("  Tier:             ", nl=False)
-        click.secho("Pro (configured)", fg="green", bold=True)
-        click.echo(f"  Active Key:       {masked_key}")
-        click.echo(f"  Key Source:       {source}")
-
-        from .license import _read_cache
-        last_verified = _read_cache(active_key)
-        if verify:
-            endpoint = resolve_license_endpoint(config_endpoint=cfg.license_endpoint if 'cfg' in locals() else None)
-            result = verify_license_online(active_key, endpoint)
-            if result.get("activated") or result.get("valid"):
-                click.secho("  Verification:     Active", fg="green")
-                if result.get("plan"):
-                    click.echo(f"  Plan:             {result['plan']}")
-                if result.get("expires_at"):
-                    click.echo(f"  Expires:          {result['expires_at']}")
+        endpoint = resolve_license_endpoint(config_endpoint=cfg_endpoint)
+        
+        result = verify_license_online(active_key, endpoint)
+        
+        if result.get("activated") or result.get("valid"):
+            click.echo("  Tier:             ", nl=False)
+            click.secho("Pro (Active)", fg="green", bold=True)
+            click.echo(f"  Active Key:       {masked_key}")
+            click.echo(f"  Key Source:       {source}")
+            
+            seats_used = result.get("seats_used", 1)
+            max_seats = result.get("max_seats", 3)
+            click.echo("  Seats Connected:  ", nl=False)
+            click.secho(f"{seats_used} / {max_seats} devices active", fg="cyan", bold=True)
+            
+            click.echo(f"  Device ID:        {device_id}")
+            
+            plan = result.get("plan", "pro")
+            plan_label = {
+                "monthly": "Monthly Pro",
+                "quarterly": "Quarterly Pro",
+                "semiannual": "6-Month Pro",
+                "annual": "Annual Pro",
+                "lifetime": "Founder Lifetime Pro"
+            }.get(plan.lower(), f"{plan.capitalize()} Pro")
+            click.echo(f"  Plan:             {plan_label}")
+            
+            exp = result.get("expires_at")
+            if exp:
+                try:
+                    exp_clean = exp.split("T")[0]
+                    click.echo(f"  Expires:          {exp_clean}")
+                except Exception:
+                    click.echo(f"  Expires:          {exp}")
             else:
-                click.secho("  Verification:     Failed", fg="red")
-                click.echo(f"  Verification error: {result.get('error', 'Invalid or expired license.')}")
-        elif last_verified:
-            age_days = (time.time() - last_verified) / 86400.0
-            click.echo(f"  Cache Status:     Valid (verified {age_days:.1f} days ago)")
+                click.echo("  Expires:          Lifetime Access (No Expiration)")
         else:
-            click.echo("  Verification:     Not checked (use --verify)")
+            from .license import _read_cache
+            last_verified = _read_cache(active_key)
+            if last_verified is not None:
+                age_days = (time.time() - last_verified) / 86400.0
+                click.echo("  Tier:             ", nl=False)
+                click.secho("Pro (Active via Local Cache)", fg="green", bold=True)
+                click.echo(f"  Active Key:       {masked_key}")
+                click.echo(f"  Key Source:       {source}")
+                click.echo(f"  Device ID:        {device_id}")
+                click.echo(f"  Cache Status:     Valid (verified {age_days:.1f} days ago)")
+            else:
+                click.echo("  Tier:             ", nl=False)
+                click.secho("Pro (Unverified / Error)", fg="yellow", bold=True)
+                click.echo(f"  Active Key:       {masked_key}")
+                click.echo(f"  Key Source:       {source}")
+                click.echo(f"  Device ID:        {device_id}")
+                click.secho(f"  Verification:     Failed ({result.get('error', 'Invalid or expired license.')})", fg="red")
+
+        click.echo("-" * 50)
+        click.secho("  Tip: Run 'schemap deactivate' to disconnect this device.", fg="yellow")
     else:
         click.echo("  Tier:             ", nl=False)
         click.secho("Free Tier", fg="yellow", bold=True)
         click.echo(f"  Table Limit:      {FREE_TABLE_LIMIT} tables")
+        click.echo(f"  Device ID:        {device_id}")
         click.echo(f"  CI Automation:    Blocked on Free Tier")
         click.echo(f"  Key Source:       None")
+        click.echo("-" * 50)
+        click.secho("  Tip: Run 'schemap activate <license-key>' to unlock Pro.", fg="yellow")
 
     click.echo(f"  Credentials File: {CREDENTIALS_FILE}")
     click.secho("=" * 50 + "\n", fg="cyan", bold=True)
