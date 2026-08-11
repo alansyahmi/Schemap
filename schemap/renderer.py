@@ -75,6 +75,31 @@ def enrich_schema_relationships(schema: DatabaseSchemaModel) -> DatabaseSchemaMo
     schema.common_journeys = list(set(journeys))
     return schema
 
+def generate_mermaid_er_diagram(schema: DatabaseSchemaModel) -> str:
+    """Generate clean Mermaid ER diagram for database schema."""
+    lines = ["erDiagram"]
+    for t in schema.tables:
+        lines.append(f"    {t.name} {{")
+        for c in t.columns[:10]: # limit to 10 cols for diagram clarity
+            pk_str = " PK" if c.primary_key else ""
+            clean_type = c.data_type.split("(")[0].replace(" ", "_")
+            lines.append(f"        {clean_type} {c.name}{pk_str}")
+        if len(t.columns) > 10:
+            lines.append(f"        more_cols plus_{len(t.columns)-10}_columns")
+        lines.append("    }")
+
+    for t in schema.tables:
+        for fk in t.foreign_keys:
+            if isinstance(fk, dict):
+                col = fk.get("column")
+                ref_tbl = fk.get("ref_table")
+            else:
+                col = getattr(fk, "column_name", getattr(fk, "column", None))
+                ref_tbl = getattr(fk, "foreign_table_name", getattr(fk, "ref_table", None))
+            if ref_tbl:
+                lines.append(f'    {t.name} }}|--|| {ref_tbl} : "{col}"')
+    return "\n".join(lines)
+
 def render_output(schema: DatabaseSchemaModel, fmt: str = "markdown") -> str:
     """
     Renders the schema into the specified format string.
@@ -85,6 +110,8 @@ def render_output(schema: DatabaseSchemaModel, fmt: str = "markdown") -> str:
         return schema.model_dump_json(indent=2)
     elif fmt == "yaml":
         return yaml.dump(schema.model_dump(), sort_keys=False)
+    elif fmt == "mermaid" or fmt == "mermaid-er":
+        return generate_mermaid_er_diagram(schema)
     elif fmt == "mcp":
         mcp_payload = {
             "mcpServers": {
@@ -135,3 +162,4 @@ def write_output(content: str, output_path: str) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with open(path, "w", encoding="utf-8") as f:
         f.write(content)
+

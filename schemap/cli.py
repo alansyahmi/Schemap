@@ -25,29 +25,69 @@ from .license import (
     FREE_TABLE_LIMIT,
     LicenseError
 )
-from .enrichment import apply_heuristics, apply_llm, apply_description_overrides
+from .enrichment import apply_heuristics, apply_llm, apply_description_overrides, apply_fk_overrides
 from .linter import calculate_score
-from .diff import save_current_state, load_previous_state, calculate_diff
+from .diff import save_current_state, load_previous_state, calculate_diff, calculate_detailed_diff
 from .export import generate_langchain, generate_llamaindex, generate_mcp_tools
 from .context import generate_database_context
 from .agents import write_agent_files
 from .doctor import get_doctor_report
 from .benchmark import calculate_benchmark
+from .fingerprint import calculate_schema_fingerprint, get_cached_fingerprint, save_fingerprint
+from .quickstart import run_quickstart
+from .query_explainer import explain_table, find_join_path
+from .fix import run_fix
+from .skills import install_agent_skills
 
 @click.group()
 @click.version_option(package_name="schemap-tool", message="Schemap %(version)s")
-def cli():
+@click.option('--profile', default=None, help="Named profile to load from schemap.yaml.")
+@click.option('--quiet', '-q', is_flag=True, help="Suppress informational messages.")
+@click.option('--no-color', is_flag=True, help="Disable color output.")
+@click.option('--output', 'output_fmt', default=None, help="Global default output format.")
+@click.option('--output-file', default=None, help="Redirect output to a file.")
+@click.pass_context
+def cli(ctx, profile, quiet, no_color, output_fmt, output_file):
     """Schemap: AI Database Context Compiler — The fastest way to make your database AI-ready."""
-    pass
+    ctx.ensure_object(dict)
+    ctx.obj['profile'] = profile
+    ctx.obj['quiet'] = quiet
+    ctx.obj['no_color'] = no_color
+    ctx.obj['output_fmt'] = output_fmt
+    ctx.obj['output_file'] = output_file
+    if no_color:
+        ctx.color = False
+
 
 @cli.command()
 @click.option('--full', is_flag=True, help="Generate full boilerplate with domain mappings and schema description overrides.")
-def init(full):
+@click.option('--interactive/--non-interactive', default=True, help="Run interactively or auto-pick defaults.")
+@click.option('--db', default=None, help="Database connection URL.")
+@click.option('--output-path', default=None, help="Context output file path.")
+@click.option('--targets', default=None, help="Target agent targets e.g. codex,claude,cursor or all.")
+def quickstart(full, interactive, db, output_path, targets):
+    """Run interactive schemap quickstart onboarding flow."""
+    run_quickstart(
+        interactive=interactive,
+        target_db=db,
+        output_path=output_path,
+        targets=targets
+    )
+
+@cli.command()
+@click.option('--full', is_flag=True, help="Generate full boilerplate with domain mappings and schema description overrides.")
+@click.option('--interactive/--non-interactive', default=True, help="Run interactively or write standard template.")
+@click.pass_context
+def init(ctx, full, interactive):
     """Initialize a new schemap.yaml configuration file in the current directory."""
     config_path = Path("schemap.yaml")
     if config_path.exists():
         click.secho("schemap.yaml already exists in the current directory.", fg="yellow")
         sys.exit(0)
+
+    if interactive and not full and sys.stdin.isatty():
+        run_quickstart(interactive=True)
+        return
         
     if full:
         boilerplate = """# Schemap Full Configuration Asset
@@ -117,6 +157,7 @@ def _process_schema(cfg, enrich: bool):
     schema_model = DatabaseSchemaModel(tables=raw_tables)
     schema_model, unresolved = apply_heuristics(schema_model, cfg.domain.mappings, cfg.domain.ignore_abbreviations)
     schema_model = apply_description_overrides(schema_model, cfg.schema_descriptions)
+    schema_model = apply_fk_overrides(schema_model, cfg.foreign_key_overrides)
 
     if enrich:
         if cfg.llm.api_key:
@@ -531,6 +572,250 @@ def activate(key, endpoint):
         click.secho(f"\n[ERROR] License activation failed: {err}", fg="red")
         sys.exit(1)
 
+@cli.command()
+@click.option('--config', default="schemap.yaml", help="Path to configuration file.")
+@click.option('--json', 'json_output', is_flag=True, help="Output diff report in machine-readable JSON.")
+@click.option('--fail-on-breaking', is_flag=True, help="Exit with status code 2 if breaking changes are detected.")
+@click.option('--verbose', is_flag=True, help="Enable verbose output.")
+@click.pass_context
+def diff(ctx, config, json_output, fail_on_breaking, verbose):
+    """Compare current database schema to the last tracked state."""
+    try:
+        prof = ctx.obj.get('profile') if ctx.obj else None
+        cfg = load_config(config, profile=prof)
+        old_schema = load_previous_state()
+        if not old_schema:
+            click.secho("[INFO] No previous schema state found. Run `schemap context` first to track state.", fg="yellow")
+            return
+            
+        schema_model, _, _ = _process_schema(cfg, enrich=False)
+        diffs, report = calculate_detailed_diff(old_schema, schema_model)
+        
+        if json_output:
+            import json
+            click.echo(json.dumps(report, indent=2))
+            if fail_on_breaking and report["breaking_changes"]:
+                sys.exit(2)
+            return
+
+        click.secho("\n" + "=" * 50, fg="cyan", bold=True)
+        click.secho(f" Schema Diff Intelligence", fg="cyan", bold=True)
+        click.secho("=" * 50, fg="cyan", bold=True)
+        
+        if not diffs:
+            click.secho("  No changes detected since last run.", fg="green")
+        else:
+            for d in diffs:
+                if d.startswith("+"):
+                    click.secho(f"  {d}", fg="green")
+                elif d.startswith("-"):
+                    click.secho(f"  {d}", fg="red")
+                elif d.startswith("~"):
+                    click.secho(f"  {d}", fg="yellow")
+                    
+        click.secho("=" * 50 + "\n", fg="cyan", bold=True)
+        
+        if fail_on_breaking and report["breaking_changes"]:
+            click.secho(f"[BREAKING CHANGES DETECTED] {len(report['breaking_changes'])} breaking change(s) found:", fg="red", bold=True)
+            for b in report["breaking_changes"]:
+                click.secho(f"  - {b}", fg="red")
+            sys.exit(2)
+
+    except Exception as e:
+        click.secho(f"\n[ERROR] {str(e)}", fg="red")
+        if verbose:
+            raise
+
+@cli.command()
+@click.argument('entity_type', type=click.Choice(['table'], case_sensitive=False), default='table')
+@click.argument('name')
+@click.option('--config', default="schemap.yaml", help="Path to configuration file.")
+@click.option('--json', 'json_output', is_flag=True, help="Output explanation in JSON format.")
+@click.option('--verbose', is_flag=True, help="Enable verbose output.")
+@click.pass_context
+def explain(ctx, entity_type, name, config, json_output, verbose):
+    """Explain table architecture, columns, relationships, and centrality."""
+    try:
+        prof = ctx.obj.get('profile') if ctx.obj else None
+        cfg = load_config(config, profile=prof)
+        schema_model, _, _ = _process_schema(cfg, enrich=False)
+        info = explain_table(schema_model, name)
+        
+        if json_output:
+            import json
+            click.echo(json.dumps(info, indent=2))
+            return
+            
+        click.secho("\n" + "=" * 55, fg="cyan", bold=True)
+        click.secho(f" Table Explanation: {info['table']}", fg="cyan", bold=True)
+        click.secho("=" * 55, fg="cyan", bold=True)
+        click.echo(f"  Business Name:     {info['business_name'] or 'N/A'}")
+        click.echo(f"  Description:       {info['description']}")
+        click.echo(f"  Centrality Rank:   {info['centrality_score']} ({info['degree_connections']} connections)")
+        click.echo("-" * 55)
+        click.secho("  Columns:", fg="yellow")
+        for c in info['columns']:
+            pk_tag = " [PK]" if c['primary_key'] else ""
+            null_tag = "" if c['nullable'] else " NOT NULL"
+            click.echo(f"   - {c['name']} ({c['data_type']}){pk_tag}{null_tag}")
+
+        if info['outgoing_relationships']:
+            click.echo("-" * 55)
+            click.secho("  Outgoing Relationships (Foreign Keys):", fg="yellow")
+            for r in info['outgoing_relationships']:
+                click.echo(f"   - {r['column']} ──> {r['ref_table']}.{r['ref_column']}")
+
+        if info['incoming_relationships']:
+            click.echo("-" * 55)
+            click.secho("  Incoming Relationships (Referenced By):", fg="yellow")
+            for r in info['incoming_relationships']:
+                click.echo(f"   - {r['from_table']}.{r['from_column']} ──> {r['to_column']}")
+
+        click.secho("=" * 55 + "\n", fg="cyan", bold=True)
+
+    except Exception as e:
+        click.secho(f"\n[ERROR] {str(e)}", fg="red")
+        if verbose:
+            raise
+
+@cli.command(name="join")
+@click.argument('tables', nargs=-1, required=True)
+@click.option('--config', default="schemap.yaml", help="Path to configuration file.")
+@click.option('--json', 'json_output', is_flag=True, help="Output join metadata in JSON format.")
+@click.option('--verbose', is_flag=True, help="Enable verbose output.")
+@click.pass_context
+def join_tables(ctx, tables, config, json_output, verbose):
+    """Find foreign key join path and generate SQL JOIN snippet."""
+    try:
+        prof = ctx.obj.get('profile') if ctx.obj else None
+        cfg = load_config(config, profile=prof)
+        schema_model, _, _ = _process_schema(cfg, enrich=False)
+        result = find_join_path(schema_model, list(tables))
+
+        if json_output:
+            import json
+            click.echo(json.dumps(result, indent=2))
+            return
+
+        click.secho("\n" + "=" * 55, fg="cyan", bold=True)
+        click.secho(" Foreign Key Join Query Solver", fg="cyan", bold=True)
+        click.secho("=" * 55, fg="cyan", bold=True)
+        if result.get("full_path"):
+            click.echo(f"  Joining Path: {' -> '.join(result['full_path'])}")
+        click.echo("-" * 55)
+        click.secho("  Generated SQL JOIN Snippet:", fg="yellow", bold=True)
+        click.secho(f"\n{result['sql_snippet']}\n", fg="green")
+        click.secho("=" * 55 + "\n", fg="cyan", bold=True)
+
+    except Exception as e:
+        click.secho(f"\n[ERROR] {str(e)}", fg="red")
+        if verbose:
+            raise
+
+@cli.command()
+@click.option('--config', default="schemap.yaml", help="Path to configuration file.")
+@click.option('--targets', default=None, help="Target frameworks e.g. codex,claude,cursor or comma-separated.")
+@click.option('--dir', 'target_dir', default=".", help="Target directory for agent files.")
+@click.option('--dry-run', is_flag=True, help="Preview output without writing files.")
+@click.option('--diff', is_flag=True, help="Show unified diff of proposed changes.")
+@click.option('--merge/--no-merge', default=True, help="Safely merge with existing user content using markers.")
+@click.option('--force', is_flag=True, help="Force overwrite existing agent files.")
+@click.option('--verbose', is_flag=True, help="Enable verbose output.")
+@click.pass_context
+def agents(ctx, config, targets, target_dir, dry_run, diff, merge, force, verbose):
+    """Generate CLAUDE.md, AGENTS.md, and agent rules for AI coding agents."""
+    try:
+        prof = ctx.obj.get('profile') if ctx.obj else None
+        cfg = load_config(config, profile=prof)
+        schema_model, _, _ = _process_schema(cfg, enrich=False)
+        
+        click.echo("-> Compiling AI agent context rules... ", nl=False)
+        res = write_agent_files(
+            schema_model=schema_model,
+            target_dir=target_dir,
+            targets=targets,
+            dry_run=dry_run,
+            diff=diff,
+            merge=merge,
+            force=force
+        )
+        click.secho("OK", fg="green")
+        
+        if dry_run or diff:
+            click.secho("\n[PREVIEW] Generated Agent Output:", fg="cyan", bold=True)
+            for fname, content in res.items():
+                click.secho(f"\n--- {fname} ---", fg="yellow")
+                click.echo(content)
+        else:
+            click.secho("\n[SUCCESS] AI Agent Context files generated successfully:", fg="green", bold=True)
+            for fname, fpath in res.items():
+                click.echo(f"  [OK] {fname} -> {fpath}")
+            click.echo("")
+            
+    except Exception as e:
+        click.secho(f"\n[ERROR] {str(e)}", fg="red")
+        if verbose:
+            raise
+
+@cli.command()
+@click.option('--config', default="schemap.yaml", help="Path to configuration file.")
+@click.option('--interactive/--non-interactive', default=True, help="Prompt interactively or use defaults.")
+@click.option('--accept-all', is_flag=True, help="Auto-accept all inferred FK candidates and abbreviation mappings.")
+@click.option('--verbose', is_flag=True, help="Enable verbose output.")
+def fix(config, interactive, accept_all, verbose):
+    """Interactively accept/reject suggested FK overrides and domain mappings, persisting them to YAML."""
+    try:
+        run_fix(config_path=config, interactive=interactive, accept_all=accept_all)
+    except Exception as e:
+        click.secho(f"\n[ERROR] {str(e)}", fg="red")
+        if verbose:
+            raise
+
+@cli.command()
+@click.option('--config', default="schemap.yaml", help="Path to configuration file.")
+@click.option('--json', 'json_output', is_flag=True, help="Output benchmark data in JSON format.")
+@click.option('--verbose', is_flag=True, help="Enable verbose output.")
+def benchmark(config, json_output, verbose):
+    """Run performance benchmarks on database schema processing."""
+    pass
+
+@cli.command()
+@click.option('--config', default="schemap.yaml", help="Path to configuration file.")
+@click.option('--targets', default=None, help="Target agent targets.")
+@click.option('--dir', 'target_dir', default=".", help="Target directory.")
+@click.option('--force', is_flag=True, help="Force re-compilation even if schema fingerprint is unchanged.")
+@click.option('--verbose', is_flag=True, help="Enable verbose output.")
+@click.pass_context
+def sync(ctx, config, targets, target_dir, force, verbose):
+    """Regenerate database context and agent rules ONLY when the schema fingerprint changes."""
+    try:
+        prof = ctx.obj.get('profile') if ctx.obj else None
+        cfg = load_config(config, profile=prof)
+        schema_model, raw_tables, _ = _process_schema(cfg, enrich=False)
+        
+        current_fp = calculate_schema_fingerprint(schema_model)
+        cached_fp = get_cached_fingerprint()
+        
+        if not force and cached_fp == current_fp:
+            click.secho("[INFO] Schema fingerprint unchanged. Skipping context generation.", fg="cyan")
+            return
+            
+        click.echo("-> Schema fingerprint changed (or --force). Syncing context maps... ", nl=False)
+        out_path = Path(cfg.output.file_path) if cfg.output.file_path else Path("schemap_database_context.md")
+        rendered_output = generate_database_context(schema_model)
+        write_output(rendered_output, str(out_path))
+        
+        write_agent_files(schema_model, target_dir=target_dir, targets=targets, force=force)
+        save_fingerprint(current_fp)
+        
+        click.secho("OK", fg="green")
+        click.secho(f"[SUCCESS] Context and agent files synced. Updated fingerprint [{current_fp[:10]}...]", fg="green", bold=True)
+        
+    except Exception as e:
+        click.secho(f"\n[ERROR] {str(e)}", fg="red")
+        if verbose:
+            raise
+
 @cli.command(name="status")
 @click.option('--config', default="schemap.yaml", help="Path to configuration file.")
 @click.option('--verify', is_flag=True, help="Force online license verification.")
@@ -654,5 +939,30 @@ def logout():
     clear_credentials()
     click.secho("\n[SUCCESS] Successfully logged out. Cleared global credentials and license cache.", fg="green")
 
+@cli.group()
+def skills():
+    """Manage AI Agent skills (Codex, Claude, Cursor)."""
+    pass
+
+@skills.command(name="install")
+@click.option('--targets', default="all", help="Target agent frameworks e.g. codex,claude,cursor or all.")
+@click.option('--dir', 'target_dir', default=".", help="Target root directory.")
+@click.option('--verbose', is_flag=True, help="Enable verbose output.")
+def install_skills(targets, target_dir, verbose):
+    """Install agent-native schemap AI skills for Codex, Claude, and Cursor."""
+    try:
+        click.echo(f"-> Installing Schemap AI Agent skills (targets: {targets})... ", nl=False)
+        paths = install_agent_skills(targets=targets, base_dir=target_dir)
+        click.secho("OK", fg="green")
+        click.secho("\n[SUCCESS] Installed AI Agent Skills:", fg="green", bold=True)
+        for p in paths:
+            click.echo(f"  [OK] {p}")
+        click.echo("")
+    except Exception as e:
+        click.secho(f"\n[ERROR] {str(e)}", fg="red")
+        if verbose:
+            raise
+
 if __name__ == "__main__":
     cli()
+

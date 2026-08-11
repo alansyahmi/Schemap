@@ -1,7 +1,12 @@
+import difflib
 from pathlib import Path
-from typing import Dict
+from typing import Dict, List, Union, Tuple
+
 from .models import DatabaseSchemaModel
 from .context import calculate_central_tables, generate_relationship_map
+
+START_MARKER = "<!-- schemap:start -->"
+END_MARKER = "<!-- schemap:end -->"
 
 def generate_claude_md(schema_model: DatabaseSchemaModel) -> str:
     """Generate CLAUDE.md tailored for Claude Code and Anthropic models."""
@@ -80,21 +85,84 @@ def generate_agents_md(schema_model: DatabaseSchemaModel) -> str:
         
     return "\n".join(out)
 
-def write_agent_files(schema_model: DatabaseSchemaModel, target_dir: str = ".") -> Dict[str, str]:
-    """Generate and write CLAUDE.md and AGENTS.md files."""
+def merge_content_with_markers(existing_content: str, new_generated_content: str, force: bool = False) -> str:
+    """Safely merge newly generated content into existing file using markers."""
+    block = f"{START_MARKER}\n{new_generated_content.strip()}\n{END_MARKER}"
+    if force or not existing_content or not existing_content.strip():
+        return block + "\n"
+
+    if START_MARKER in existing_content and END_MARKER in existing_content:
+        before = existing_content.split(START_MARKER)[0]
+        after = existing_content.split(END_MARKER)[1]
+        return f"{before.rstrip()}\n\n{block}\n{after.lstrip()}"
+    else:
+        return f"{existing_content.rstrip()}\n\n{block}\n"
+
+def parse_targets(targets: Union[str, List[str], None]) -> set[str]:
+    """Parse comma-separated or list targets into normalized set."""
+    if not targets or targets == "all":
+        return {"codex", "claude", "cursor", "agents"}
+    if isinstance(targets, str):
+        t_list = [t.strip().lower() for t in targets.split(",") if t.strip()]
+    else:
+        t_list = [t.strip().lower() for t in targets if t and t.strip()]
+    return set(t_list)
+
+def write_agent_files(
+    schema_model: DatabaseSchemaModel,
+    target_dir: str = ".",
+    targets: Union[str, List[str], None] = None,
+    dry_run: bool = False,
+    diff: bool = False,
+    merge: bool = True,
+    force: bool = False
+) -> Dict[str, str]:
+    """
+    Generate and write AI agent files (AGENTS.md, CLAUDE.md, .cursorrules)
+    supporting target filtering, marker preservation, dry-run, and unified diff.
+    """
     base = Path(target_dir)
+    target_set = parse_targets(targets)
     
-    claude_content = generate_claude_md(schema_model)
-    claude_path = base / "CLAUDE.md"
-    with open(claude_path, "w", encoding="utf-8") as f:
-        f.write(claude_content)
+    files_to_generate: Dict[str, str] = {}
+    
+    if "claude" in target_set:
+        files_to_generate["CLAUDE.md"] = generate_claude_md(schema_model)
         
-    agents_content = generate_agents_md(schema_model)
-    agents_path = base / "AGENTS.md"
-    with open(agents_path, "w", encoding="utf-8") as f:
-        f.write(agents_content)
+    if "codex" in target_set or "agents" in target_set or "copilot" in target_set or "general" in target_set or "all" in target_set:
+        files_to_generate["AGENTS.md"] = generate_agents_md(schema_model)
         
-    return {
-        "CLAUDE.md": str(claude_path),
-        "AGENTS.md": str(agents_path)
-    }
+    if "cursor" in target_set:
+        cursor_dir = base / ".cursor" / "rules"
+        cursor_path_rel = ".cursor/rules/schemap.mdc"
+        files_to_generate[cursor_path_rel] = generate_agents_md(schema_model)
+        if "AGENTS.md" not in files_to_generate:
+            files_to_generate["AGENTS.md"] = generate_agents_md(schema_model)
+
+    results: Dict[str, str] = {}
+    
+    for fname, raw_content in files_to_generate.items():
+        file_path = base / fname
+        file_path.parent.mkdir(parents=True, exist_ok=True)
+        
+        existing_content = ""
+        if file_path.exists():
+            with open(file_path, "r", encoding="utf-8") as f:
+                existing_content = f.read()
+                
+        final_content = merge_content_with_markers(existing_content, raw_content, force=(force or not merge))
+        
+        if diff:
+            existing_lines = existing_content.splitlines(keepends=True)
+            final_lines = final_content.splitlines(keepends=True)
+            udiff = "".join(difflib.unified_diff(existing_lines, final_lines, fromfile=f"a/{fname}", tofile=f"b/{fname}"))
+            results[fname] = udiff if udiff else "No changes."
+        elif dry_run:
+            results[fname] = final_content
+        else:
+            with open(file_path, "w", encoding="utf-8") as f:
+                f.write(final_content)
+            results[fname] = str(file_path)
+            
+    return results
+

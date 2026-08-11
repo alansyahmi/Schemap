@@ -218,3 +218,44 @@ def apply_description_overrides(schema: DatabaseSchemaModel, overrides: dict) ->
                     if col_override.business_name is not None:
                         col.business_name = col_override.business_name
     return schema
+
+def apply_fk_overrides(schema: DatabaseSchemaModel, fk_overrides: list) -> DatabaseSchemaModel:
+    """
+    Applies custom foreign key overrides from configuration.
+    """
+    if not fk_overrides:
+        return schema
+    from .models import ForeignKeyModel
+    for fk_item in fk_overrides:
+        # fk_item could be a dict or a ForeignKeyOverride model
+        if isinstance(fk_item, dict):
+            tbl_name = fk_item.get("table")
+            col_name = fk_item.get("column")
+            ref_tbl = fk_item.get("ref_table")
+            ref_col = fk_item.get("ref_column")
+        else:
+            tbl_name = getattr(fk_item, "table", None)
+            col_name = getattr(fk_item, "column", None)
+            ref_tbl = getattr(fk_item, "ref_table", None)
+            ref_col = getattr(fk_item, "ref_column", None)
+
+        if not tbl_name or not col_name or not ref_tbl or not ref_col:
+            continue
+
+        target_table = next((t for t in schema.tables if t.name == tbl_name), None)
+        if target_table:
+            # Avoid duplicate FK
+            exists = any(
+                fk.column_name == col_name and fk.foreign_table_name == ref_tbl and fk.foreign_column_name == ref_col
+                for fk in target_table.foreign_keys
+            )
+            if not exists:
+                target_table.foreign_keys.append(
+                    ForeignKeyModel(
+                        column_name=col_name,
+                        foreign_table_name=ref_tbl,
+                        foreign_column_name=ref_col
+                    )
+                )
+    return schema
+
