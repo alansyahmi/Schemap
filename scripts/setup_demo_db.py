@@ -1,11 +1,18 @@
 import sqlite3
 import os
 
-db_path = "demo_ecommerce.db"
-if os.path.exists(db_path):
+from pathlib import Path
+
+# Target examples/demo_ecommerce.db relative to repository root
+repo_root = Path(__file__).parent.parent
+examples_dir = repo_root / "examples"
+examples_dir.mkdir(exist_ok=True)
+db_path = examples_dir / "demo_ecommerce.db"
+
+if db_path.exists():
     os.remove(db_path)
 
-conn = sqlite3.connect(db_path)
+conn = sqlite3.connect(str(db_path))
 cur = conn.cursor()
 
 schema_sql = """
@@ -89,4 +96,5 @@ CREATE TABLE coupon_codes (
 cur.executescript(schema_sql)
 conn.commit()
 conn.close()
-print("Database demo_ecommerce.db created successfully with 8 tables.")
+print(f"Database {db_path} created successfully with 8 tables.")
+

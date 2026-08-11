@@ -4,10 +4,12 @@ import shutil
 from playwright.async_api import async_playwright
 
 async def record_demo1_video():
-    output_video_path = "docs/assets/schemap_demo1_hallucinated_sql.webm"
-    os.makedirs("docs/assets", exist_ok=True)
+    repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    output_video_path = os.path.join(repo_root, "docs", "assets", "schemap_demo1_hallucinated_sql.webm")
+    os.makedirs(os.path.dirname(output_video_path), exist_ok=True)
     
-    html_file_path = "file:///" + os.path.abspath("demo1_presentation.html").replace("\\", "/")
+    html_abs = os.path.join(repo_root, "examples", "demo1_presentation.html")
+    html_file_path = "file:///" + html_abs.replace("\\", "/")
     
     width, height = 1920, 1080
     temp_dir = os.path.abspath("temp_video_dir_demo1")

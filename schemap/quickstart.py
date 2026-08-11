@@ -28,10 +28,14 @@ def detect_local_databases() -> List[Tuple[str, str]]:
 
     cwd = Path.cwd()
     patterns = ["*.db", "*.sqlite", "*.sqlite3"]
-    for p in patterns:
-        for f in cwd.glob(p):
-            if f.is_file():
-                results.append((f"Local File ({f.name})", f"sqlite:///{f.name}"))
+    search_dirs = [cwd, cwd / "examples"]
+    for sdir in search_dirs:
+        if sdir.exists():
+            for p in patterns:
+                for f in sdir.glob(p):
+                    if f.is_file():
+                        rel_path = f.relative_to(cwd)
+                        results.append((f"Local File ({rel_path})", f"sqlite:///{rel_path.as_posix()}"))
 
     return results
 
@@ -51,6 +55,8 @@ def run_quickstart(
 
     detected = detect_local_databases()
     selected_url = target_db
+
+    default_demo_url = "sqlite:///examples/demo_ecommerce.db" if (Path.cwd() / "examples" / "demo_ecommerce.db").exists() else "sqlite:///demo_ecommerce.db"
 
     if not selected_url:
         if interactive and sys.stdin.isatty():
@@ -74,10 +80,10 @@ def run_quickstart(
                 selected_url = click.prompt(
                     "No local database detected. Enter database connection URL",
                     type=str,
-                    default="sqlite:///demo_ecommerce.db"
+                    default=default_demo_url
                 )
         else:
-            selected_url = detected[0][1] if detected else "sqlite:///demo_ecommerce.db"
+            selected_url = detected[0][1] if detected else default_demo_url
 
     if not output_path:
         if interactive and sys.stdin.isatty():

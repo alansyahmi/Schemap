@@ -5,10 +5,12 @@ import numpy as np
 from playwright.async_api import async_playwright
 
 async def record_demo_video():
-    output_video_path = "docs/assets/schemap_demo_showcase.mp4"
-    os.makedirs("docs/assets", exist_ok=True)
+    repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    output_video_path = os.path.join(repo_root, "docs", "assets", "schemap_demo_showcase.mp4")
+    os.makedirs(os.path.dirname(output_video_path), exist_ok=True)
     
-    html_file_path = "file:///" + os.path.abspath("demo_presentation.html").replace("\\", "/")
+    html_abs = os.path.join(repo_root, "examples", "demo_presentation.html")
+    html_file_path = "file:///" + html_abs.replace("\\", "/")
     
     fps = 30
     duration_seconds = 16  # 4 steps x 4 seconds each
