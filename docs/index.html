@@ -7,6 +7,17 @@
     <title>Give AI the Context It Needs to Understand Your Database | Schemap</title>
     <meta name="description"
         content="Schemap compiles your database schema into compact, deterministic context for AI coding agents, SQL workflows, and developer tools.">
+    <link rel="canonical" href="https://schemap-tool.pages.dev/">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://schemap-tool.pages.dev/">
+    <meta property="og:title" content="Give AI the Context It Needs to Understand Your Database | Schemap">
+    <meta property="og:description" content="Schemap compiles database schema metadata into compact, deterministic context for AI coding agents, SQL workflows, and developer tools.">
+    <meta property="og:image" content="https://schemap-tool.pages.dev/assets/Icon%20Dark.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://schemap-tool.pages.dev/">
+    <meta name="twitter:title" content="Give AI the Context It Needs to Understand Your Database | Schemap">
+    <meta name="twitter:description" content="Schemap compiles database schema metadata into compact, deterministic context for AI coding agents, SQL workflows, and developer tools.">
+    <meta name="twitter:image" content="https://schemap-tool.pages.dev/assets/Icon%20Dark.png">
     <link rel="icon" href="assets/Icon Dark.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -15,6 +26,80 @@
         rel="stylesheet">
     <link rel="stylesheet" href="style.css?v=7">
     <script async src="https://startupbar.co/widget/loader.js" data-startup-id="6a520807-b62b-4145-8c05-b2c862af8e05"></script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "Schemap",
+      "operatingSystem": "Cross-platform",
+      "applicationCategory": "DeveloperApplication",
+      "description": "Deterministic AI Database Context Compiler for Claude Code, Cursor, Codex, and GitHub Copilot.",
+      "url": "https://schemap-tool.pages.dev/",
+      "softwareVersion": "3.0.0",
+      "offers": [
+        {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD",
+          "name": "Free Tier"
+        },
+        {
+          "@type": "Offer",
+          "price": "7.99",
+          "priceCurrency": "USD",
+          "name": "Pro Tier"
+        }
+      ]
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is Schemap?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Schemap is a local-first developer CLI compiler that extracts database schemas and compiles deterministic, token-optimized context maps (schemap_database_context.md, CLAUDE.md, AGENTS.md, Cursor rules) for AI coding agents."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How do I update Schemap to the latest version?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Run pipx upgrade schemap-tool (or uv tool upgrade schemap-tool / pip install --upgrade schemap-tool). Verify your CLI version with schemap --version."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Does Schemap send my database data to an AI?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Not by default. Schema extraction and compilation run locally. Optional --enrich sends compressed schema metadata to OpenAI API."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I use Schemap with Cursor, Claude Code, Codex, or Copilot?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. Generate Markdown context, CLAUDE.md, AGENTS.md, JSON, MCP, or framework exports for the workflow your agent reads."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Which databases are supported?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "PostgreSQL, SQLite, MySQL, Turso/libSQL, and Oracle are supported by current extractors."
+          }
+        }
+      ]
+    }
+    </script>
 </head>
 
 <body>
@@ -393,6 +478,14 @@ JOIN payments ON orders.id = payments.order_id;</pre>
                         <p>Run <code>pipx upgrade schemap-tool</code> (or <code>uv tool upgrade schemap-tool</code> / <code>pip install --upgrade schemap-tool</code>). You can verify your active CLI version anytime with <code>schemap --version</code>.</p>
                     </details>
                     <details>
+                        <summary>What is Schemap and how does it work?</summary>
+                        <p>Schemap is a local-first developer CLI compiler. It extracts schema metadata from PostgreSQL, SQLite, MySQL, Turso, or Oracle databases, computes AI Readiness scores, resolves foreign key join paths, and compiles compressed context files (<code>schemap_database_context.md</code>, <code>CLAUDE.md</code>, <code>AGENTS.md</code>) to prevent AI coding agents from guessing schema structures.</p>
+                    </details>
+                    <details>
+                        <summary>How do I update Schemap to the latest version?</summary>
+                        <p>Run <code>pipx upgrade schemap-tool</code> (or <code>uv tool upgrade schemap-tool</code> / <code>pip install --upgrade schemap-tool</code>). You can verify your active CLI version anytime with <code>schemap --version</code>.</p>
+                    </details>
+                    <details>
                         <summary>Does Schemap send my database data to an AI?</summary>
                         <p>Not by default. Extraction and compilation run locally. Optional <code>--enrich</code> sends
                             compressed schema metadata to the configured OpenAI API. Licensed CI/CD usage also performs
@@ -429,8 +522,18 @@ JOIN payments ON orders.id = payments.order_id;</pre>
     </main>
     <footer>
         <div class="footer-content"><img src="assets/Icon Dark.png" alt="Schemap" height="24">
-            <p>© 2026 Schemap · Local-first database context for AI workflows.</p><a
-                href="https://billing.stripe.com/p/login/28EaEXgO9dZ36S44fddIA00" target="_blank" rel="noopener">Manage Subscription</a><a
+            <p>© 2026 Schemap · Local-first database context for AI workflows.</p>
+            <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin:10px 0;font-size:0.85rem;">
+                <a href="docs.html#quickstart">Quickstart</a> ·
+                <a href="docs.html#context">Context Reference</a> ·
+                <a href="docs.html#doctor">Health Doctor</a> ·
+                <a href="docs.html#agents">Agent Rules</a> ·
+                <a href="docs.html#join">JOIN Solver</a> ·
+                <a href="vs-pg-dump.html">vs. pg_dump</a> ·
+                <a href="vs-mcp-sql.html">vs. MCP SQL</a> ·
+                <a href="llms.txt">llms.txt</a>
+            </div>
+            <a href="https://billing.stripe.com/p/login/28EaEXgO9dZ36S44fddIA00" target="_blank" rel="noopener">Manage Subscription</a><a
                 href="https://github.com/alansyahmi/Schemap" target="_blank" rel="noopener">GitHub</a>
             <p>Developed by <a href="https://swarty.pages.dev/" target="_blank" rel="noopener" class="logo-font">Swarty.</a></p>
         </div>

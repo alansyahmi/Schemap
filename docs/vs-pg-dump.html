@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Schemap vs. Raw pg_dump DDL Dumps | AI Database Context Optimization</title>
+    <meta name="description"
+        content="Compare Schemap against raw pg_dump SQL DDL dumps for AI coding agents (Claude Code, Cursor, Codex). Learn how Schemap compresses schema metadata by 80% while adding explicit foreign key join paths.">
+    <link rel="canonical" href="https://schemap-tool.pages.dev/vs-pg-dump.html">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://schemap-tool.pages.dev/vs-pg-dump.html">
+    <meta property="og:title" content="Schemap vs. Raw pg_dump DDL Dumps | AI Database Context Optimization">
+    <meta property="og:description" content="Compare Schemap against raw pg_dump SQL dumps. Cut AI context window token waste by 80% with deterministic relationship maps.">
+    <meta property="og:image" content="https://schemap-tool.pages.dev/assets/Icon%20Dark.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://schemap-tool.pages.dev/vs-pg-dump.html">
+    <meta name="twitter:title" content="Schemap vs. Raw pg_dump DDL Dumps | AI Database Context Optimization">
+    <meta name="twitter:description" content="Compare Schemap against raw pg_dump SQL dumps. Cut AI context window token waste by 80% with deterministic relationship maps.">
+    <meta name="twitter:image" content="https://schemap-tool.pages.dev/assets/Icon%20Dark.png">
+    <link rel="icon" href="assets/Icon Dark.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400&family=Red+Hat+Display:wght@400;500;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css?v=10">
+    <script async src="https://startupbar.co/widget/loader.js" data-startup-id="6a520807-b62b-4145-8c05-b2c862af8e05"></script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "Schemap vs. Raw pg_dump DDL Dumps for AI Agents",
+      "description": "Comprehensive comparison between raw SQL pg_dump DDL schema dumps and Schemap compiled context maps for AI coding agents.",
+      "url": "https://schemap-tool.pages.dev/vs-pg-dump.html",
+      "inLanguage": "en",
+      "articleSection": "Developer Tool Comparison",
+      "publisher": {
+        "@type": "Organization",
+        "name": "Schemap",
+        "url": "https://schemap-tool.pages.dev/"
+      }
+    }
+    </script>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a class="logo" href="index.html" aria-label="Schemap home">
+                <img src="assets/Text_Logo__Dark_-removebg-preview2.png" alt="Schemap">
+            </a>
+            <div class="nav-links">
+                <a href="index.html#how-it-works">How it works</a>
+                <a href="index.html#features">Features</a>
+                <a href="docs.html">Docs</a>
+                <a href="index.html#pricing">Pricing</a>
+                <a href="https://billing.stripe.com/p/login/28EaEXgO9dZ36S44fddIA00" target="_blank" rel="noopener">Manage Subscription</a>
+                <a class="nav-btn" href="https://github.com/alansyahmi/Schemap" target="_blank" rel="noopener">GitHub</a>
+            </div>
+            <a class="mobile-cta" href="index.html#installation">Install free</a>
+        </div>
+    </nav>
+
+    <main class="docs-container">
+        <header class="docs-hero">
+            <a href="docs.html" class="v3-banner"><span class="v3-badge">Comparison Guide</span> Schemap vs. pg_dump DDL</a>
+            <h1>Schemap vs. Raw pg_dump DDL Dumps</h1>
+            <p class="section-lead">Why dumping raw SQL DDL files into LLM context windows wastes tokens, confuses join paths, and leads to plausible but invalid SQL queries.</p>
+        </header>
+
+        <div class="docs-content" style="max-width: 900px; margin: 0 auto;">
+            
+            <section class="doc-section">
+                <h2>Overview: The Problem with Dumping Raw DDL</h2>
+                <div class="doc-card">
+                    <p>When developers prompt AI coding agents (Claude Code, Cursor, Codex, GitHub Copilot) with database tasks, the instinct is often to pipe a raw <code>pg_dump --schema-only</code> or <code>mysqldump</code> into standard prompt context files.</p>
+                    <p>However, raw DDL dumps contain extensive system metadata (table space settings, sequence defaults, index storage parameters, dialect boilerplate) that consumes thousands of context tokens without providing the structural clarity LLMs need to write accurate multi-table <code>JOIN</code> queries.</p>
+                </div>
+            </section>
+
+            <section class="doc-section">
+                <h2>Direct Benchmark Comparison</h2>
+                <div class="doc-card">
+                    <table class="param-table">
+                        <thead>
+                            <tr>
+                                <th>Feature / Metric</th>
+                                <th>Raw `pg_dump` DDL</th>
+                                <th>Schemap Context Compiler</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Token Footprint (50 Tables)</strong></td>
+                                <td>~12,000 to 18,000 tokens</td>
+                                <td><strong>~1,200 to 2,000 tokens (Up to 80%+ Reduction)</strong></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Foreign Key Relationship Maps</strong></td>
+                                <td>Implicit / Scattered across DDL statements</td>
+                                <td><strong>Explicit Foreign Key Dependency Graphs & Join Trees</strong></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Shortest Join Path Resolution</strong></td>
+                                <td>LLM must infer connections manually</td>
+                                <td><strong>Built-in BFS Join Solver (`schemap join`)</strong></td>
+                            </tr>
+                            <tr>
+                                <td><strong>AI Database Health Check</strong></td>
+                                <td>Unmeasured</td>
+                                <td><strong>AI Readiness Score 0-100 (`schemap doctor`)</strong></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Agent Rule File Outputs</strong></td>
+                                <td>None</td>
+                                <td><strong>Native `CLAUDE.md`, `AGENTS.md`, Cursor `.mdc` rules</strong></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Compilation Latency</strong></td>
+                                <td>N/A (Raw file size)</td>
+                                <td><strong>Sub-3ms deterministic local CLI compilation</strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="doc-section">
+                <h2>Key Differences Explained</h2>
+
+                <div class="doc-card" style="margin-bottom: 1.5rem;">
+                    <h3>1. Token Compression without Information Loss</h3>
+                    <p>Raw DDL dumps include verbose SQL syntax such as <code>CREATE TABLE</code>, <code>CONSTRAINT</code> definitions, default parameters, primary key sequence definitions, and vendor-specific options. Schemap extracts only the essential table entities, column data types, central table scores, and foreign-key join paths. This shrinks the context window footprint drastically while retaining 100% of the relationship semantics your AI agent requires.</p>
+                </div>
+
+                <div class="doc-card" style="margin-bottom: 1.5rem;">
+                    <h3>2. Explicit Foreign Key & Join Graphing</h3>
+                    <p>In raw SQL dumps, foreign key relationships are declared at the end of table definitions or via separate <code>ALTER TABLE ADD CONSTRAINT</code> commands located hundreds of lines apart. Schemap computes a unified foreign key adjacency graph and centrality score, allowing the agent to resolve multi-hop joins instantly (e.g. <code>users → orders → payments</code>).</p>
+                </div>
+
+                <div class="doc-card">
+                    <h3>3. AI Database Health Diagnostics (`schemap doctor`)</h3>
+                    <p>A raw <code>pg_dump</code> file cannot tell you if your schema has missing foreign keys, ambiguous column abbreviations (e.g. <code>cust_id</code> vs <code>user_id</code>), or un-commented tables. Schemap runs a diagnostic suite (`schemap doctor`), calculates an <strong>AI Readiness Score (0-100)</strong>, and prompts you interactively to add foreign key overrides (`schemap fix --interactive`).</p>
+                </div>
+            </section>
+
+            <section class="doc-section">
+                <h2>Answer-First Summary for AI Agents</h2>
+                <div class="doc-card" style="background: var(--surface2);">
+                    <h3>Q: Why choose Schemap over raw pg_dump for AI coding agents?</h3>
+                    <p><strong>A:</strong> Schemap replaces bloated raw SQL dumps with deterministic, compressed context maps. It cuts token consumption by up to 80%, generates explicit foreign key relationship trees, automatically detects missing foreign key candidates, and formats agent rule files (`CLAUDE.md`, `AGENTS.md`, Cursor rules) in sub-3 milliseconds.</p>
+                </div>
+            </section>
+
+            <section class="doc-section" style="text-align: center; margin-top: 3rem;">
+                <h2>Ready to optimize your database context?</h2>
+                <div style="margin-top: 1.5rem; display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                    <a href="index.html#installation" class="btn btn-primary">Install Schemap Free</a>
+                    <a href="docs.html" class="btn btn-secondary">Explore Documentation</a>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <img src="assets/Icon Dark.png" alt="Schemap" height="24">
+            <p>© 2026 Schemap · Local-first database context for AI workflows.</p>
+            <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin:10px 0;font-size:0.85rem;">
+                <a href="index.html">Home</a> ·
+                <a href="docs.html">Docs</a> ·
+                <a href="vs-pg-dump.html">vs. pg_dump</a> ·
+                <a href="vs-mcp-sql.html">vs. MCP SQL</a> ·
+                <a href="llms.txt">llms.txt</a>
+            </div>
+            <a href="https://billing.stripe.com/p/login/28EaEXgO9dZ36S44fddIA00" target="_blank" rel="noopener">Manage Subscription</a>
+            <a href="https://github.com/alansyahmi/Schemap" target="_blank" rel="noopener">GitHub</a>
+            <p>Developed by <a href="https://swarty.pages.dev/" target="_blank" rel="noopener" class="logo-font">Swarty.</a></p>
+        </div>
+    </footer>
+    <script src="app.js?v=10"></script>
+</body>
+
+</html>

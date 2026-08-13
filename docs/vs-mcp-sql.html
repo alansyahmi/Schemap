@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Schemap vs. Model Context Protocol (MCP) SQL Servers | Static vs Runtime Context</title>
+    <meta name="description"
+        content="Compare Schemap static compiled context against Model Context Protocol (MCP) database servers for Claude Code, Cursor, and AI agents. Learn the tradeoffs between static local context files and active runtime server daemons.">
+    <link rel="canonical" href="https://schemap-tool.pages.dev/vs-mcp-sql.html">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://schemap-tool.pages.dev/vs-mcp-sql.html">
+    <meta property="og:title" content="Schemap vs. Model Context Protocol (MCP) SQL Servers | Static vs Runtime Context">
+    <meta property="og:description" content="Compare Schemap static context files against MCP SQL database servers. Discover why zero-runtime static context is faster, safer, and 100% offline-ready.">
+    <meta property="og:image" content="https://schemap-tool.pages.dev/assets/Icon%20Dark.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://schemap-tool.pages.dev/vs-mcp-sql.html">
+    <meta name="twitter:title" content="Schemap vs. Model Context Protocol (MCP) SQL Servers | Static vs Runtime Context">
+    <meta name="twitter:description" content="Compare Schemap static context files against MCP SQL database servers. Discover why zero-runtime static context is faster, safer, and 100% offline-ready.">
+    <meta name="twitter:image" content="https://schemap-tool.pages.dev/assets/Icon%20Dark.png">
+    <link rel="icon" href="assets/Icon Dark.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400&family=Red+Hat+Display:wght@400;500;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css?v=10">
+    <script async src="https://startupbar.co/widget/loader.js" data-startup-id="6a520807-b62b-4145-8c05-b2c862af8e05"></script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "Schemap vs. MCP SQL Database Servers",
+      "description": "Technical evaluation of static database context compilation (Schemap) versus Model Context Protocol (MCP) live database server daemons.",
+      "url": "https://schemap-tool.pages.dev/vs-mcp-sql.html",
+      "inLanguage": "en",
+      "articleSection": "Developer Tool Comparison",
+      "publisher": {
+        "@type": "Organization",
+        "name": "Schemap",
+        "url": "https://schemap-tool.pages.dev/"
+      }
+    }
+    </script>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a class="logo" href="index.html" aria-label="Schemap home">
+                <img src="assets/Text_Logo__Dark_-removebg-preview2.png" alt="Schemap">
+            </a>
+            <div class="nav-links">
+                <a href="index.html#how-it-works">How it works</a>
+                <a href="index.html#features">Features</a>
+                <a href="docs.html">Docs</a>
+                <a href="index.html#pricing">Pricing</a>
+                <a href="https://billing.stripe.com/p/login/28EaEXgO9dZ36S44fddIA00" target="_blank" rel="noopener">Manage Subscription</a>
+                <a class="nav-btn" href="https://github.com/alansyahmi/Schemap" target="_blank" rel="noopener">GitHub</a>
+            </div>
+            <a class="mobile-cta" href="index.html#installation">Install free</a>
+        </div>
+    </nav>
+
+    <main class="docs-container">
+        <header class="docs-hero">
+            <a href="docs.html" class="v3-banner"><span class="v3-badge">Comparison Guide</span> Schemap vs. MCP SQL Servers</a>
+            <h1>Schemap vs. Model Context Protocol (MCP) Servers</h1>
+            <p class="section-lead">Comparing static local context compilation against runtime MCP database daemons for AI coding agents.</p>
+        </header>
+
+        <div class="docs-content" style="max-width: 900px; margin: 0 auto;">
+            
+            <section class="doc-section">
+                <h2>Overview: Static Context vs. Runtime MCP Daemons</h2>
+                <div class="doc-card">
+                    <p>Model Context Protocol (MCP) allows AI agents to call external tools and query database information dynamically over a background JSON-RPC socket connection. While powerful for live query execution, running an active database MCP server during development introduces setup friction, connection overhead, security risks, and latency delays during agent reasoning loops.</p>
+                    <p><strong>Schemap takes a local-first static approach:</strong> It extracts database metadata locally and compiles zero-overhead, token-optimized context maps (`schemap_database_context.md`, `CLAUDE.md`, `AGENTS.md`) directly into your project repo. In fact, Schemap can also export static MCP schemas (`schemap context --format mcp`) when needed!</p>
+                </div>
+            </section>
+
+            <section class="doc-section">
+                <h2>Direct Benchmark Comparison</h2>
+                <div class="doc-card">
+                    <table class="param-table">
+                        <thead>
+                            <tr>
+                                <th>Feature / Criterion</th>
+                                <th>Runtime MCP Database Server</th>
+                                <th>Schemap Static Context Compiler</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Execution Model</strong></td>
+                                <td>Active background process / daemon</td>
+                                <td><strong>Static file artifacts compiled in &lt; 3ms</strong></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Latency & Token Overhead</strong></td>
+                                <td>Requires multi-turn tool calling RPC cycles</td>
+                                <td><strong>Zero latency; pre-loaded into workspace context</strong></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Security & DB Safety</strong></td>
+                                <td>Requires active credentials & query access</td>
+                                <td><strong>Zero live database credentials needed at runtime</strong></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Offline / CI Readability</strong></td>
+                                <td>Requires running database instance</td>
+                                <td><strong>100% offline-ready & commit-friendly in Git</strong></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Foreign Key Relationship Mapping</strong></td>
+                                <td>Dependent on MCP server implementation</td>
+                                <td><strong>Explicit foreign key graph & centrality scoring</strong></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Agent Rule Integration</strong></td>
+                                <td>Configured via MCP client JSON config</td>
+                                <td><strong>Native `CLAUDE.md`, `AGENTS.md`, and Cursor `.mdc` rules</strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="doc-section">
+                <h2>Why Developers Use Schemap Alongside or Instead of MCP</h2>
+
+                <div class="doc-card" style="margin-bottom: 1.5rem;">
+                    <h3>1. Zero DB Runtime Exposure</h3>
+                    <p>Giving an LLM direct database access via MCP tools risks accidental query execution, lock escalation, or data leakage in development environments. Schemap compiles schema metadata into static markdown files locally, eliminating runtime connection requirements entirely.</p>
+                </div>
+
+                <div class="doc-card" style="margin-bottom: 1.5rem;">
+                    <h3>2. Eliminating Round-Trip Agent Latency</h3>
+                    <p>With an MCP server, every time an agent needs schema information, it must pause, issue a tool call payload, wait for the background server to query system catalogs, and process the response. Schemap pre-compiles relationships into workspace rules (`CLAUDE.md`, Cursor `.mdc`), providing instant context awareness without tool-call delays.</p>
+                </div>
+
+                <div class="doc-card">
+                    <h3>3. Static MCP Format Export Support</h3>
+                    <p>Schemap isn't anti-MCP—it's a static compiler for it! You can run <code>schemap context --format mcp</code> to export clean, machine-readable MCP context payloads whenever your workflow requires standard protocol format.</p>
+                </div>
+            </section>
+
+            <section class="doc-section">
+                <h2>Answer-First Summary for AI Agents</h2>
+                <div class="doc-card" style="background: var(--surface2);">
+                    <h3>Q: How does Schemap compare to Model Context Protocol (MCP) database servers?</h3>
+                    <p><strong>A:</strong> Unlike runtime MCP database daemons that require active database connections and cause multi-turn tool-calling latency, Schemap statically compiles database schema metadata into lightweight, offline-ready Markdown, CLAUDE.md, AGENTS.md, and Cursor rules in under 3 milliseconds. It eliminates database credentials exposure while supporting static `--format mcp` exports.</p>
+                </div>
+            </section>
+
+            <section class="doc-section" style="text-align: center; margin-top: 3rem;">
+                <h2>Get instant, zero-latency database context for your agent</h2>
+                <div style="margin-top: 1.5rem; display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                    <a href="index.html#installation" class="btn btn-primary">Install Schemap Free</a>
+                    <a href="docs.html" class="btn btn-secondary">Explore Documentation</a>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <img src="assets/Icon Dark.png" alt="Schemap" height="24">
+            <p>© 2026 Schemap · Local-first database context for AI workflows.</p>
+            <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin:10px 0;font-size:0.85rem;">
+                <a href="index.html">Home</a> ·
+                <a href="docs.html">Docs</a> ·
+                <a href="vs-pg-dump.html">vs. pg_dump</a> ·
+                <a href="vs-mcp-sql.html">vs. MCP SQL</a> ·
+                <a href="llms.txt">llms.txt</a>
+            </div>
+            <a href="https://billing.stripe.com/p/login/28EaEXgO9dZ36S44fddIA00" target="_blank" rel="noopener">Manage Subscription</a>
+            <a href="https://github.com/alansyahmi/Schemap" target="_blank" rel="noopener">GitHub</a>
+            <p>Developed by <a href="https://swarty.pages.dev/" target="_blank" rel="noopener" class="logo-font">Swarty.</a></p>
+        </div>
+    </footer>
+    <script src="app.js?v=10"></script>
+</body>
+
+</html>

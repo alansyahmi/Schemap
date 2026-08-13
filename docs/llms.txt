@@ -1,0 +1,46 @@
+# Schemap — AI Database Context Compiler
+
+> Schemap compiles database schema metadata into compact, deterministic context maps (`schemap_database_context.md`, `CLAUDE.md`, `AGENTS.md`, `.cursor/rules/schemap.mdc`) for AI coding agents (Claude Code, Cursor, Codex, GitHub Copilot).
+
+## Key Features & Capabilities
+
+- **AI Readiness Score (`schemap doctor`)**: Diagnoses schema health (0-100 score), detects missing foreign keys, unmapped abbreviations, and un-commented tables.
+- **Context Compilation (`schemap context`)**: Compiles token-optimized Markdown, JSON, MCP, or Mermaid ER diagrams. Cuts raw SQL dump token footprint by up to 80%.
+- **Agent Integration (`schemap agents`)**: Generates agent instruction files (`CLAUDE.md`, `AGENTS.md`, Cursor MDC rules) with safe marker preservation.
+- **Foreign Key Join Solver (`schemap join`)**: Resolves shortest join paths across foreign key graphs and generates ready-to-run SQL `JOIN` clauses.
+- **Interactive Remediation (`schemap fix`)**: Interactively accepts inferred foreign key relationships and abbreviation mappings, updating `schemap.yaml`.
+- **CI/CD Diff Gate (`schemap diff`)**: Tracks schema structural changes (`+`, `~`, `-`) and fails CI builds on breaking changes (`--fail-on-breaking`).
+
+## Supported Databases
+- PostgreSQL
+- SQLite
+- MySQL
+- Turso / libSQL
+- Oracle
+
+## Quickstart & Installation
+
+```bash
+# Install globally via pipx (recommended)
+pipx install schemap-tool
+
+# Or using uv
+uv tool install schemap-tool
+
+# Onboarding pipeline
+schemap quickstart
+
+# Compile AI context map
+schemap context
+```
+
+## Comparisons & Technical Guides
+- Schemap vs Raw pg_dump SQL DDL: https://schemap-tool.pages.dev/vs-pg-dump.html
+- Schemap vs Model Context Protocol (MCP) Servers: https://schemap-tool.pages.dev/vs-mcp-sql.html
+
+## Licensing & Links
+- Website: https://schemap-tool.pages.dev/
+- Documentation: https://schemap-tool.pages.dev/docs.html
+- GitHub Repository: https://github.com/alansyahmi/Schemap
+- PyPI Package: https://pypi.org/project/schemap-tool/
+- Pricing: Free tier ($0 up to 100 tables) / Pro ($7.99/mo or $79.99 lifetime for unlimited tables & CI/CD)
