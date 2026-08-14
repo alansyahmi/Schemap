@@ -38,18 +38,27 @@ def calculate_benchmark(schema_model: DatabaseSchemaModel, raw_tables: List[Dict
     rel_map = generate_relationship_map(schema_model)
     ai_score, _ = calculate_score(schema_model, unresolved_abbrs)
     
+    tokens_saved = max(0, raw_tokens - compiled_tokens)
+    cost_per_million = 3.00  # $3.00 per 1M tokens (Claude 3.5 Sonnet / GPT-4o input rate)
+    savings_per_prompt = round((tokens_saved / 1_000_000.0) * cost_per_million, 4)
+    monthly_dev_savings = round(savings_per_prompt * 2000.0, 2)
+    
     return {
         "tables_count": len(raw_tables),
         "raw_sql_tokens": raw_tokens,
         "schemap_tokens": compiled_tokens,
         "compression_percentage": f"{reduction_pct}%",
+        "tokens_saved_per_prompt": tokens_saved,
+        "estimated_savings_per_prompt_usd": f"${savings_per_prompt:.4f}",
+        "estimated_monthly_savings_per_dev_usd": f"${monthly_dev_savings:.2f}",
         "relationships_mapped": len(rel_map),
         "ai_readiness_score": ai_score,
         "generation_latency_ms": f"{elapsed_ms}ms",
         "context_efficiency": {
             "raw_sql_tokens": raw_tokens,
             "schemap_tokens": compiled_tokens,
-            "reduction_percentage": f"{reduction_pct}%"
+            "reduction_percentage": f"{reduction_pct}%",
+            "monthly_dev_savings_usd": f"${monthly_dev_savings:.2f}"
         },
         "context_quality": {
             "relationship_graph": "explicit graph" if len(rel_map) > 0 else "disconnected",

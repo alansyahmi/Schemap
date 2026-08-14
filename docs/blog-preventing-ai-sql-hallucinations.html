@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Stop AI Coding Agents from Hallucinating Invalid SQL JOINs & Exposing Credentials</title>
+    <meta name="description"
+        content="Learn how to prevent Claude Code, Cursor, and Copilot from hallucinating invalid SQL JOINs, querying sensitive columns, or corrupting production database data using automated context guardrails.">
+    <link rel="canonical" href="https://schemap-tool.pages.dev/blog-preventing-ai-sql-hallucinations.html">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://schemap-tool.pages.dev/blog-preventing-ai-sql-hallucinations.html">
+    <meta property="og:title" content="Stop AI Coding Agents from Hallucinating Invalid SQL JOINs & Exposing Credentials">
+    <meta property="og:description" content="Learn how automated anti-hallucination rules and deterministic database context maps stop AI coding agents from writing broken SQL queries.">
+    <meta property="og:image" content="https://schemap-tool.pages.dev/assets/Icon%20Dark.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://schemap-tool.pages.dev/blog-preventing-ai-sql-hallucinations.html">
+    <meta name="twitter:title" content="Stop AI Coding Agents from Hallucinating Invalid SQL JOINs & Exposing Credentials">
+    <meta name="twitter:description" content="Learn how automated anti-hallucination rules and deterministic database context maps stop AI coding agents from writing broken SQL queries.">
+    <meta name="twitter:image" content="https://schemap-tool.pages.dev/assets/Icon%20Dark.png">
+    <link rel="icon" href="assets/Icon Dark.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400&family=Red+Hat+Display:wght@400;500;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css?v=10">
+    <script async src="https://startupbar.co/widget/loader.js" data-startup-id="6a520807-b62b-4145-8c05-b2c862af8e05"></script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "How to Stop AI Coding Agents from Hallucinating Invalid SQL JOINs",
+      "description": "Technical guide on preventing AI coding agents from generating invalid multi-table JOINs or exposing sensitive database credentials.",
+      "url": "https://schemap-tool.pages.dev/blog-preventing-ai-sql-hallucinations.html",
+      "inLanguage": "en",
+      "articleSection": "Developer Technical Blog",
+      "publisher": {
+        "@type": "Organization",
+        "name": "Schemap",
+        "url": "https://schemap-tool.pages.dev/"
+      }
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Why do AI coding agents hallucinate wrong SQL JOIN paths?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "AI models guess join paths based on statistical training data. When a database schema lacks explicit foreign key metadata or uses implicit column names (like user_id vs account_id), the AI defaults to joining primary keys directly (e.g., orders.id = users.id), returning invalid or corrupted results."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How does Schemap prevent AI database mistakes?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Schemap extracts full database schemas, infers candidate foreign keys, and injects explicit anti-hallucination safety rules ([SAFETY]) directly into CLAUDE.md, AGENTS.md, and Cursor rules."
+          }
+        }
+      ]
+    }
+    </script>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a class="logo" href="index.html" aria-label="Schemap home">
+                <img src="assets/Text_Logo__Dark_-removebg-preview2.png" alt="Schemap">
+            </a>
+            <div class="nav-links">
+                <a href="index.html#how-it-works">How it works</a>
+                <a href="index.html#features">Features</a>
+                <a href="docs.html">Docs</a>
+                <a href="index.html#pricing">Pricing</a>
+                <a href="https://billing.stripe.com/p/login/28EaEXgO9dZ36S44fddIA00" target="_blank" rel="noopener">Manage Subscription</a>
+                <a class="nav-btn" href="https://github.com/alansyahmi/Schemap" target="_blank" rel="noopener">GitHub</a>
+            </div>
+            <a class="mobile-cta" href="index.html#installation">Install free</a>
+        </div>
+    </nav>
+
+    <main class="docs-container">
+        <header class="docs-hero">
+            <a href="docs.html" class="v3-banner"><span class="v3-badge">Technical Guide</span> AI Database Safety</a>
+            <h1>Stop AI Coding Agents from Hallucinating Invalid SQL JOINs &amp; Exposing Credentials</h1>
+            <p class="section-lead">A deep dive into why Claude Code, Cursor, and Copilot write broken multi-table JOINs, and how negative safety guardrail rules eliminate database hallucinations before code is committed.</p>
+        </header>
+
+        <div class="docs-content" style="max-width: 900px; margin: 0 auto;">
+
+            <section class="doc-section">
+                <h2>Direct Answer: Why AI Agents Make SQL Mistakes</h2>
+                <div class="doc-card" style="background: var(--surface2);">
+                    <p><strong>Direct Answer:</strong> AI coding agents hallucinate invalid SQL queries because they rely on statistical patterns rather than strict relational integrity. When presented with raw database structures or un-indexed foreign keys, LLMs frequently make three critical mistakes: joining primary keys directly (e.g., <code>orders.id = users.id</code>), querying sensitive columns (like <code>password_hash</code> or <code>ssn</code>), or generating destructive <code>DELETE</code> statements on audit logs. Injecting explicit negative safety guardrails into <code>CLAUDE.md</code> and <code>AGENTS.md</code> solves this permanently.</p>
+                </div>
+            </section>
+
+            <section class="doc-section">
+                <h2>The 3 Most Common AI Database Hallucinations</h2>
+
+                <div class="doc-card" style="margin-bottom: 1.5rem;">
+                    <h3>1. The Ambiguous Foreign Key Trap</h3>
+                    <p>When an AI agent is asked to fetch user purchases, it inspects table names and often constructs this broken SQL query:</p>
+                    <pre style="background: var(--surface); padding: 12px; border-radius: 6px; color: #ff6b6b;"><code>-- ❌ HALLUCINATED QUERY (Broken Join)
+SELECT * FROM orders 
+JOIN users ON orders.id = users.id; -- WRONG: Joins order ID to user ID!</code></pre>
+                    <p>The correct query requires joining <code>orders.user_id → users.id</code>. Without explicit relationship mapping, the LLM generates syntactically valid SQL that returns empty or corrupted datasets.</p>
+                </div>
+
+                <div class="doc-card" style="margin-bottom: 1.5rem;">
+                    <h3>2. Sensitive Credential Exposure</h3>
+                    <p>When asked to "generate a user profile query", an AI agent will blindly select all columns, including sensitive fields:</p>
+                    <pre style="background: var(--surface); padding: 12px; border-radius: 6px; color: #ff6b6b;"><code>-- ❌ DANGEROUS QUERY (Exposes Credentials)
+SELECT id, email, password_hash, auth_token, ssn FROM users;</code></pre>
+                </div>
+
+                <div class="doc-card">
+                    <h3>3. Destructive Auditing Operations</h3>
+                    <p>When asked to "clean up inactive users", AI agents often generate cascading <code>DELETE</code> statements that destroy immutable financial logs or audit trails (`payments`, `audit_logs`).</p>
+                </div>
+            </section>
+
+            <section class="doc-section">
+                <h2>The Solution: Negative Safety Guardrails (`schemap agents`)</h2>
+                <div class="doc-card">
+                    <p>Schemap solves database hallucinations by automatically generating explicit negative guardrail rules for Claude Code, Cursor, and Copilot. Run <code>schemap agents</code> to inject these rules into your project config files:</p>
+                    <pre style="background: var(--surface); padding: 14px; border-radius: 6px; color: var(--text);"><code>$ schemap agents
+
+-> Compiling AI agent context rules... OK
+[SUCCESS] AI Agent Context files generated successfully:
+  [OK] CLAUDE.md
+  [OK] AGENTS.md
+  [OK] .cursor/rules/schemap.mdc</code></pre>
+
+                    <h3 style="margin-top: 1.5rem;">Generated `CLAUDE.md` & `AGENTS.md` Output Example:</h3>
+                    <pre style="background: var(--surface2); padding: 14px; border-radius: 6px; color: var(--text);"><code>## AI Safety & Anti-Hallucination Guardrails
+- [SAFETY] Never join `orders.id` directly to `users.id`. Correct JOIN path: `orders.user_id -> users.id`.
+- [SAFETY] Never join `order_items.id` directly to `products.id`. Correct JOIN path: `order_items.product_id -> products.id`.
+- [SAFETY] Sensitive Data Protection: Never query or expose raw credentials: `users.password_hash`
+- [SAFETY] Immutability Guardrail: Do not generate DELETE or UPDATE queries for audit/financial records: `payments`</code></pre>
+                </div>
+            </section>
+
+            <section class="doc-section">
+                <h2>Automating Team Context with Git Pre-Commit Hooks</h2>
+                <div class="doc-card">
+                    <p>To ensure database context and safety rules stay synchronized as your team writes SQL migrations, Schemap includes a one-click Git pre-commit hook installer:</p>
+                    <pre style="background: var(--surface); padding: 14px; border-radius: 6px; color: var(--text);"><code>$ schemap hook install
+
+✔ Installed Git pre-commit hook at .git/hooks/pre-commit</code></pre>
+                    <p>Now, whenever a developer commits an SQL migration file, Schemap automatically updates `schemap_database_context.md` and agent rule files before the commit is completed.</p>
+                </div>
+            </section>
+
+            <section class="doc-section" style="text-align: center; margin-top: 3rem;">
+                <h2>Eliminate AI Database Hallucinations Today</h2>
+                <div style="margin-top: 1.5rem; display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                    <a href="index.html#installation" class="btn btn-primary">Install Schemap Free</a>
+                    <a href="docs.html" class="btn btn-secondary">Explore Documentation</a>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <img src="assets/Icon Dark.png" alt="Schemap" height="24">
+            <p>© 2026 Schemap · Local-first database context for AI workflows.</p>
+            <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin:10px 0;font-size:0.85rem;">
+                <a href="index.html">Home</a> ·
+                <a href="docs.html">Docs</a> ·
+                <a href="blog-preventing-ai-sql-hallucinations.html">AI Safety Guide</a> ·
+                <a href="vs-llmschema.html">vs. LLMSchema</a> ·
+                <a href="vs-pg-dump.html">vs. pg_dump</a> ·
+                <a href="vs-mcp-sql.html">vs. MCP SQL</a> ·
+                <a href="llms.txt">llms.txt</a>
+            </div>
+            <a href="https://billing.stripe.com/p/login/28EaEXgO9dZ36S44fddIA00" target="_blank" rel="noopener">Manage Subscription</a>
+            <a href="https://github.com/alansyahmi/Schemap" target="_blank" rel="noopener">GitHub</a>
+            <p>Developed by <a href="https://swarty.pages.dev/" target="_blank" rel="noopener" class="logo-font">Swarty.</a></p>
+        </div>
+    </footer>
+    <script src="app.js?v=10"></script>
+</body>
+
+</html>

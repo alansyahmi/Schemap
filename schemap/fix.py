@@ -51,7 +51,7 @@ def run_fix(
     if fk_candidates:
         click.secho("🔗 Suggested Foreign Key Candidate Relationships:", fg="yellow", bold=True)
         for cand in fk_candidates:
-            rel_str = f"{cand['table']}.{cand['column']} ──> {cand['ref_table']}.{cand['ref_column']}"
+            rel_str = f"{cand['table']}.{cand['column']} --> {cand['ref_table']}.{cand['ref_column']}"
             conf_str = f"Confidence: {cand['confidence']}% ({cand['reason']})"
             
             should_accept = False

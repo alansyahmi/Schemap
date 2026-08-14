@@ -89,14 +89,56 @@ def generate_query_examples(schema_model: DatabaseSchemaModel) -> List[str]:
                     
     return queries
 
-def generate_database_context(schema_model: DatabaseSchemaModel) -> str:
-    """Generate the full schemap_database_context.md content."""
-    total_tables = len(schema_model.tables)
-    total_cols = sum(len(t.columns) for t in schema_model.tables)
-    total_fks = sum(len(t.foreign_keys) for t in schema_model.tables)
+def filter_schema_by_scope(schema_model: DatabaseSchemaModel, scope: str = "all") -> DatabaseSchemaModel:
+    """Filter tables in schema model based on role-scoped profile (analytics, backend, core, or custom keyword)."""
+    if not scope or scope.lower() == "all":
+        return schema_model
+    
+    scope_lower = scope.lower()
+    filtered_tables = []
+    
+    if scope_lower == "analytics":
+        analytics_keywords = {'fact', 'dim', 'analytics', 'stats', 'metrics', 'summary', 'report', 'history', 'snapshot', 'sales', 'revenue', 'aggregates'}
+        for t in schema_model.tables:
+            name_lower = t.name.lower()
+            if any(kw in name_lower for kw in analytics_keywords):
+                filtered_tables.append(t)
+    elif scope_lower == "backend":
+        backend_keywords = {'user', 'users', 'auth', 'session', 'account', 'order', 'payment', 'transaction', 'role', 'permission', 'profile'}
+        for t in schema_model.tables:
+            name_lower = t.name.lower()
+            if any(kw in name_lower for kw in backend_keywords):
+                filtered_tables.append(t)
+    elif scope_lower == "core":
+        central = calculate_central_tables(schema_model)
+        top_names = {c[0] for c in central if c[2] > 0}
+        if not top_names:
+            top_names = {c[0] for c in central[:5]}
+        for t in schema_model.tables:
+            if t.name in top_names:
+                filtered_tables.append(t)
+    else:
+        for t in schema_model.tables:
+            if scope_lower in t.name.lower():
+                filtered_tables.append(t)
+                
+    if not filtered_tables:
+        filtered_tables = schema_model.tables
+
+    return DatabaseSchemaModel(tables=filtered_tables)
+
+def generate_database_context(schema_model: DatabaseSchemaModel, scope: str = "all") -> str:
+    """Generate the full schemap_database_context.md content supporting scoped context roles."""
+    model_to_use = filter_schema_by_scope(schema_model, scope=scope)
+    total_tables = len(model_to_use.tables)
+    total_cols = sum(len(t.columns) for t in model_to_use.tables)
+    total_fks = sum(len(t.foreign_keys) for t in model_to_use.tables)
     
     out = []
     out.append("# Database Context Engine Output\n")
+    if scope and scope.lower() != "all":
+        out.append(f"> **Context Scope**: `{scope.lower()}` profile ({total_tables} focused tables)\n")
+        
     out.append("## Database Overview\n")
     out.append(f"- **Total Tables**: {total_tables}")
     out.append(f"- **Total Columns**: {total_cols}")
@@ -105,19 +147,19 @@ def generate_database_context(schema_model: DatabaseSchemaModel) -> str:
     # Schema Relationship Map
     out.append("## Schema Relationship Map\n")
     out.append("```")
-    rel_map = generate_relationship_map(schema_model)
+    rel_map = generate_relationship_map(model_to_use)
     out.extend(rel_map)
     out.append("```\n")
     
     # Central Tables
     out.append("## Central Tables\n")
-    central_tables = calculate_central_tables(schema_model)
+    central_tables = calculate_central_tables(model_to_use)
     top_central = [ct for ct in central_tables if ct[2] > 0][:5]
     if not top_central:
         top_central = central_tables[:5]
         
     for name, score, degree in top_central:
-        t_model = next((t for t in schema_model.tables if t.name == name), None)
+        t_model = next((t for t in model_to_use.tables if t.name == name), None)
         desc = t_model.description if t_model and t_model.description else "No description available."
         out.append(f"### `{name}`")
         out.append(f"- **Connectivity Score**: {score} ({degree} connections)")
@@ -128,7 +170,7 @@ def generate_database_context(schema_model: DatabaseSchemaModel) -> str:
             
     # Query Examples
     out.append("## Query Examples\n")
-    query_examples = generate_query_examples(schema_model)
+    query_examples = generate_query_examples(model_to_use)
     if query_examples:
         for q in query_examples[:5]:
             out.append("```sql")

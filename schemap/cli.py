@@ -40,7 +40,7 @@ from .fix import run_fix
 from .skills import install_agent_skills
 
 @click.group()
-@click.version_option(package_name="schemap-tool", message="Schemap %(version)s")
+@click.version_option("3.1.0", package_name="schemap-tool", message="Schemap %(version)s")
 @click.option('--profile', default=None, help="Named profile to load from schemap.yaml.")
 @click.option('--quiet', '-q', is_flag=True, help="Suppress informational messages.")
 @click.option('--no-color', is_flag=True, help="Disable color output.")
@@ -48,7 +48,7 @@ from .skills import install_agent_skills
 @click.option('--output-file', default=None, help="Redirect output to a file.")
 @click.pass_context
 def cli(ctx, profile, quiet, no_color, output_fmt, output_file):
-    """Schemap: AI Database Context Compiler — The fastest way to make your database AI-ready."""
+    """Schemap: AI Database Context Compiler - The fastest way to make your database AI-ready."""
     ctx.ensure_object(dict)
     ctx.obj['profile'] = profile
     ctx.obj['quiet'] = quiet
@@ -138,7 +138,7 @@ domain:
     with open(config_path, "w", encoding="utf-8") as f:
         f.write(boilerplate)
         
-    click.secho("✔ Created schemap.yaml", fg="green")
+    click.secho("[OK] Created schemap.yaml", fg="green")
 
 def _process_schema(cfg, enrich: bool):
     click.echo("-> Connecting to database... ", nl=False)
@@ -253,9 +253,10 @@ def doctor(config, json_output, verbose):
 @cli.command()
 @click.option('--config', default="schemap.yaml", help="Path to configuration file.")
 @click.option('--json', 'json_output', is_flag=True, help="Output benchmark data in JSON format.")
+@click.option('--cost', is_flag=True, help="Display monetary LLM cost savings estimates.")
 @click.option('--verbose', is_flag=True, help="Enable verbose output.")
-def benchmark(config, json_output, verbose):
-    """Run Database Context Benchmark (tables, raw vs schemap tokens, compression, relationships, AI score, latency)."""
+def benchmark(config, json_output, cost, verbose):
+    """Run Database Context Benchmark (tables, raw vs schemap tokens, compression, monetary savings, AI score, latency)."""
     try:
         cfg = load_config(config)
         schema_model, raw_tables, unresolved = _process_schema(cfg, enrich=False)
@@ -276,6 +277,12 @@ def benchmark(config, json_output, verbose):
         click.secho(f"{bench_data['schemap_tokens']:,} tokens", fg="green", bold=True)
         click.echo(f"  Compression:          ", nl=False)
         click.secho(f"{bench_data['compression_percentage']}", fg="magenta", bold=True)
+        click.echo("-" * 50)
+        click.echo(f"  Tokens Saved/Prompt:  {bench_data.get('tokens_saved_per_prompt', 0):,}")
+        click.echo(f"  Cost Saved/Prompt:    ", nl=False)
+        click.secho(f"{bench_data.get('estimated_savings_per_prompt_usd', '$0.00')}", fg="green", bold=True)
+        click.echo(f"  Est. Monthly/Dev:     ", nl=False)
+        click.secho(f"{bench_data.get('estimated_monthly_savings_per_dev_usd', '$0.00')}", fg="green", bold=True)
         click.echo("-" * 50)
         click.echo(f"  Relationships Mapped: {bench_data['relationships_mapped']}")
         click.echo(f"  AI Readiness Score:   {bench_data['ai_readiness_score']}/100")
@@ -336,9 +343,10 @@ def inspect(config, json_output, verbose):
 @click.option('--config', default="schemap.yaml", help="Path to the configuration file.")
 @click.option('--verbose', is_flag=True, help="Enable verbose output.")
 @click.option('--format', 'fmt', type=click.Choice(['markdown', 'json', 'yaml', 'xml', 'mcp', 'ai'], case_sensitive=False), help="Override the output format.")
+@click.option('--scope', default='all', help="Filter schema scope by role profile (all, analytics, backend, core).")
 @click.option('--enrich', is_flag=True, help="[BETA] Apply optional LLM enrichment for table descriptions.")
 @click.option('--track/--no-track', default=True, help="Track schema state for diff intelligence.")
-def context(config, verbose, fmt, enrich, track):
+def context(config, verbose, fmt, scope, enrich, track):
     """Generate AI-optimized database context (schemap_database_context.md)."""
     try:
         cfg = load_config(config)
@@ -350,9 +358,9 @@ def context(config, verbose, fmt, enrich, track):
         target_fmt = fmt if fmt else cfg.output.format
         out_path = Path(cfg.output.file_path) if cfg.output.file_path else Path("schemap_database_context.md")
         
-        click.echo(f"-> Compiling AI context engine [{target_fmt}]... ", nl=False)
+        click.echo(f"-> Compiling AI context engine [{target_fmt}] (scope: {scope})... ", nl=False)
         if target_fmt == "markdown":
-            rendered_output = generate_database_context(schema_model)
+            rendered_output = generate_database_context(schema_model, scope=scope)
         else:
             rendered_output = render_output(schema_model, fmt=target_fmt)
             
@@ -668,13 +676,13 @@ def explain(ctx, entity_type, name, config, json_output, verbose):
             click.echo("-" * 55)
             click.secho("  Outgoing Relationships (Foreign Keys):", fg="yellow")
             for r in info['outgoing_relationships']:
-                click.echo(f"   - {r['column']} ──> {r['ref_table']}.{r['ref_column']}")
+                click.echo(f"   - {r['column']} --> {r['ref_table']}.{r['ref_column']}")
 
         if info['incoming_relationships']:
             click.echo("-" * 55)
             click.secho("  Incoming Relationships (Referenced By):", fg="yellow")
             for r in info['incoming_relationships']:
-                click.echo(f"   - {r['from_table']}.{r['from_column']} ──> {r['to_column']}")
+                click.echo(f"   - {r['from_table']}.{r['from_column']} --> {r['to_column']}")
 
         click.secho("=" * 55 + "\n", fg="cyan", bold=True)
 
@@ -750,7 +758,10 @@ def agents(ctx, config, targets, target_dir, dry_run, diff, merge, force, verbos
             click.secho("\n[PREVIEW] Generated Agent Output:", fg="cyan", bold=True)
             for fname, content in res.items():
                 click.secho(f"\n--- {fname} ---", fg="yellow")
-                click.echo(content)
+                try:
+                    click.echo(content)
+                except UnicodeEncodeError:
+                    sys.stdout.buffer.write(content.encode("utf-8", errors="replace") + b"\n")
         else:
             click.secho("\n[SUCCESS] AI Agent Context files generated successfully:", fg="green", bold=True)
             for fname, fpath in res.items():
@@ -776,13 +787,7 @@ def fix(config, interactive, accept_all, verbose):
         if verbose:
             raise
 
-@cli.command()
-@click.option('--config', default="schemap.yaml", help="Path to configuration file.")
-@click.option('--json', 'json_output', is_flag=True, help="Output benchmark data in JSON format.")
-@click.option('--verbose', is_flag=True, help="Enable verbose output.")
-def benchmark(config, json_output, verbose):
-    """Run performance benchmarks on database schema processing."""
-    pass
+
 
 @cli.command()
 @click.option('--config', default="schemap.yaml", help="Path to configuration file.")
@@ -967,6 +972,73 @@ def install_skills(targets, target_dir, verbose):
         click.secho(f"\n[ERROR] {str(e)}", fg="red")
         if verbose:
             raise
+
+@cli.command()
+@click.option('--config', default="schemap.yaml", help="Path to configuration file.")
+@click.option('--json', 'json_output', is_flag=True, help="Output canonical queries in JSON format.")
+@click.option('--verbose', is_flag=True, help="Enable verbose output.")
+@click.pass_context
+def examples(ctx, config, json_output, verbose):
+    """Generate canonical reference SQL JOIN queries from database relationships."""
+    try:
+        prof = ctx.obj.get('profile') if ctx.obj else None
+        cfg = load_config(config, profile=prof)
+        schema_model, _, _ = _process_schema(cfg, enrich=False)
+        from .context import generate_query_examples
+        queries = generate_query_examples(schema_model)
+        
+        if json_output:
+            import json
+            click.echo(json.dumps({"canonical_sql_examples": queries}, indent=2))
+            return
+            
+        click.secho("\n" + "=" * 55, fg="cyan", bold=True)
+        click.secho(" Canonical Reference SQL Examples", fg="cyan", bold=True)
+        click.secho("=" * 55, fg="cyan", bold=True)
+        if queries:
+            for q in queries:
+                click.secho(f"{q}\n", fg="green")
+        else:
+            click.echo("No foreign key relationships detected to auto-generate queries.")
+        click.secho("=" * 55 + "\n", fg="cyan", bold=True)
+    except Exception as e:
+        click.secho(f"\n[ERROR] {str(e)}", fg="red")
+        if verbose:
+            raise
+
+@cli.group()
+def hook():
+    """Manage Git pre-commit hooks for automatic Schemap context sync."""
+    pass
+
+@hook.command(name="install")
+def hook_install():
+    """Install a Git pre-commit hook to auto-sync database context on SQL migration commits."""
+    git_dir = Path(".git")
+    if not git_dir.exists():
+        click.secho("[ERROR] Not a Git repository (.git folder not found).", fg="red")
+        sys.exit(1)
+        
+    hooks_dir = git_dir / "hooks"
+    hooks_dir.mkdir(exist_ok=True)
+    hook_file = hooks_dir / "pre-commit"
+    
+    script = """#!/bin/sh
+# Schemap auto-sync pre-commit hook
+echo "[Schemap] Auto-syncing database context map..."
+if command -v schemap >/dev/null 2>&1; then
+    schemap sync --quiet
+fi
+"""
+    with open(hook_file, "w", encoding="utf-8") as f:
+        f.write(script)
+    import os
+    try:
+        os.chmod(hook_file, 0o755)
+    except Exception:
+        pass
+        
+    click.secho(f"[OK] Installed Git pre-commit hook at {hook_file}", fg="green", bold=True)
 
 if __name__ == "__main__":
     cli()

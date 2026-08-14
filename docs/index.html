@@ -4,19 +4,19 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Give AI the Context It Needs to Understand Your Database | Schemap</title>
+    <title>The Database Intelligence Layer for AI Coding Agents | Schemap</title>
     <meta name="description"
-        content="Schemap compiles your database schema into compact, deterministic context for AI coding agents, SQL workflows, and developer tools.">
+        content="Schemap is the database intelligence layer for AI coding agents. Stop AI agents from hallucinating invalid JOINs, querying sensitive columns, or wasting 50,000+ tokens per prompt.">
     <link rel="canonical" href="https://schemap-tool.pages.dev/">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://schemap-tool.pages.dev/">
-    <meta property="og:title" content="Give AI the Context It Needs to Understand Your Database | Schemap">
-    <meta property="og:description" content="Schemap compiles database schema metadata into compact, deterministic context for AI coding agents, SQL workflows, and developer tools.">
+    <meta property="og:title" content="The Database Intelligence Layer for AI Coding Agents | Schemap">
+    <meta property="og:description" content="Schemap is the database intelligence layer for AI coding agents. Stop AI agents from hallucinating invalid JOINs or wasting 50,000+ tokens per prompt.">
     <meta property="og:image" content="https://schemap-tool.pages.dev/assets/Icon%20Dark.png">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:url" content="https://schemap-tool.pages.dev/">
-    <meta name="twitter:title" content="Give AI the Context It Needs to Understand Your Database | Schemap">
-    <meta name="twitter:description" content="Schemap compiles database schema metadata into compact, deterministic context for AI coding agents, SQL workflows, and developer tools.">
+    <meta name="twitter:title" content="The Database Intelligence Layer for AI Coding Agents | Schemap">
+    <meta name="twitter:description" content="Schemap is the database intelligence layer for AI coding agents. Stop AI agents from hallucinating invalid JOINs or wasting 50,000+ tokens per prompt.">
     <meta name="twitter:image" content="https://schemap-tool.pages.dev/assets/Icon%20Dark.png">
     <link rel="icon" href="assets/Icon Dark.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -35,7 +35,7 @@
       "applicationCategory": "DeveloperApplication",
       "description": "Deterministic AI Database Context Compiler for Claude Code, Cursor, Codex, and GitHub Copilot.",
       "url": "https://schemap-tool.pages.dev/",
-      "softwareVersion": "3.0.0",
+      "softwareVersion": "3.1.0",
       "offers": [
         {
           "@type": "Offer",
@@ -107,7 +107,7 @@
         <div class="nav-container"><a class="logo" href="#" aria-label="Schemap home"><img
                     src="assets/Text_Logo__Dark_-removebg-preview2.png" alt="Schemap"></a>
             <div class="nav-links"><a href="#how-it-works">How it works</a><a href="#features">Features</a><a
-                    href="docs.html">Docs</a><a href="#pricing">Pricing</a><a href="https://billing.stripe.com/p/login/28EaEXgO9dZ36S44fddIA00" target="_blank" rel="noopener">Manage Subscription</a><a class="nav-btn" href="https://github.com/alansyahmi/Schemap"
+                    href="blog.html">Blog</a><a href="docs.html">Docs</a><a href="#pricing">Pricing</a><a href="https://billing.stripe.com/p/login/28EaEXgO9dZ36S44fddIA00" target="_blank" rel="noopener">Manage Subscription</a><a class="nav-btn" href="https://github.com/alansyahmi/Schemap"
                     target="_blank" rel="noopener">GitHub</a></div><a class="mobile-cta" href="#installation">Install
                 free</a>
         </div>
@@ -116,11 +116,10 @@
         <header class="hero" style="position:relative;overflow:hidden"><canvas id="matrix-bg"
                 aria-hidden="true"></canvas>
             <div class="hero-content" style="position:relative;z-index:1">
-                <a href="docs.html" class="v3-banner"><span class="v3-badge">v3.0.0</span> Interactive Quickstart, AI Agent Skills &amp; Auto-Fixes ↗</a>
-                <p class="eyebrow">AI Database Context Compiler</p>
-                <h1>AI can write SQL.<br><span>It can’t know your database.</span></h1>
-                <p class="hero-subtitle">Schemap compiles your database schema into compact, deterministic context for
-                    AI coding agents, SQL workflows, and developer tools.</p>
+                <a href="docs.html" class="v3-banner"><span class="v3-badge">Database Intelligence Layer</span> Zero SQL Hallucinations &amp; Anti-Rules ↗</a>
+                <p class="eyebrow">AI Database Intelligence &amp; Safety Engine</p>
+                <h1>The Database Intelligence Layer<br><span>for AI Coding Agents.</span></h1>
+                <p class="hero-subtitle">Stop AI agents from hallucinating invalid JOINs, querying sensitive columns, or wasting 50,000+ tokens per prompt. Local-first, sub-3ms compilation for Claude Code, Cursor, Codex, and Copilot.</p>
                 <div class="hero-actions"><a class="btn btn-primary" href="#installation">Install Schemap Free</a><a
                         class="btn btn-secondary" href="https://github.com/alansyahmi/Schemap" target="_blank"
                         rel="noopener">View on GitHub</a></div>
@@ -132,7 +131,7 @@
                 <div class="terminal-bar" style="display:flex;align-items:center;justify-content:space-between;padding:8px 14px;border-bottom:1px solid var(--line);">
                     <div style="display:flex;align-items:center;gap:7px;">
                         <i class="dot red"></i><i class="dot yellow"></i><i class="dot green"></i>
-                        <span style="color:var(--subtle);font-size:.72rem;margin-left:4px;">schemap cli v3.0</span>
+                        <span style="color:var(--subtle);font-size:.72rem;margin-left:4px;">schemap cli v3.1.0</span>
                     </div>
                     <div class="hero-cmd-tabs" style="display:flex;gap:4px;">
                         <button class="hero-cmd-tab is-active" data-hero-cmd="context" style="padding:4px 10px;font:600 .72rem 'JetBrains Mono',monospace;border:1px solid var(--line);background:var(--surface2);color:var(--text);border-radius:var(--radius);cursor:pointer;">context</button>
@@ -296,41 +295,41 @@ JOIN payments ON orders.id = payments.order_id;</pre>
         </section>
         <section id="features" class="section section-muted">
             <div class="section-container">
-                <p class="eyebrow">The workflow</p>
-                <h2>Everything your agent needs to stop guessing.</h2>
+                <p class="eyebrow">Database Intelligence Capabilities</p>
+                <h2>Built to stop AI SQL errors and cut token costs.</h2>
                 <div class="feature-grid">
                     <article><small>01</small>
-                        <h3>Quickstart</h3>
-                        <p>Auto-detect local databases, configure rules, and generate agent context in one command.</p>
-                        <code>schemap quickstart</code>
+                        <h3>Anti-Hallucination Guardrails</h3>
+                        <p>Auto-detect ambiguous foreign keys and write explicit negative rules to stop AI agents from querying invalid JOINs.</p>
+                        <code>schemap agents</code>
                     </article>
                     <article><small>02</small>
-                        <h3>Auto-Fix</h3>
-                        <p>Interactively accept inferred foreign key candidates and abbreviation mappings.</p>
-                        <code>schemap fix --interactive</code>
+                        <h3>Role-Scoped Profiles</h3>
+                        <p>Filter schema context outputs by role (e.g. <code>analytics</code> vs <code>backend</code>) to keep prompt context hyper-focused.</p>
+                        <code>schemap context --scope analytics</code>
                     </article>
                     <article><small>03</small>
-                        <h3>Explain &amp; Join</h3>
-                        <p>Inspect table architecture and auto-solve shortest foreign key join paths with SQL snippets.</p>
-                        <code>schemap explain / join</code>
+                        <h3>Token Savings &amp; Cost Inspector</h3>
+                        <p>Measure raw vs. compiled context tokens (80%+ savings) and calculate dollar savings per prompt.</p>
+                        <code>schemap benchmark --cost</code>
                     </article>
                     <article><small>04</small>
-                        <h3>Agent Skills</h3>
-                        <p>Install agent-native guardrail skills for Claude Code, Cursor rules, and Codex.</p>
-                        <code>schemap skills install</code>
+                        <h3>Shortest JOIN Path Solver</h3>
+                        <p>Solve multi-hop foreign key paths across tables and output canonical reference SQL JOIN clauses instantly.</p>
+                        <code>schemap join users payments</code>
                     </article>
                     <article><small>05</small>
-                        <h3>Context &amp; Sync</h3>
-                        <p>Compile Markdown, JSON, MCP, or Mermaid ER diagrams. Sync on schema changes.</p>
-                        <code>schemap context / sync</code>
+                        <h3>AI Readiness &amp; Auto-Fix</h3>
+                        <p>Diagnose schema health (0-100 score) and interactively accept inferred foreign keys and abbreviation mappings.</p>
+                        <code>schemap doctor / fix</code>
                     </article>
                     <article><small>06</small>
                         <div style="display:flex;align-items:center;justify-content:space-between;">
-                            <h3>Diff &amp; CI Gate</h3>
+                            <h3>CI/CD Migration Risk Gate</h3>
                             <span class="flow-badge pro" style="font-size:0.65rem;padding:2px 6px;">PRO</span>
                         </div>
-                        <p>Track schema changes and fail automated CI builds on breaking data type removals.</p>
-                        <code>schemap diff --fail-on-breaking</code>
+                        <p>Analyze migration diffs for breaking schema changes that threaten AI context maps in automated CI/CD builds.</p>
+                        <code>schemap diff --risk --fail-on-breaking</code>
                     </article>
                 </div>
             </div>
@@ -468,6 +467,59 @@ JOIN payments ON orders.id = payments.order_id;</pre>
                 </div>
             </div>
         </section>
+
+        <!-- Technical Guides & Competitor Benchmarks Section -->
+        <section id="guides" class="section">
+            <div class="section-container">
+                <p class="eyebrow">Technical Guides &amp; Architecture Benchmarks</p>
+                <h2>Master AI Database Context Engineering</h2>
+                <p class="section-lead">In-depth technical guides, token economics benchmarks, and architectural comparisons vs alternatives.</p>
+                <div class="grid feature-grid" style="margin-top:2rem;">
+                    <article class="card feature-card">
+                        <div class="feature-icon" style="background:rgba(255,107,107,0.1);color:#ff6b6b;display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:8px;margin-bottom:12px;font-size:1.2rem;">🛡️</div>
+                        <h3>Stop AI SQL Hallucinations</h3>
+                        <p>Learn how to prevent Claude Code, Cursor, and Copilot from hallucinating invalid JOINs or exposing credentials with automated guardrails.</p>
+                        <a href="blog-preventing-ai-sql-hallucinations.html" style="color:var(--accent);font-weight:600;text-decoration:none;display:inline-block;margin-top:12px;">Read Technical Guide ↗</a>
+                    </article>
+
+                    <article class="card feature-card">
+                        <div class="feature-icon" style="background:rgba(78,205,196,0.1);color:#4ecdc4;display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:8px;margin-bottom:12px;font-size:1.2rem;">💰</div>
+                        <h3>Cut Token Costs by 80%</h3>
+                        <p>Discover prompt token economics, measure monetary savings ($3.00/1M tokens), and supply minimum effective context with role profiles.</p>
+                        <a href="blog-token-optimization-db-context.html" style="color:var(--accent);font-weight:600;text-decoration:none;display:inline-block;margin-top:12px;">Read Token Economics Guide ↗</a>
+                    </article>
+
+                    <article class="card feature-card">
+                        <div class="feature-icon" style="background:rgba(255,190,118,0.1);color:#ffbe76;display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:8px;margin-bottom:12px;font-size:1.2rem;">⚔️</div>
+                        <h3>vs. LLMSchema &amp; DbSketch</h3>
+                        <p>Why raw Markdown dumpers fail on complex multi-table schemas and how Schemap's Database Intelligence Layer outperforms passive scripts.</p>
+                        <a href="vs-llmschema.html" style="color:var(--accent);font-weight:600;text-decoration:none;display:inline-block;margin-top:12px;">View Comparison ↗</a>
+                    </article>
+
+                    <article class="card feature-card">
+                        <div class="feature-icon" style="background:rgba(104,109,224,0.1);color:#686de0;display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:8px;margin-bottom:12px;font-size:1.2rem;">⚔️</div>
+                        <h3>vs. tbls (Human Docs)</h3>
+                        <p>Comparing human documentation web generators against sub-3ms AI agent context compilers. Stop wasting 80% of context window tokens.</p>
+                        <a href="vs-tbls.html" style="color:var(--accent);font-weight:600;text-decoration:none;display:inline-block;margin-top:12px;">View Comparison ↗</a>
+                    </article>
+
+                    <article class="card feature-card">
+                        <div class="feature-icon" style="background:rgba(149,175,192,0.1);color:#95afc0;display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:8px;margin-bottom:12px;font-size:1.2rem;">⚡</div>
+                        <h3>vs. Raw pg_dump DDL</h3>
+                        <p>Why piping raw SQL DDL into LLM prompts wastes 10,000+ tokens, confuses join paths, and leads to invalid multi-table queries.</p>
+                        <a href="vs-pg-dump.html" style="color:var(--accent);font-weight:600;text-decoration:none;display:inline-block;margin-top:12px;">View Comparison ↗</a>
+                    </article>
+
+                    <article class="card feature-card">
+                        <div class="feature-icon" style="background:rgba(224,86,36,0.1);color:#e056fd;display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:8px;margin-bottom:12px;font-size:1.2rem;">🔌</div>
+                        <h3>vs. MCP SQL Servers</h3>
+                        <p>Comparing zero-latency static local context maps against runtime RPC daemons requiring active database connection credentials.</p>
+                        <a href="vs-mcp-sql.html" style="color:var(--accent);font-weight:600;text-decoration:none;display:inline-block;margin-top:12px;">View Comparison ↗</a>
+                    </article>
+                </div>
+            </div>
+        </section>
+
         <section class="section section-muted">
             <div class="section-container narrow">
                 <p class="eyebrow">Developer FAQ</p>
@@ -526,11 +578,13 @@ JOIN payments ON orders.id = payments.order_id;</pre>
             <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin:10px 0;font-size:0.85rem;">
                 <a href="docs.html#quickstart">Quickstart</a> ·
                 <a href="docs.html#context">Context Reference</a> ·
-                <a href="docs.html#doctor">Health Doctor</a> ·
                 <a href="docs.html#agents">Agent Rules</a> ·
-                <a href="docs.html#join">JOIN Solver</a> ·
+                <a href="vs-llmschema.html">vs. LLMSchema</a> ·
+                <a href="vs-tbls.html">vs. tbls</a> ·
                 <a href="vs-pg-dump.html">vs. pg_dump</a> ·
                 <a href="vs-mcp-sql.html">vs. MCP SQL</a> ·
+                <a href="blog-preventing-ai-sql-hallucinations.html">AI Safety Guide</a> ·
+                <a href="blog-token-optimization-db-context.html">Token Economics</a> ·
                 <a href="llms.txt">llms.txt</a>
             </div>
             <a href="https://billing.stripe.com/p/login/28EaEXgO9dZ36S44fddIA00" target="_blank" rel="noopener">Manage Subscription</a><a

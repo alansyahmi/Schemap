@@ -8,6 +8,46 @@ from .context import calculate_central_tables, generate_relationship_map
 START_MARKER = "<!-- schemap:start -->"
 END_MARKER = "<!-- schemap:end -->"
 
+def generate_safety_rules(schema_model: DatabaseSchemaModel) -> List[str]:
+    """Generate explicit negative safety guardrails and anti-hallucination warnings for AI agents."""
+    rules = []
+    
+    # 1. Ambiguous JOIN warnings
+    for t in schema_model.tables:
+        for fk in t.foreign_keys:
+            if isinstance(fk, dict):
+                col = fk.get("column")
+                ref_tbl = fk.get("ref_table")
+                ref_col = fk.get("ref_column")
+            else:
+                col = getattr(fk, "column_name", getattr(fk, "column", None))
+                ref_tbl = getattr(fk, "foreign_table_name", getattr(fk, "ref_table", None))
+                ref_col = getattr(fk, "foreign_column_name", getattr(fk, "ref_column", None))
+                
+            if col and ref_tbl and ref_col and col != "id":
+                if col != f"{ref_tbl}_id":
+                    rules.append(f"[SAFETY] Never join `{t.name}.id` directly to `{ref_tbl}.id`. Correct JOIN path: `{t.name}.{col} -> {ref_tbl}.{ref_col}`.")
+                else:
+                    rules.append(f"[SAFETY] Primary JOIN Rule: `{t.name}.{col}` references `{ref_tbl}.{ref_col}`.")
+                    
+    # 2. Sensitive Column Warnings
+    sensitive_keywords = {"password", "hash", "secret", "token", "ssn", "credit_card", "cvv", "auth_key", "private_key"}
+    sensitive_found = []
+    for t in schema_model.tables:
+        for c in t.columns:
+            if any(k in c.name.lower() for k in sensitive_keywords):
+                sensitive_found.append(f"`{t.name}.{c.name}`")
+    if sensitive_found:
+        rules.append(f"[SAFETY] Sensitive Data Protection: Never query or expose raw credentials: {', '.join(sensitive_found[:8])}")
+
+    # 3. Immutability Warnings for Audit/Financial Logs
+    immutable_keywords = {"audit", "log", "ledger", "invoice", "payment", "transaction"}
+    immutable_tables = [f"`{t.name}`" for t in schema_model.tables if any(k in t.name.lower() for k in immutable_keywords)]
+    if immutable_tables:
+        rules.append(f"[SAFETY] Immutability Guardrail: Do not generate DELETE or UPDATE queries for audit/financial records: {', '.join(immutable_tables[:6])}")
+
+    return rules
+
 def generate_claude_md(schema_model: DatabaseSchemaModel) -> str:
     """Generate CLAUDE.md tailored for Claude Code and Anthropic models."""
     total_tables = len(schema_model.tables)
@@ -15,6 +55,7 @@ def generate_claude_md(schema_model: DatabaseSchemaModel) -> str:
     top_tables = [c[0] for c in central[:5]]
     
     rel_map = generate_relationship_map(schema_model)
+    safety_rules = generate_safety_rules(schema_model)
     
     out = []
     out.append("# Database Architecture & Context for Claude\n")
@@ -24,6 +65,12 @@ def generate_claude_md(schema_model: DatabaseSchemaModel) -> str:
     out.append(f"- **Active Tables**: {total_tables}")
     out.append(f"- **Key Hub Entities**: {', '.join(top_tables)}\n")
     
+    if safety_rules:
+        out.append("## AI Safety & Anti-Hallucination Guardrails")
+        for r in safety_rules:
+            out.append(f"- {r}")
+        out.append("")
+
     out.append("## Central Tables Overview")
     for name in top_tables:
         t_model = next((t for t in schema_model.tables if t.name == name), None)
@@ -54,13 +101,20 @@ def generate_agents_md(schema_model: DatabaseSchemaModel) -> str:
     top_tables = [c[0] for c in central[:5]]
     
     out = []
-    out.append("# AGENTS.md — Database Context\n")
+    out.append("# AGENTS.md - Database Context\n")
     out.append("This file provides automated database context for AI agents working in this repository.\n")
     
     out.append("## Database Summary")
     out.append(f"- Total Tables: {total_tables}")
     out.append(f"- Key Central Tables: {', '.join(top_tables)}\n")
     
+    safety_rules = generate_safety_rules(schema_model)
+    if safety_rules:
+        out.append("## AI Safety & Anti-Hallucination Guardrails")
+        for r in safety_rules:
+            out.append(f"- {r}")
+        out.append("")
+
     out.append("## Table Map")
     for t in schema_model.tables:
         col_summary = ", ".join([c.name for c in t.columns])

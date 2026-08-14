@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Schemap vs. LLMSchema & DbSketch | AI Database Context Optimization</title>
+    <meta name="description"
+        content="Compare Schemap against LLMSchema and DbSketch schema dumpers for AI coding agents. Discover why raw markdown dumpers lead to AI JOIN hallucinations and how Schemap's Database Intelligence Layer solves it.">
+    <link rel="canonical" href="https://schemap-tool.pages.dev/vs-llmschema.html">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://schemap-tool.pages.dev/vs-llmschema.html">
+    <meta property="og:title" content="Schemap vs. LLMSchema & DbSketch | AI Database Context Optimization">
+    <meta property="og:description" content="Compare Schemap against LLMSchema and DbSketch. See how Schemap's AI anti-hallucination guardrails and role-scoped context profiles outperform simple schema dumpers.">
+    <meta property="og:image" content="https://schemap-tool.pages.dev/assets/Icon%20Dark.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://schemap-tool.pages.dev/vs-llmschema.html">
+    <meta name="twitter:title" content="Schemap vs. LLMSchema & DbSketch | AI Database Context Optimization">
+    <meta name="twitter:description" content="Compare Schemap against LLMSchema and DbSketch. See how Schemap's AI anti-hallucination guardrails and role-scoped context profiles outperform simple schema dumpers.">
+    <meta name="twitter:image" content="https://schemap-tool.pages.dev/assets/Icon%20Dark.png">
+    <link rel="icon" href="assets/Icon Dark.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400&family=Red+Hat+Display:wght@400;500;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css?v=10">
+    <script async src="https://startupbar.co/widget/loader.js" data-startup-id="6a520807-b62b-4145-8c05-b2c862af8e05"></script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "Schemap vs. LLMSchema & DbSketch Comparison",
+      "description": "In-depth comparison between simple schema dumpers (LLMSchema, DbSketch) and Schemap's Database Intelligence Layer for AI coding agents.",
+      "url": "https://schemap-tool.pages.dev/vs-llmschema.html",
+      "inLanguage": "en",
+      "articleSection": "Developer Tool Comparison",
+      "publisher": {
+        "@type": "Organization",
+        "name": "Schemap",
+        "url": "https://schemap-tool.pages.dev/"
+      }
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Why choose Schemap over LLMSchema or DbSketch?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "While LLMSchema and DbSketch dump basic raw Markdown tables, Schemap acts as a complete Database Intelligence Layer. Schemap automatically injects anti-hallucination guardrails into CLAUDE.md/AGENTS.md/Cursor rules, infers missing foreign key candidates, provides role-scoped context filtering (--scope analytics), and calculates LLM API token cost savings in sub-3 milliseconds."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "When is LLMSchema or DbSketch a better fit?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "LLMSchema or DbSketch are sufficient if you only need a quick, one-off Markdown table export of a tiny database (1-3 tables) without requiring team context enforcement, AI health scoring, or multi-table JOIN solving."
+          }
+        }
+      ]
+    }
+    </script>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a class="logo" href="index.html" aria-label="Schemap home">
+                <img src="assets/Text_Logo__Dark_-removebg-preview2.png" alt="Schemap">
+            </a>
+            <div class="nav-links">
+                <a href="index.html#how-it-works">How it works</a>
+                <a href="index.html#features">Features</a>
+                <a href="docs.html">Docs</a>
+                <a href="index.html#pricing">Pricing</a>
+                <a href="https://billing.stripe.com/p/login/28EaEXgO9dZ36S44fddIA00" target="_blank" rel="noopener">Manage Subscription</a>
+                <a class="nav-btn" href="https://github.com/alansyahmi/Schemap" target="_blank" rel="noopener">GitHub</a>
+            </div>
+            <a class="mobile-cta" href="index.html#installation">Install free</a>
+        </div>
+    </nav>
+
+    <main class="docs-container">
+        <header class="docs-hero">
+            <a href="docs.html" class="v3-banner"><span class="v3-badge">Comparison Guide</span> Schemap vs. Schema Dumpers</a>
+            <h1>Schemap vs. LLMSchema &amp; DbSketch</h1>
+            <p class="section-lead">Why passive schema dumpers fail on complex production databases, and how Schemap's Database Intelligence Layer prevents AI JOIN hallucinations, cuts token costs by 80%, and enforces team guardrails.</p>
+        </header>
+
+        <div class="docs-content" style="max-width: 900px; margin: 0 auto;">
+
+            <section class="doc-section">
+                <h2>Direct Comparison Matrix</h2>
+                <div class="doc-card">
+                    <p><strong>Direct Answer:</strong> <em>LLMSchema</em> and <em>DbSketch</em> are basic schema dumper scripts that output raw Markdown tables. <strong>Schemap</strong> is a deterministic Database Intelligence Layer that computes AI readiness scores, injects negative safety rules into agent configs, filters role-based context, and solves multi-table JOIN paths in sub-3ms.</p>
+                    <table class="param-table" style="margin-top: 1.5rem;">
+                        <thead>
+                            <tr>
+                                <th>Capability / Feature</th>
+                                <th>`LLMSchema` / `DbSketch`</th>
+                                <th>Schemap v3.1.0</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>AI Anti-Hallucination Rules</strong></td>
+                                <td>❌ None (AI guesses JOIN paths)</td>
+                                <td><strong>✅ Automatic `[SAFETY]` rule generator (`schemap agents`)</strong></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Role-Scoped Context Filtering</strong></td>
+                                <td>❌ No (Dumps entire DB)</td>
+                                <td><strong>✅ `--scope analytics`, `backend`, `core`</strong></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Candidate Foreign Key Inference</strong></td>
+                                <td>❌ No (Fails on undeclared FKs)</td>
+                                <td><strong>✅ Confidence scoring & interactive fix (`schemap fix`)</strong></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Token & Monetary Cost Benchmark</strong></td>
+                                <td>❌ No cost reporting</td>
+                                <td><strong>✅ Token compression & USD savings tracker (`schemap benchmark --cost`)</strong></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Shortest Join Path Solver</strong></td>
+                                <td>❌ No</td>
+                                <td><strong>✅ Built-in BFS Join Graph Solver (`schemap join`)</strong></td>
+                            </tr>
+                            <tr>
+                                <td><strong>AI Readiness Score</strong></td>
+                                <td>❌ No</td>
+                                <td><strong>✅ Diagnostic health suite 0-100 (`schemap doctor`)</strong></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Git Pre-Commit Automation</strong></td>
+                                <td>❌ Manual run only</td>
+                                <td><strong>✅ One-click Git pre-commit hook (`schemap hook install`)</strong></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Compilation Latency</strong></td>
+                                <td>~100ms - 200ms</td>
+                                <td><strong>Sub-3ms deterministic compilation</strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="doc-section">
+                <h2>When to Use LLMSchema vs. When to Use Schemap</h2>
+                
+                <div class="doc-card" style="margin-bottom: 1.5rem; border-left: 4px solid var(--muted);">
+                    <h3>When to Pick LLMSchema or DbSketch</h3>
+                    <ul>
+                        <li>You have a tiny SQLite or Postgres database with fewer than 5 tables.</li>
+                        <li>You only need a quick one-off raw Markdown printout for a prompt.</li>
+                        <li>You do not use persistent AI agent rule files (`CLAUDE.md`, `AGENTS.md`, Cursor `.mdc`).</li>
+                    </ul>
+                </div>
+
+                <div class="doc-card" style="border-left: 4px solid var(--accent);">
+                    <h3>When to Pick Schemap</h3>
+                    <ul>
+                        <li>You work with production schemas (10 to 500+ tables) with implicit foreign key constraints.</li>
+                        <li>You want to stop AI agents from guessing invalid JOINs (e.g. `orders.id = users.id`) or querying sensitive password hashes.</li>
+                        <li>You want to save up to 80% on LLM input token bills with role-scoped profiles (`--scope analytics`).</li>
+                        <li>You want automated context synchronization across team developers with Git pre-commit hooks (`schemap hook install`).</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section class="doc-section">
+                <h2>Key Intelligence Differentiators</h2>
+
+                <div class="doc-card" style="margin-bottom: 1.5rem;">
+                    <h3>1. Anti-Hallucination Safety Guardrails</h3>
+                    <p>Raw schema dumpers simply list tables. When an AI agent encounters columns like <code>user_id</code> and <code>account_id</code>, it often guesses the wrong JOIN sequence. Schemap generates explicit negative guardrails in <code>CLAUDE.md</code> and <code>AGENTS.md</code>:</p>
+                    <pre style="background: var(--surface); padding: 12px; border-radius: 6px; overflow-x: auto; color: var(--text);"><code>## AI Safety & Anti-Hallucination Guardrails
+- [SAFETY] Never join `orders.id` directly to `users.id`. Correct JOIN path: `orders.user_id -> users.id`.
+- [SAFETY] Sensitive Data Protection: Never query or expose raw credentials: `users.password_hash`
+- [SAFETY] Immutability Guardrail: Do not generate DELETE or UPDATE queries for audit/financial records: `payments`</code></pre>
+                </div>
+
+                <div class="doc-card" style="margin-bottom: 1.5rem;">
+                    <h3>2. Role-Scoped Context Profiles</h3>
+                    <p>Dumping 100 tables into an LLM context window wastes 50,000+ tokens and degrades AI reasoning. Schemap allows role-scoped filtering:</p>
+                    <pre style="background: var(--surface); padding: 12px; border-radius: 6px; color: var(--text);"><code># For Data Engineers & Analysts
+schemap context --scope analytics
+
+# For Backend Transaction Engineers
+schemap context --scope backend</code></pre>
+                </div>
+
+                <div class="doc-card">
+                    <h3>3. Monetary Token Cost Inspector</h3>
+                    <p>Schemap includes a built-in cost calculator based on real LLM API rates ($3.00/1M input tokens):</p>
+                    <pre style="background: var(--surface); padding: 12px; border-radius: 6px; color: var(--text);"><code>$ schemap benchmark --cost
+
+==================================================
+ Database Context Benchmark
+==================================================
+  Raw Schema:           18,400 tokens
+  Schemap Context:       3,200 tokens
+  Compression:          82.6%
+--------------------------------------------------
+  Tokens Saved/Prompt:  15,200
+  Cost Saved/Prompt:    $0.0456
+  Est. Monthly/Dev:     $91.20
+==================================================</code></pre>
+                </div>
+            </section>
+
+            <section class="doc-section" style="text-align: center; margin-top: 3rem;">
+                <h2>Upgrade from Schema Dumps to Database Intelligence</h2>
+                <div style="margin-top: 1.5rem; display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                    <a href="index.html#installation" class="btn btn-primary">Install Schemap Free</a>
+                    <a href="docs.html" class="btn btn-secondary">Explore Documentation</a>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <img src="assets/Icon Dark.png" alt="Schemap" height="24">
+            <p>© 2026 Schemap · Local-first database context for AI workflows.</p>
+            <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin:10px 0;font-size:0.85rem;">
+                <a href="index.html">Home</a> ·
+                <a href="docs.html">Docs</a> ·
+                <a href="vs-llmschema.html">vs. LLMSchema</a> ·
+                <a href="vs-pg-dump.html">vs. pg_dump</a> ·
+                <a href="vs-mcp-sql.html">vs. MCP SQL</a> ·
+                <a href="llms.txt">llms.txt</a>
+            </div>
+            <a href="https://billing.stripe.com/p/login/28EaEXgO9dZ36S44fddIA00" target="_blank" rel="noopener">Manage Subscription</a>
+            <a href="https://github.com/alansyahmi/Schemap" target="_blank" rel="noopener">GitHub</a>
+            <p>Developed by <a href="https://swarty.pages.dev/" target="_blank" rel="noopener" class="logo-font">Swarty.</a></p>
+        </div>
+    </footer>
+    <script src="app.js?v=10"></script>
+</body>
+
+</html>

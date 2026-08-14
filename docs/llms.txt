@@ -1,15 +1,16 @@
-# Schemap — AI Database Context Compiler
+# Schemap — AI Database Context & Intelligence Layer
 
-> Schemap compiles database schema metadata into compact, deterministic context maps (`schemap_database_context.md`, `CLAUDE.md`, `AGENTS.md`, `.cursor/rules/schemap.mdc`) for AI coding agents (Claude Code, Cursor, Codex, GitHub Copilot).
+> Schemap is the Database Intelligence Layer for AI Coding Agents. It compiles database schemas into compact, deterministic context maps (`schemap_database_context.md`, `CLAUDE.md`, `AGENTS.md`, `.cursor/rules/schemap.mdc`) for Claude Code, Cursor, Codex, and GitHub Copilot.
 
 ## Key Features & Capabilities
 
-- **AI Readiness Score (`schemap doctor`)**: Diagnoses schema health (0-100 score), detects missing foreign keys, unmapped abbreviations, and un-commented tables.
-- **Context Compilation (`schemap context`)**: Compiles token-optimized Markdown, JSON, MCP, or Mermaid ER diagrams. Cuts raw SQL dump token footprint by up to 80%.
-- **Agent Integration (`schemap agents`)**: Generates agent instruction files (`CLAUDE.md`, `AGENTS.md`, Cursor MDC rules) with safe marker preservation.
-- **Foreign Key Join Solver (`schemap join`)**: Resolves shortest join paths across foreign key graphs and generates ready-to-run SQL `JOIN` clauses.
-- **Interactive Remediation (`schemap fix`)**: Interactively accepts inferred foreign key relationships and abbreviation mappings, updating `schemap.yaml`.
-- **CI/CD Diff Gate (`schemap diff`)**: Tracks schema structural changes (`+`, `~`, `-`) and fails CI builds on breaking changes (`--fail-on-breaking`).
+- **AI Safety & Anti-Hallucination Guardrails (`schemap agents`)**: Injects negative safety rules into agent config files to prevent broken JOINs, credential leaks (`password_hash`), and financial record mutation.
+- **Role-Scoped Context Profiles (`schemap context --scope`)**: Filters schema compilation to role-specific views (`analytics`, `backend`, `core`, `all`), saving 80% on LLM prompt token costs.
+- **Monetary Cost & Token Inspector (`schemap benchmark --cost`)**: Calculates tokens saved per prompt and estimated monthly dollar savings per developer.
+- **Canonical Reference Query Generator (`schemap examples`)**: Auto-generates standard SQL JOIN queries derived from foreign key graphs.
+- **Git Pre-Commit Automation (`schemap hook install`)**: One-command Git pre-commit hook installer to sync context maps on migration commits.
+- **AI Readiness Diagnostics (`schemap doctor`)**: Diagnoses schema clarity (0-100 score), detects missing foreign keys, unmapped abbreviations, and un-commented tables.
+- **Shortest JOIN Path Solver (`schemap join`)**: Resolves multi-hop relationship paths across foreign key graphs.
 
 ## Supported Databases
 - PostgreSQL
@@ -31,12 +32,16 @@ uv tool install schemap-tool
 schemap quickstart
 
 # Compile AI context map
-schemap context
+schemap context --scope analytics
 ```
 
-## Comparisons & Technical Guides
+## Competitor Comparisons & Technical Guides
+- Schemap vs LLMSchema & DbSketch: https://schemap-tool.pages.dev/vs-llmschema.html
+- Schemap vs tbls (Human Documentation vs AI Context): https://schemap-tool.pages.dev/vs-tbls.html
 - Schemap vs Raw pg_dump SQL DDL: https://schemap-tool.pages.dev/vs-pg-dump.html
 - Schemap vs Model Context Protocol (MCP) Servers: https://schemap-tool.pages.dev/vs-mcp-sql.html
+- Technical Guide: Stop AI Coding Agents from Hallucinating SQL JOINs: https://schemap-tool.pages.dev/blog-preventing-ai-sql-hallucinations.html
+- Technical Guide: Cutting AI API Token Costs by 80% on Production Schemas: https://schemap-tool.pages.dev/blog-token-optimization-db-context.html
 
 ## Licensing & Links
 - Website: https://schemap-tool.pages.dev/
