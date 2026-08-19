@@ -30,17 +30,46 @@ Modern AI coding agents (Claude Code, Cursor, GitHub Copilot, Codex) struggle wi
 
 ---
 
-## 📊 Before vs. After Schemap
+## 📊 Benchmarks: Next-Gen AI Models & Multi-Turn Agent Economics
 
-| Metric | Raw SQL Dump (`pg_dump`) | Schemap Compiled Context | Impact |
-| :--- | :--- | :--- | :--- |
-| **Token Footprint** | ~14,500 tokens | **~820 tokens** | **94% Context Window Savings** |
-| **Relationship Mapping** | Implicit / Scattered across DDL | **Explicit Foreign Key Graph** | **Zero Broken JOIN Queries** |
-| **Database Diagnostics** | Unmeasured | **AI Readiness Score (e.g. 88/100)** | **Identifies Missing FKs & Gaps** |
-| **Agent Rule Files** | None | **Auto-generated `CLAUDE.md` & `AGENTS.md`** | **Instant Workspace Sync** |
-| **Compilation Latency** | Slow DDL export | **< 3ms local execution** | **Instant CI/CD & CLI feedback** |
+*Measured using OpenAI `tiktoken` (`cl100k_base` / `o200k_base` across Claude Opus 5, GPT-5.6 Terra, Gemini 3.7, and Claude 3.7).* Full methodology and reproduction in [BENCHMARKS.md](BENCHMARKS.md).
+
+### 1. Token Compression across Database Scales
+| Database Schema | Tables | Raw SQL Dump (`pg_dump`) | Schemap Context | `CLAUDE.md` Rules | Token Reduction | Compiler Latency |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: |
+| **Chinook** | 11 | 995 tokens | **536 tokens** | 953 tokens | **46.1%** | `0.92 ms` |
+| **Northwind** | 13 | 1,045 tokens | **590 tokens** | 999 tokens | **43.5%** | `1.05 ms` |
+| **Pagila (Postgres)** | 15 | 1,222 tokens | **673 tokens** | 1,054 tokens | **44.9%** | `1.20 ms` |
+| **SaaS E-Commerce** | 30 | 2,446 tokens | **516 tokens** | 834 tokens | **78.9%** | `1.77 ms` |
+| **Enterprise Scale** | 100 | 8,577 tokens | **921 tokens** | 1,496 tokens | **89.3%** | `5.27 ms` |
+
+### 2. Multi-Turn Autonomous Agent Loop Savings (20 Turns / Feature Task)
+| Model | Provider | Input Pricing | Tokens Saved / Task | Annual Savings (5-Dev Team) |
+| :--- | :---: | :---: | :---: | :---: |
+| **Claude Opus 5** | Anthropic | `$15.00` / 1M | 153,120 tokens | **$6,063.55 / yr** |
+| **GPT-5.6 Terra** | OpenAI | `$10.00` / 1M | 153,120 tokens | **$4,042.37 / yr** |
+| **Gemini 3.7 Pro** | Google | `$3.50` / 1M | 153,120 tokens | **$1,414.83 / yr** |
+| **Claude 3.7 Sonnet** | Anthropic | `$3.00` / 1M | 153,120 tokens | **$1,212.71 / yr** |
+
+### 3. Live AI Text-to-SQL Accuracy & Hallucination Elimination
+| Evaluation Mode | Execution Pass Rate | Foreign Key JOIN Accuracy | Hallucination Rate |
+| :--- | :---: | :---: | :---: |
+| **Zero Context (Blind Guess)** | 0.0% | 0.0% | 100.0% |
+| **Raw DDL Dump (`pg_dump`)** | 88.9% | 88.9% | 11.1% |
+| **Schemap Compiled Context** | **100.0%** | **100.0%** | **0.0%** |
+
+### 4. Compiler Latency & Scaling (10 to 1,000 Tables)
+| Database Scale | Mean Latency | Median (p50) | Peak RAM | Pre-Commit Overhead |
+| :---: | :---: | :---: | :---: | :---: |
+| **10 Tables** | `0.52 ms` | `0.52 ms` | `17.7 KB` | Imperceptible ($< 1\text{ms}$) |
+| **50 Tables** | `2.11 ms` | `2.08 ms` | `47.6 KB` | Imperceptible ($2\text{ms}$) |
+| **100 Tables** | `3.61 ms` | `3.60 ms` | `76.4 KB` | Instant ($3.6\text{ms}$) |
+| **1,000 Tables** | `43.15 ms` | `43.09 ms` | `777.7 KB` | Ultra-fast ($43\text{ms}$, $<1\text{MB}$ RAM) |
+
+> 🔬 **Reproduce All Benchmarks:** Run `uv run python benchmarks/tier1_token_benchmark.py` or inspect full test methodologies in [BENCHMARKS.md](BENCHMARKS.md).
 
 ---
+
 
 ## 🚀 30-Second Quick Start
 

@@ -1,0 +1,403 @@
+{
+  "timestamp": "2026-08-19 15:49:28 UTC",
+  "next_gen_models": {
+    "Claude Opus 5 (Anthropic)": 15.0,
+    "GPT-5.6 Terra (OpenAI)": 10.0,
+    "Gemini 3.7 Pro (Google)": 3.5,
+    "Claude 3.7 Sonnet (Thinking)": 3.0,
+    "OpenAI o3-mini": 1.1,
+    "Gemini 3.7 Flash": 0.35
+  },
+  "agent_loop_parameters": {
+    "turns_per_task": 20,
+    "tasks_per_dev_per_month": 44,
+    "team_size": 5
+  },
+  "results": [
+    {
+      "schema_name": "Chinook (Media Store)",
+      "tables_count": 11,
+      "columns_count": 64,
+      "relationships_count": 11,
+      "latency_ms": 0.917,
+      "cl100k_tokens": {
+        "raw_ddl": 995,
+        "schemap_context": 536,
+        "claude_md": 953,
+        "agents_md": 817,
+        "tokens_saved": 459,
+        "reduction_percentage": "46.1%",
+        "agent_reduction_percentage": "17.9%"
+      },
+      "o200k_tokens": {
+        "raw_ddl": 1012,
+        "schemap_context": 546,
+        "reduction_percentage": "46.0%"
+      },
+      "multi_turn_agent_loop": {
+        "turns_per_task": 20,
+        "raw_task_tokens": 19900,
+        "schemap_task_tokens": 10720,
+        "task_tokens_saved": 9180
+      },
+      "next_gen_models_roi": {
+        "Claude Opus 5 (Anthropic)": {
+          "rate_per_million": 15.0,
+          "cost_saved_per_1k_prompts": 6.88,
+          "monthly_savings_per_dev": 6.06,
+          "annual_savings_team_5": 363.53,
+          "agent_loop_task_tokens_saved": 9180,
+          "agent_loop_annual_team_savings": 363.53
+        },
+        "GPT-5.6 Terra (OpenAI)": {
+          "rate_per_million": 10.0,
+          "cost_saved_per_1k_prompts": 4.59,
+          "monthly_savings_per_dev": 4.04,
+          "annual_savings_team_5": 242.35,
+          "agent_loop_task_tokens_saved": 9180,
+          "agent_loop_annual_team_savings": 242.35
+        },
+        "Gemini 3.7 Pro (Google)": {
+          "rate_per_million": 3.5,
+          "cost_saved_per_1k_prompts": 1.61,
+          "monthly_savings_per_dev": 1.41,
+          "annual_savings_team_5": 84.82,
+          "agent_loop_task_tokens_saved": 9180,
+          "agent_loop_annual_team_savings": 84.82
+        },
+        "Claude 3.7 Sonnet (Thinking)": {
+          "rate_per_million": 3.0,
+          "cost_saved_per_1k_prompts": 1.38,
+          "monthly_savings_per_dev": 1.21,
+          "annual_savings_team_5": 72.71,
+          "agent_loop_task_tokens_saved": 9180,
+          "agent_loop_annual_team_savings": 72.71
+        },
+        "OpenAI o3-mini": {
+          "rate_per_million": 1.1,
+          "cost_saved_per_1k_prompts": 0.5,
+          "monthly_savings_per_dev": 0.44,
+          "annual_savings_team_5": 26.66,
+          "agent_loop_task_tokens_saved": 9180,
+          "agent_loop_annual_team_savings": 26.66
+        },
+        "Gemini 3.7 Flash": {
+          "rate_per_million": 0.35,
+          "cost_saved_per_1k_prompts": 0.16,
+          "monthly_savings_per_dev": 0.14,
+          "annual_savings_team_5": 8.48,
+          "agent_loop_task_tokens_saved": 9180,
+          "agent_loop_annual_team_savings": 8.48
+        }
+      }
+    },
+    {
+      "schema_name": "Northwind (ERP/Inventory)",
+      "tables_count": 13,
+      "columns_count": 86,
+      "relationships_count": 13,
+      "latency_ms": 1.054,
+      "cl100k_tokens": {
+        "raw_ddl": 1045,
+        "schemap_context": 590,
+        "claude_md": 999,
+        "agents_md": 981,
+        "tokens_saved": 455,
+        "reduction_percentage": "43.5%",
+        "agent_reduction_percentage": "6.1%"
+      },
+      "o200k_tokens": {
+        "raw_ddl": 1060,
+        "schemap_context": 599,
+        "reduction_percentage": "43.5%"
+      },
+      "multi_turn_agent_loop": {
+        "turns_per_task": 20,
+        "raw_task_tokens": 20900,
+        "schemap_task_tokens": 11800,
+        "task_tokens_saved": 9100
+      },
+      "next_gen_models_roi": {
+        "Claude Opus 5 (Anthropic)": {
+          "rate_per_million": 15.0,
+          "cost_saved_per_1k_prompts": 6.83,
+          "monthly_savings_per_dev": 6.01,
+          "annual_savings_team_5": 360.36,
+          "agent_loop_task_tokens_saved": 9100,
+          "agent_loop_annual_team_savings": 360.36
+        },
+        "GPT-5.6 Terra (OpenAI)": {
+          "rate_per_million": 10.0,
+          "cost_saved_per_1k_prompts": 4.55,
+          "monthly_savings_per_dev": 4.0,
+          "annual_savings_team_5": 240.24,
+          "agent_loop_task_tokens_saved": 9100,
+          "agent_loop_annual_team_savings": 240.24
+        },
+        "Gemini 3.7 Pro (Google)": {
+          "rate_per_million": 3.5,
+          "cost_saved_per_1k_prompts": 1.59,
+          "monthly_savings_per_dev": 1.4,
+          "annual_savings_team_5": 84.08,
+          "agent_loop_task_tokens_saved": 9100,
+          "agent_loop_annual_team_savings": 84.08
+        },
+        "Claude 3.7 Sonnet (Thinking)": {
+          "rate_per_million": 3.0,
+          "cost_saved_per_1k_prompts": 1.36,
+          "monthly_savings_per_dev": 1.2,
+          "annual_savings_team_5": 72.07,
+          "agent_loop_task_tokens_saved": 9100,
+          "agent_loop_annual_team_savings": 72.07
+        },
+        "OpenAI o3-mini": {
+          "rate_per_million": 1.1,
+          "cost_saved_per_1k_prompts": 0.5,
+          "monthly_savings_per_dev": 0.44,
+          "annual_savings_team_5": 26.43,
+          "agent_loop_task_tokens_saved": 9100,
+          "agent_loop_annual_team_savings": 26.43
+        },
+        "Gemini 3.7 Flash": {
+          "rate_per_million": 0.35,
+          "cost_saved_per_1k_prompts": 0.16,
+          "monthly_savings_per_dev": 0.14,
+          "annual_savings_team_5": 8.41,
+          "agent_loop_task_tokens_saved": 9100,
+          "agent_loop_annual_team_savings": 8.41
+        }
+      }
+    },
+    {
+      "schema_name": "Pagila (DVD Rental/Complex)",
+      "tables_count": 15,
+      "columns_count": 82,
+      "relationships_count": 20,
+      "latency_ms": 1.199,
+      "cl100k_tokens": {
+        "raw_ddl": 1222,
+        "schemap_context": 673,
+        "claude_md": 1054,
+        "agents_md": 1083,
+        "tokens_saved": 549,
+        "reduction_percentage": "44.9%",
+        "agent_reduction_percentage": "11.4%"
+      },
+      "o200k_tokens": {
+        "raw_ddl": 1259,
+        "schemap_context": 681,
+        "reduction_percentage": "45.9%"
+      },
+      "multi_turn_agent_loop": {
+        "turns_per_task": 20,
+        "raw_task_tokens": 24440,
+        "schemap_task_tokens": 13460,
+        "task_tokens_saved": 10980
+      },
+      "next_gen_models_roi": {
+        "Claude Opus 5 (Anthropic)": {
+          "rate_per_million": 15.0,
+          "cost_saved_per_1k_prompts": 8.23,
+          "monthly_savings_per_dev": 7.25,
+          "annual_savings_team_5": 434.81,
+          "agent_loop_task_tokens_saved": 10980,
+          "agent_loop_annual_team_savings": 434.81
+        },
+        "GPT-5.6 Terra (OpenAI)": {
+          "rate_per_million": 10.0,
+          "cost_saved_per_1k_prompts": 5.49,
+          "monthly_savings_per_dev": 4.83,
+          "annual_savings_team_5": 289.87,
+          "agent_loop_task_tokens_saved": 10980,
+          "agent_loop_annual_team_savings": 289.87
+        },
+        "Gemini 3.7 Pro (Google)": {
+          "rate_per_million": 3.5,
+          "cost_saved_per_1k_prompts": 1.92,
+          "monthly_savings_per_dev": 1.69,
+          "annual_savings_team_5": 101.46,
+          "agent_loop_task_tokens_saved": 10980,
+          "agent_loop_annual_team_savings": 101.46
+        },
+        "Claude 3.7 Sonnet (Thinking)": {
+          "rate_per_million": 3.0,
+          "cost_saved_per_1k_prompts": 1.65,
+          "monthly_savings_per_dev": 1.45,
+          "annual_savings_team_5": 86.96,
+          "agent_loop_task_tokens_saved": 10980,
+          "agent_loop_annual_team_savings": 86.96
+        },
+        "OpenAI o3-mini": {
+          "rate_per_million": 1.1,
+          "cost_saved_per_1k_prompts": 0.6,
+          "monthly_savings_per_dev": 0.53,
+          "annual_savings_team_5": 31.89,
+          "agent_loop_task_tokens_saved": 10980,
+          "agent_loop_annual_team_savings": 31.89
+        },
+        "Gemini 3.7 Flash": {
+          "rate_per_million": 0.35,
+          "cost_saved_per_1k_prompts": 0.19,
+          "monthly_savings_per_dev": 0.17,
+          "annual_savings_team_5": 10.15,
+          "agent_loop_task_tokens_saved": 10980,
+          "agent_loop_annual_team_savings": 10.15
+        }
+      }
+    },
+    {
+      "schema_name": "SaaS E-Commerce Platform",
+      "tables_count": 30,
+      "columns_count": 349,
+      "relationships_count": 8,
+      "latency_ms": 1.769,
+      "cl100k_tokens": {
+        "raw_ddl": 2446,
+        "schemap_context": 516,
+        "claude_md": 834,
+        "agents_md": 2035,
+        "tokens_saved": 1930,
+        "reduction_percentage": "78.9%",
+        "agent_reduction_percentage": "16.8%"
+      },
+      "o200k_tokens": {
+        "raw_ddl": 2484,
+        "schemap_context": 524,
+        "reduction_percentage": "78.9%"
+      },
+      "multi_turn_agent_loop": {
+        "turns_per_task": 20,
+        "raw_task_tokens": 48920,
+        "schemap_task_tokens": 10320,
+        "task_tokens_saved": 38600
+      },
+      "next_gen_models_roi": {
+        "Claude Opus 5 (Anthropic)": {
+          "rate_per_million": 15.0,
+          "cost_saved_per_1k_prompts": 28.95,
+          "monthly_savings_per_dev": 25.48,
+          "annual_savings_team_5": 1528.56,
+          "agent_loop_task_tokens_saved": 38600,
+          "agent_loop_annual_team_savings": 1528.56
+        },
+        "GPT-5.6 Terra (OpenAI)": {
+          "rate_per_million": 10.0,
+          "cost_saved_per_1k_prompts": 19.3,
+          "monthly_savings_per_dev": 16.98,
+          "annual_savings_team_5": 1019.04,
+          "agent_loop_task_tokens_saved": 38600,
+          "agent_loop_annual_team_savings": 1019.04
+        },
+        "Gemini 3.7 Pro (Google)": {
+          "rate_per_million": 3.5,
+          "cost_saved_per_1k_prompts": 6.76,
+          "monthly_savings_per_dev": 5.94,
+          "annual_savings_team_5": 356.66,
+          "agent_loop_task_tokens_saved": 38600,
+          "agent_loop_annual_team_savings": 356.66
+        },
+        "Claude 3.7 Sonnet (Thinking)": {
+          "rate_per_million": 3.0,
+          "cost_saved_per_1k_prompts": 5.79,
+          "monthly_savings_per_dev": 5.1,
+          "annual_savings_team_5": 305.71,
+          "agent_loop_task_tokens_saved": 38600,
+          "agent_loop_annual_team_savings": 305.71
+        },
+        "OpenAI o3-mini": {
+          "rate_per_million": 1.1,
+          "cost_saved_per_1k_prompts": 2.12,
+          "monthly_savings_per_dev": 1.87,
+          "annual_savings_team_5": 112.09,
+          "agent_loop_task_tokens_saved": 38600,
+          "agent_loop_annual_team_savings": 112.09
+        },
+        "Gemini 3.7 Flash": {
+          "rate_per_million": 0.35,
+          "cost_saved_per_1k_prompts": 0.68,
+          "monthly_savings_per_dev": 0.59,
+          "annual_savings_team_5": 35.67,
+          "agent_loop_task_tokens_saved": 38600,
+          "agent_loop_annual_team_savings": 35.67
+        }
+      }
+    },
+    {
+      "schema_name": "Enterprise Production Scale",
+      "tables_count": 100,
+      "columns_count": 1198,
+      "relationships_count": 31,
+      "latency_ms": 5.273,
+      "cl100k_tokens": {
+        "raw_ddl": 8577,
+        "schemap_context": 921,
+        "claude_md": 1496,
+        "agents_md": 6899,
+        "tokens_saved": 7656,
+        "reduction_percentage": "89.3%",
+        "agent_reduction_percentage": "19.6%"
+      },
+      "o200k_tokens": {
+        "raw_ddl": 8709,
+        "schemap_context": 929,
+        "reduction_percentage": "89.3%"
+      },
+      "multi_turn_agent_loop": {
+        "turns_per_task": 20,
+        "raw_task_tokens": 171540,
+        "schemap_task_tokens": 18420,
+        "task_tokens_saved": 153120
+      },
+      "next_gen_models_roi": {
+        "Claude Opus 5 (Anthropic)": {
+          "rate_per_million": 15.0,
+          "cost_saved_per_1k_prompts": 114.84,
+          "monthly_savings_per_dev": 101.06,
+          "annual_savings_team_5": 6063.55,
+          "agent_loop_task_tokens_saved": 153120,
+          "agent_loop_annual_team_savings": 6063.55
+        },
+        "GPT-5.6 Terra (OpenAI)": {
+          "rate_per_million": 10.0,
+          "cost_saved_per_1k_prompts": 76.56,
+          "monthly_savings_per_dev": 67.37,
+          "annual_savings_team_5": 4042.37,
+          "agent_loop_task_tokens_saved": 153120,
+          "agent_loop_annual_team_savings": 4042.37
+        },
+        "Gemini 3.7 Pro (Google)": {
+          "rate_per_million": 3.5,
+          "cost_saved_per_1k_prompts": 26.8,
+          "monthly_savings_per_dev": 23.58,
+          "annual_savings_team_5": 1414.83,
+          "agent_loop_task_tokens_saved": 153120,
+          "agent_loop_annual_team_savings": 1414.83
+        },
+        "Claude 3.7 Sonnet (Thinking)": {
+          "rate_per_million": 3.0,
+          "cost_saved_per_1k_prompts": 22.97,
+          "monthly_savings_per_dev": 20.21,
+          "annual_savings_team_5": 1212.71,
+          "agent_loop_task_tokens_saved": 153120,
+          "agent_loop_annual_team_savings": 1212.71
+        },
+        "OpenAI o3-mini": {
+          "rate_per_million": 1.1,
+          "cost_saved_per_1k_prompts": 8.42,
+          "monthly_savings_per_dev": 7.41,
+          "annual_savings_team_5": 444.66,
+          "agent_loop_task_tokens_saved": 153120,
+          "agent_loop_annual_team_savings": 444.66
+        },
+        "Gemini 3.7 Flash": {
+          "rate_per_million": 0.35,
+          "cost_saved_per_1k_prompts": 2.68,
+          "monthly_savings_per_dev": 2.36,
+          "annual_savings_team_5": 141.48,
+          "agent_loop_task_tokens_saved": 153120,
+          "agent_loop_annual_team_savings": 141.48
+        }
+      }
+    }
+  ]
+}
