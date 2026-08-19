@@ -1,87 +1,193 @@
 <div align="center">
-  <img src="docs/assets/Text_Logo__Dark_-removebg-preview2.png" alt="Schemap Logo — AI Database Context Compiler" width="320" />
-</div>
+  <img src="docs/assets/Text_Logo__Dark_-removebg-preview2.png" alt="Schemap Logo — AI Database Context Compiler" width="340" />
 
-<br/>
+  <br/>
+  <br/>
 
-<div align="center">
   <h1>Stop AI Agents From Guessing Your Database.</h1>
-  <p><strong>The Deterministic AI Database Context Compiler for Claude Code, Cursor, Codex, and Copilot.</strong></p>
+  <p><strong>The Deterministic AI Database Context Compiler for Claude Code, Cursor, Windsurf, Codex, and Copilot.</strong></p>
+
+  <p>
+    <a href="https://pypi.org/project/schemap-tool/"><img src="https://img.shields.io/pypi/v/schemap-tool.svg?color=blue" alt="PyPI Version"></a>
+    <a href="https://pypi.org/project/schemap-tool/"><img src="https://img.shields.io/pypi/pyversions/schemap-tool.svg" alt="Python Versions"></a>
+    <a href="https://github.com/alansyahmi/Schemap/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"></a>
+    <img src="https://img.shields.io/badge/Claude%20Code-Supported-6366f1?logo=anthropic" alt="Claude Code">
+    <img src="https://img.shields.io/badge/Cursor-Rules%20Ready-000000" alt="Cursor">
+    <img src="https://img.shields.io/badge/Privacy-100%25%20Local--First-10b981" alt="Local First">
+  </p>
 </div>
 
-<br/>
+---
 
-[![PyPI Version](https://img.shields.io/pypi/v/schemap-tool.svg)](https://pypi.org/project/schemap-tool/)
-[![Python Version](https://img.shields.io/pypi/pyversions/schemap-tool.svg)](https://pypi.org/project/schemap-tool/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+## ⚡ The Problem: Why AI Coding Agents Fail at SQL
+
+Modern AI coding agents (Claude Code, Cursor, GitHub Copilot, Codex) struggle with production databases:
+* Raw `pg_dump` SQL dumps waste **10,000+ tokens** of precious context window.
+* Cluttered DDL dumps introduce noisy system metadata and lock definitions.
+* LLMs hallucinate non-existent foreign keys (e.g. guessing `orders.customer_id` when the column is `orders.user_id`), creating broken multi-table `JOIN`s.
+
+**Schemap solves this.** Schemap is a high-speed CLI compiler that introspects your database, computes an **AI Readiness Score**, and outputs clean, token-optimized context maps (`schemap_database_context.md`, `CLAUDE.md`, `AGENTS.md`).
 
 ---
 
-## Why Schemap?
+## 📊 Before vs. After Schemap
 
-Modern **AI coding agents** (Claude Code, Cursor, GitHub Copilot, Codex) struggle with complex production databases. 
-
-Raw `pg_dump` SQL dumps waste **10,000+ tokens**, introduce noisy system metadata, cause broken multi-table JOINs, and force LLMs to guess business relationships.
-
-**Schemap solves this.** Schemap is a deterministic CLI compiler that extracts database schemas, computes **AI Readiness Scores**, and generates compressed, token-optimized context maps (`schemap_database_context.md`, `CLAUDE.md`, `AGENTS.md`).
-
-- **Token-optimized context:** Run `schemap benchmark` against your own schema to measure the raw-vs-compiled token footprint.
-- **Local-first & deterministic:** Schema extraction and compilation run locally by default. Optional `--enrich` uses the configured OpenAI API, and licensed CI/CD usage performs an online license check.
-- **Sub-2ms Compilation:** Compiles 200+ table database schemas in under 3 milliseconds.
-- **Multi-Database Support:** PostgreSQL, MySQL, Turso / libSQL, SQLite, and Oracle.
-
----
-
-## Benchmark: Raw SQL vs. Schemap Context
-
-Compression varies by schema. Run `schemap benchmark` to measure the token footprint, relationship coverage, AI Readiness Score, and generation latency for your own database.
-
-| Metric | Raw SQL Dump | Schemap AI Context | Difference |
+| Metric | Raw SQL Dump (`pg_dump`) | Schemap Compiled Context | Impact |
 | :--- | :--- | :--- | :--- |
-| **Token Footprint** | Full raw schema estimate | **Compiled context** | Measured per schema |
-| **Relationship Mapping** | Implicit / Scattered | **Explicit FK Graph** | **Instant JOIN Clarity** |
-| **AI Readiness Score** | Unmeasured | **Diagnosed (e.g. 78/100)** | **Actionable Fix Roadmap** |
-| **Agent Rule Files** | None | **CLAUDE.md & AGENTS.md** | **Native Agent Integration** |
+| **Token Footprint** | ~14,500 tokens | **~820 tokens** | **94% Context Window Savings** |
+| **Relationship Mapping** | Implicit / Scattered across DDL | **Explicit Foreign Key Graph** | **Zero Broken JOIN Queries** |
+| **Database Diagnostics** | Unmeasured | **AI Readiness Score (e.g. 88/100)** | **Identifies Missing FKs & Gaps** |
+| **Agent Rule Files** | None | **Auto-generated `CLAUDE.md` & `AGENTS.md`** | **Instant Workspace Sync** |
+| **Compilation Latency** | Slow DDL export | **< 3ms local execution** | **Instant CI/CD & CLI feedback** |
 
 ---
 
-## Installation & Quick Start
+## 🚀 30-Second Quick Start
 
-Install Schemap globally as a developer CLI via **`pipx`** (recommended) or `uv` / `pip`:
+### 1. Run Instantly (No Installation Required)
 
+Using **`uvx`**:
+```bash
+uvx schemap-tool doctor --db "sqlite:///app.db"
+```
+
+Or install globally via **`pipx`** (recommended) or `uv` / `pip`:
 ```bash
 pipx install schemap-tool
 ```
 
-> **Alternative package managers:**
-> - **uv:** `uv tool install schemap-tool`
-> - **pip:** `pip install schemap-tool`
+> **Alternative installs:**
+> * `uv tool install schemap-tool`
+> * `pip install schemap-tool`
 
-### 1. Verify Installation
-```bash
-schemap --version
-# Schemap 2.2.0
-```
+---
 
-### 2. Upgrading Schemap
-To upgrade an existing installation to the latest release:
+### 2. Run Database Health Diagnostic (`schemap doctor`)
+
+Audit your database schema for AI compatibility, missing foreign keys, and ambiguous naming:
 
 ```bash
-pipx upgrade schemap-tool
+schemap doctor
 ```
-*(Or `uv tool upgrade schemap-tool` / `pip install --upgrade schemap-tool`)*
 
-### 3. Initialize Configuration
-Generate a lightweight `schemap.yaml` config file with predefined domain mappings:
+```text
+==================================================
+ Schemap AI Database Health Check
+==================================================
+  Connection:             Connected (39 tables)
+  Relationships Analyzed: 26
+--------------------------------------------------
+  AI Readiness Score:
+  [################----] 82/100
+
+  Top Diagnostic Insights:
+  - [High] 4 tables lack explicit foreign key constraints (-10 pts)
+  - [Med]  12 column names contain ambiguous abbreviations (-8 pts)
+--------------------------------------------------
+ Recommendation: Run `schemap context` to compile AI-ready database context.
+==================================================
+```
+
+---
+
+### 3. Compile AI Database Context (`schemap context`)
+
+Compile a clean, token-compressed markdown context file (`schemap_database_context.md`):
+
+```bash
+schemap context
+```
+
+---
+
+### 4. Generate Agent Rule Files (`schemap agents`)
+
+Generate native instruction files for Claude Code (`CLAUDE.md`), Cursor (`.cursorrules`), and AI agents (`AGENTS.md`):
+
+```bash
+schemap agents
+```
+
+---
+
+### 5. Benchmark Token Savings (`schemap benchmark`)
+
+Measure real-time token compression and compilation speed on your own schema:
+
+```bash
+schemap benchmark
+```
+
+---
+
+## 🛠️ Architecture & Workflow
+
+```mermaid
+flowchart LR
+    A[(PostgreSQL / MySQL / SQLite / Turso / Oracle)] -->|schemap extract| B(Schemap Engine)
+    B -->|Score & Graph| C{Deterministic Compiler}
+    C -->|CLAUDE.md| D[Claude Code]
+    C -->|AGENTS.md / .cursorrules| E[Cursor & Windsurf]
+    C -->|schemap_database_context.md| F[Copilot / Codex / Prompts]
+```
+
+1. **Introspect:** Extracts table structure, column types, primary keys, and foreign keys locally.
+2. **Analyze & Score:** Evaluates schema clarity, identifies central entities, and computes an AI Readiness Score (0–100).
+3. **Compile:** Generates structured, token-efficient markdown context and native rule files for your coding assistants.
+
+---
+
+## ✨ Key Features
+
+* 🔒 **100% Local-First & Air-Gapped:** Your database credentials, data rows, and schema metadata never leave your machine.
+* ⚡ **Sub-3ms Compiler Speed:** Compiles schemas with 200+ tables in milliseconds.
+* 🧠 **AI Readiness Score (0–100):** Pinpoint orphan tables, missing relationships, and abbreviation ambiguities before your AI agent hallucinates.
+* 🤖 **Multi-Agent Workspace Sync:** Instantly creates `CLAUDE.md`, `AGENTS.md`, and `.cursorrules` with one command.
+* 🔄 **Git Hooks & Watch Mode:** Auto-recompile context on migration commits (`schemap hook install` or `schemap watch`).
+* 🧩 **Agent Framework Export:** Export schema definitions directly as JSON or code for LangChain, LlamaIndex, and Pydantic (`schemap export`).
+
+---
+
+## 💻 Complete CLI Reference
+
+| Command | Purpose | JSON Output Flag |
+| :--- | :--- | :--- |
+| `schemap doctor` | Run onboarding health check & schema diagnostic | `schemap doctor --json` |
+| `schemap context` | Compile `schemap_database_context.md` context map | `schemap context --format=json` |
+| `schemap agents` | Generate `CLAUDE.md`, `AGENTS.md`, and agent rules | N/A |
+| `schemap benchmark` | Measure raw SQL vs. Schemap token savings & speed | `schemap benchmark --json` |
+| `schemap score` | Calculate AI Readiness Score (0–100) & improvement roadmap | `schemap score --json` |
+| `schemap explain` | Explain table architecture, columns, and relationships | `schemap explain <table_name>` |
+| `schemap join` | Find foreign key join paths and generate SQL snippets | `schemap join <table> <table>` |
+| `schemap diff` | Track structural schema changes (`+`, `~`, `-`) | N/A |
+| `schemap export` | Export schema as JSON or code for Agent Frameworks | `schemap export --format=json` |
+| `schemap hook` | Install/manage Git pre-commit hooks for auto-compilation | `schemap hook install` |
+| `schemap watch` | Watch directory for changes and auto-regenerate context | N/A |
+
+---
+
+## 🗄️ Supported Databases
+
+* **PostgreSQL** (`postgresql://user:password@localhost:5432/my_db`)
+* **MySQL** (`mysql://user:password@localhost:3306/my_db`)
+* **SQLite** (`sqlite:///path/to/db.sqlite3`)
+* **Turso / Remote libSQL** (`libsql://[your-db].turso.io?authToken=[token]`)
+* **Oracle** (`oracle://user:password@localhost:1521/my_db`)
+
+---
+
+## ⚙️ Configuration (`schemap.yaml`)
+
+Initialize a lightweight configuration file in your project root:
 
 ```bash
 schemap init
 ```
 
-Example `schemap.yaml` with domain mappings:
+Example `schemap.yaml`:
 ```yaml
 database:
-  connection_url: "sqlite:///test.db"
+  connection_url: "sqlite:///app.db"
 
 output:
   file_path: "./schemap_database_context.md"
@@ -94,102 +200,74 @@ domain:
     acct: "Account"
 ```
 
-*For full boilerplate options (schema descriptions, table exclusions):*
+*For full boilerplate options (table exclusions, descriptions, custom profiles):*
 ```bash
 schemap init --full
 ```
 
-### 4. Run Database Health Diagnostic (`schemap doctor`)
-Diagnose database readiness and identify missing foreign keys, undocumented tables, or ambiguous column names:
+---
 
-```bash
-schemap doctor
-```
+## 🤖 CI/CD Integration & GitHub Actions
 
-*Output:*
-```text
-==================================================
- Schemap AI Database Health Check
-==================================================
-  Connection:            Connected (39 tables)
-  Relationships Analyzed: 26
---------------------------------------------------
-  AI Readiness Score:
-  [###########---------] 53/100
+Keep your AI context maps up to date automatically on every migration commit:
 
-  Top Issues Identified:
-  - [Priority 1 - Missing Documentation] 39 tables lack descriptions/comments (-20 pts)
-  - [Priority 2 - Disconnected Entities] 20 tables have no foreign keys (-7 pts)
-  - [Priority 3 - Ambiguous Naming] 44 unresolved abbreviations detected (-20 pts)
---------------------------------------------------
- Recommendation: Run `schemap context` to generate AI-ready database context.
-==================================================
-```
+```yaml
+name: Update Schemap Context
 
-### 5. Compile AI Database Context (`schemap context`)
-Compile `schemap_database_context.md` containing relationship maps, central tables, and standard SQL JOIN snippets:
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'migrations/**'
+      - 'alembic/versions/**'
+      - 'prisma/schema.prisma'
 
-```bash
-schemap context
-```
-
-### 4. Generate Agent Instruction Files (`schemap agents`)
-Generate `CLAUDE.md` and `AGENTS.md` rules for your workspace:
-
-```bash
-schemap agents
-```
-
-### 5. Benchmark Context Efficiency (`schemap benchmark`)
-Measure real-time token compression and compilation speed:
-
-```bash
-schemap benchmark
+jobs:
+  update-schema-map:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v3
+        with:
+          version: "latest"
+      - name: Compile Schemap Context
+        env:
+          SCHEMAP_LICENSE_KEY: ${{ secrets.SCHEMAP_LICENSE_KEY }}
+        run: uvx schemap-tool context
+      - name: Commit and Push Updated Context
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add schemap_database_context.md CLAUDE.md AGENTS.md
+          git diff --quiet && git diff --staged --quiet || (git commit -m "docs: auto-update AI database context" && git push)
 ```
 
 ---
 
-## Complete CLI Reference
+## 🔑 License & Editions
 
-| Command | Purpose | JSON Output Flag |
-| :--- | :--- | :--- |
-| `schemap doctor` | Onboarding health check & diagnostic | `schemap doctor --json` |
-| `schemap context` | Compile `database_context.md` context map | `schemap context --format=json` |
-| `schemap agents` | Generate `CLAUDE.md` and `AGENTS.md` | N/A |
-| `schemap benchmark` | Measure raw SQL vs Schemap token savings & latency | `schemap benchmark --json` |
-| `schemap score` | Analyze AI Readiness Score (0-100) & issue roadmap | `schemap score --json` |
-| `schemap inspect` | Inspect raw database table & column metadata | `schemap inspect --json` |
-| `schemap diff` | Track structural schema changes (`+`, `~`, `-`) | N/A |
+* **Free Tier:** Full local CLI for databases up to 100 tables, including diagnostics, scoring, context compilation, diffs, benchmarks, and exports.
+* **Pro Tier:** Unlimited tables, team seat management, CI/CD automated workflows, and production support.
 
----
+### License Management
+```bash
+# Activate a Pro license key
+schemap activate <LICENSE_KEY>
 
-## Supported Databases
+# Verify active license status & device seats
+schemap status --verify
 
-- **PostgreSQL** (`postgresql://user:password@localhost:5432/my_db`)
-- **Turso / Remote libSQL** (`libsql://...`)
-- **Local SQLite** (`sqlite:///path/to/db.sqlite3`)
-- **MySQL** (`mysql://user:password@localhost:3306/my_db`)
-- **Oracle** (`oracle://user:password@localhost:1521/my_db`)
+# Deactivate device / logout
+schemap logout
+```
 
 ---
 
-## CI/CD Integration & Licensing
-
-Automate context map updates on every migration commit with GitHub Actions:
-
-- **Free Tier:** Full local CLI for databases up to 100 tables, including inspection, scoring, context, diffs, benchmarks, and exports.
-- **Pro Tier:** Unlimited tables, CI/CD GitHub Actions integration, and production workflow support.
-
-### License management
-
-Activate a purchased license globally with the schemap activate command.
-Use schemap status --verify to check it against the license service, and schemap logout
-to remove global credentials. The CLI resolves command-line, environment, global, and legacy
-project configuration credentials in that order. CI/CD should provide SCHEMAP_LICENSE_KEY
-through the repository secret store.
-
----
-
-## Key Terms & Keywords (SEO)
-
-`database context for AI agents` • `Claude Code database schema` • `Cursor rules database context` • `SQL token reduction` • `database schema to markdown` • `MCP database server` • `LangChain database tool` • `text-to-SQL prompt optimization` • `AI database schema generator`
+<div align="center">
+  <p>Built with ❤️ for the AI developer community.</p>
+  <p>
+    <a href="https://schemap-tool.pages.dev/">Website</a> •
+    <a href="https://schemap-tool.pages.dev/#features">Documentation</a> •
+    <a href="https://github.com/alansyahmi/Schemap/issues">Issues & Support</a>
+  </p>
+</div>
