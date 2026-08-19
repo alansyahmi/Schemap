@@ -260,7 +260,7 @@ def verify_tier(tables_count: int, license_key: str | None, endpoint: str | None
         return # allowed on free tier
         
     if not license_key:
-        raise LicenseError(f"Free tier limited to {FREE_TABLE_LIMIT} tables. Found {tables_count} tables. Please upgrade to Schemap Pro.")
+        raise LicenseError(f"Free tier limited to {FREE_TABLE_LIMIT} tables. Found {tables_count} tables. Please upgrade to Schemap Pro (from $1.99/mo or $29 Lifetime at https://schemap.dev/#pricing).")
         
     # 3. Local Cache Optimization (bypass in CI)
     if not is_ci:

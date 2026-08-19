@@ -140,10 +140,10 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     const plans = {
-        monthly: ["$7.99", "/mo", "$9.99/mo", "20% off", "Flexible monthly billing.", "https://buy.stripe.com/dRm00jeG13kpfoA131dIA01"],
-        quarterly: ["$21.99", "/3mo", "$27.99 / 3mo", "21% off", "Billed every three months.", "https://buy.stripe.com/9B6bJ1gO94otekw275dIA02"],
-        semiannual: ["$39.99", "/6mo", "$49.99 / 6mo", "20% off", "Billed every six months.", "https://buy.stripe.com/9B6fZh0Pb6wB0tG5jhdIA03"],
-        annual: ["$69.99", "/yr", "$99.99/yr", "30% off", "Best value: save $30 annually.", "https://buy.stripe.com/6oU8wP9lH3kpgsE275dIA04"]
+        monthly: ["$1.99", "/mo", "$8.99/mo", "78% launch discount", "Launch Special: Flexible monthly billing (Includes 7-Day Free Trial).", "https://buy.stripe.com/dRm00jeG13kpfoA131dIA01"],
+        quarterly: ["$4.99", "/3mo", "$24.99 / 3mo", "80% launch discount", "Launch Special: Billed every three months (~$1.66/mo).", "https://buy.stripe.com/9B6bJ1gO94otekw275dIA02"],
+        semiannual: ["$8.99", "/6mo", "$45.99 / 6mo", "80% launch discount", "Launch Special: Billed every six months (~$1.50/mo).", "https://buy.stripe.com/9B6fZh0Pb6wB0tG5jhdIA03"],
+        annual: ["$15.99", "/yr", "$79.99/yr", "80% launch discount", "Best Value Launch Deal: Only ~$1.33/mo.", "https://buy.stripe.com/6oU8wP9lH3kpgsE275dIA04"]
     };
     document.querySelectorAll("[data-sub-interval]").forEach((button) => {
         button.addEventListener("click", () => {

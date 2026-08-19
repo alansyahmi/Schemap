@@ -35,12 +35,14 @@ from .doctor import get_doctor_report
 from .benchmark import calculate_benchmark
 from .fingerprint import calculate_schema_fingerprint, get_cached_fingerprint, save_fingerprint
 from .quickstart import run_quickstart
-from .query_explainer import explain_table, find_join_path
 from .fix import run_fix
 from .skills import install_agent_skills
+from .state import get_trial_status, start_trial, record_successful_run, mark_review_prompted
+import webbrowser
+import urllib.parse
 
 @click.group()
-@click.version_option("3.1.0", package_name="schemap-tool", message="Schemap %(version)s")
+@click.version_option("3.1.2", package_name="schemap-tool", message="Schemap %(version)s")
 @click.option('--profile', default=None, help="Named profile to load from schemap.yaml.")
 @click.option('--quiet', '-q', is_flag=True, help="Suppress informational messages.")
 @click.option('--no-color', is_flag=True, help="Disable color output.")
@@ -208,6 +210,56 @@ def _display_token_savings(rendered_output: str, raw_tables: list, out_path: Pat
     click.echo(f"  Total Token Reduction:     ", nl=False)
     click.secho(f"{reduction:.1f}%", fg="magenta", bold=True)
     click.secho("=" * 50 + "\n", fg="cyan", bold=True)
+    _maybe_prompt_feedback(cmd_name="context", tokens_saved=max(0, original_token_count - final_token_count))
+
+def _maybe_prompt_feedback(cmd_name: str = "run", tokens_saved: int = 0):
+    """
+    Non-intrusive review/feedback prompt shown only on 2nd or 3rd successful value run.
+    Bypassed in CI, quiet mode, or non-interactive terminals.
+    """
+    is_ci = os.environ.get("CI") == "true" or os.environ.get("GITHUB_ACTIONS") == "true"
+    if is_ci or not sys.stdout.isatty():
+        return
+
+    should_prompt = record_successful_run(cmd_name)
+    if not should_prompt:
+        return
+
+    trial_active, days_remaining, _ = get_trial_status()
+    has_key, _ = resolve_license_key()
+
+    savings_msg = f"Saved ~{tokens_saved:,} tokens on this run!" if tokens_saved > 0 else "Schemap run completed!"
+
+    click.echo("")
+    click.secho("+-------------------------------------------------------------+", fg="cyan")
+    click.secho(f"|  {savings_msg:<57}  |", fg="cyan", bold=True)
+    click.secho("|                                                             |", fg="cyan")
+    click.secho("|  Enjoying Schemap? Help us build in public:                 |", fg="cyan")
+    click.secho("|  [1] Star repository on GitHub (github.com/alansyahmi/schemap)|", fg="cyan")
+    click.secho("|  [2] Share on X / Tweet your token savings                  |", fg="cyan")
+    if not has_key:
+        click.secho("|  [3] Unlock Pro ($1.99/mo launch special)                  |", fg="cyan")
+    click.secho("|  [Enter to skip]                                            |", fg="cyan")
+    click.secho("+-------------------------------------------------------------+", fg="cyan")
+    
+    try:
+        choice = click.prompt("Your choice", default="", show_default=False).strip()
+        mark_review_prompted()
+        
+        if choice == "1":
+            click.secho("-> Opening GitHub repository... Thank you for the star!", fg="green")
+            webbrowser.open("https://github.com/alansyahmi/schemap")
+        elif choice == "2":
+            tweet_text = f"Just shaved {tokens_saved:,} tokens from my database schema with @schemap_ai! Check it out:" if tokens_saved > 0 else "Loving @schemap_ai for AI database context generation! Check it out:"
+            intent_url = f"https://twitter.com/intent/tweet?text={urllib.parse.quote(tweet_text)}&url={urllib.parse.quote('https://schemap.dev')}"
+            click.secho("-> Opening X/Twitter... Thank you for the shoutout!", fg="green")
+            webbrowser.open(intent_url)
+        elif choice == "3" and not has_key:
+            checkout_url = "https://buy.stripe.com/dRm00jeG13kpfoA131dIA01"
+            click.secho(f"-> Opening Pro checkout link ({checkout_url})...", fg="green")
+            webbrowser.open(checkout_url)
+    except Exception:
+        mark_review_prompted()
 
 @cli.command()
 @click.option('--config', default="schemap.yaml", help="Path to configuration file.")
@@ -283,12 +335,12 @@ def benchmark(config, json_output, cost, verbose):
         click.secho(f"{bench_data.get('estimated_savings_per_prompt_usd', '$0.00')}", fg="green", bold=True)
         click.echo(f"  Est. Monthly/Dev:     ", nl=False)
         click.secho(f"{bench_data.get('estimated_monthly_savings_per_dev_usd', '$0.00')}", fg="green", bold=True)
-        click.echo("-" * 50)
         click.echo(f"  Relationships Mapped: {bench_data['relationships_mapped']}")
         click.echo(f"  AI Readiness Score:   {bench_data['ai_readiness_score']}/100")
         click.echo(f"  Generation Latency:   {bench_data['generation_latency_ms']}")
         click.secho("=" * 50 + "\n", fg="magenta", bold=True)
         
+        _maybe_prompt_feedback(cmd_name="benchmark", tokens_saved=bench_data.get('tokens_saved_per_prompt', 0))
     except Exception as e:
         click.secho(f"\n[ERROR] {str(e)}", fg="red")
         if verbose:
@@ -831,6 +883,16 @@ def sync(ctx, config, targets, target_dir, force, verbose):
 @click.option('--verify', is_flag=True, help="Force online license verification.")
 def license_status(config, verify):
     """Display configured license status, active seats, device ID, and plan details."""
+    _show_license_status(config, verify)
+
+@cli.command(name="license")
+@click.option('--config', default="schemap.yaml", help="Path to configuration file.")
+@click.option('--verify', is_flag=True, help="Force online license verification.")
+def license_cmd(config, verify):
+    """Display configured license status, active seats, device ID, and plan details."""
+    _show_license_status(config, verify)
+
+def _show_license_status(config, verify):
     config_key = None
     cfg_endpoint = None
     try:
@@ -914,10 +976,31 @@ def license_status(config, verify):
         click.echo(f"  CI Automation:    Blocked on Free Tier")
         click.echo(f"  Key Source:       None")
         click.echo("-" * 50)
-        click.secho("  Tip: Run 'schemap activate <license-key>' to unlock Pro.", fg="yellow")
+        click.secho("  [$] Launch Pricing: $1.99/mo | $4.99/qtr | $8.99/6mo | $15.99/yr | $29 Founder Lifetime", fg="magenta")
+        click.secho("  Tip: Run 'schemap activate <license-key>' to activate Pro.", fg="yellow")
 
     click.echo(f"  Credentials File: {CREDENTIALS_FILE}")
     click.secho("=" * 50 + "\n", fg="cyan", bold=True)
+
+@cli.group()
+def trial():
+    """Manage Schemap 7-Day Free Pro trial."""
+    pass
+
+@trial.command(name="start")
+def trial_start():
+    """Open Schemap Pro / Trial checkout page."""
+    checkout_url = "https://buy.stripe.com/dRm00jeG13kpfoA131dIA01"
+    click.secho("\n" + "=" * 50, fg="cyan", bold=True)
+    click.secho(" Schemap Pro Trial & Launch Checkout", fg="cyan", bold=True)
+    click.secho("=" * 50, fg="cyan", bold=True)
+    click.echo(f"  -> Opening Pro checkout link: {checkout_url}")
+    click.echo("  Launch special: $1.99/mo or $29 Founder Lifetime")
+    click.secho("=" * 50 + "\n", fg="cyan", bold=True)
+    try:
+        webbrowser.open(checkout_url)
+    except Exception:
+        pass
 
 @cli.command()
 @click.option('--config', default="schemap.yaml", help="Path to configuration file.")
