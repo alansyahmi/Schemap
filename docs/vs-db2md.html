@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Schemap vs. db2md | AI Database Intelligence vs. Human Documentation</title>
+    <meta name="description"
+        content="Compare Schemap against db2md schema documentation generators. Learn why passive markdown tables waste 80% of AI context windows and how Schemap's Database Intelligence Layer solves it.">
+    <link rel="canonical" href="https://schemap-tool.pages.dev/vs-db2md.html">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://schemap-tool.pages.dev/vs-db2md.html">
+    <meta property="og:title" content="Schemap vs. db2md | AI Database Intelligence vs. Human Documentation">
+    <meta property="og:description"
+        content="Compare Schemap against db2md. Learn how Schemap's 89% token reduction, AI anti-hallucination guardrails, and role-scoped profiles outperform human markdown dumpers.">
+    <meta property="og:image" content="https://schemap-tool.pages.dev/assets/Icon%20Dark.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://schemap-tool.pages.dev/vs-db2md.html">
+    <meta name="twitter:title" content="Schemap vs. db2md | AI Database Intelligence vs. Human Documentation">
+    <meta name="twitter:description"
+        content="Compare Schemap against db2md. Learn how Schemap's 89% token reduction, AI anti-hallucination guardrails, and role-scoped profiles outperform human markdown dumpers.">
+    <meta name="twitter:image" content="https://schemap-tool.pages.dev/assets/Icon%20Dark.png">
+    <link rel="icon" href="assets/Icon Dark.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400&family=Red+Hat+Display:wght@400;500;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css?v=10">
+    <script async src="https://startupbar.co/widget/loader.js"
+        data-startup-id="6a520807-b62b-4145-8c05-b2c862af8e05"></script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "Schemap vs. db2md Comparison",
+      "description": "In-depth technical comparison between human schema documenters (db2md) and Schemap's Database Intelligence Layer for AI coding agents.",
+      "url": "https://schemap-tool.pages.dev/vs-db2md.html",
+      "inLanguage": "en",
+      "articleSection": "Developer Tool Comparison",
+      "publisher": {
+        "@type": "Organization",
+        "name": "Schemap",
+        "url": "https://schemap-tool.pages.dev/"
+      }
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Why choose Schemap over db2md?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "db2md generates verbose Markdown tables and Mermaid ER diagrams meant for human engineers browsing documentation. When passed to AI coding agents, db2md's verbose formatting wastes up to 80% of the context window and lacks anti-hallucination rules. Schemap compiles ultra-compact, deterministic context maps (schemap_database_context.md, CLAUDE.md, AGENTS.md, Cursor rules) with anti-hallucination guardrails, AI readiness scoring, and sub-3ms compilation speed."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "When is db2md a better choice?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "db2md is useful if your primary goal is generating visual Mermaid ER diagrams for a human-facing GitHub wiki or static documentation site where AI agent token efficiency and SQL hallucination prevention are not required."
+          }
+        }
+      ]
+    }
+    </script>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a class="logo" href="index.html" aria-label="Schemap home">
+                <img src="assets/Text_Logo__Dark_-removebg-preview2.png" alt="Schemap">
+            </a>
+            <div class="nav-links">
+                <a href="index.html#how-it-works">How it works</a>
+                <a href="index.html#benchmarks">Benchmarks</a>
+                <a href="index.html#features">Features</a>
+                <a href="docs.html">Docs</a>
+                <a href="index.html#pricing">Pricing</a>
+                <a href="https://billing.stripe.com/p/login/28EaEXgO9dZ36S44fddIA00" target="_blank"
+                    rel="noopener">Manage Subscription</a>
+                <a class="nav-btn" href="https://github.com/alansyahmi/Schemap" target="_blank"
+                    rel="noopener">GitHub</a>
+            </div>
+            <a class="mobile-cta" href="index.html#installation">Install free</a>
+        </div>
+    </nav>
+
+    <main class="docs-container">
+        <header class="docs-hero">
+            <a href="index.html#benchmarks" class="v3-banner"><span class="v3-badge">⚡ Benchmark Validated</span> 89% Token Reduction ↗</a>
+            <h1>Schemap vs. db2md</h1>
+            <p class="section-lead">Why human documentation generators bloat AI context windows, and how Schemap's Database Intelligence Layer delivers 89% token compression, zero SQL hallucinations, and sub-3ms compilation.</p>
+        </header>
+
+        <div class="docs-content" style="max-width: 900px; margin: 0 auto;">
+
+            <section class="doc-section">
+                <h2>Direct Comparison Matrix</h2>
+                <div class="doc-card">
+                    <p><strong>Direct Answer:</strong> <em>db2md</em> is an npm-based documentation tool that converts database schemas into human-oriented Markdown tables and Mermaid diagrams. <strong>Schemap</strong> is an AI Database Intelligence Layer built specifically for coding agents (Claude Code, Cursor, Codex, Copilot), delivering 80%+ token reduction, explicit anti-hallucination rules (<code>CLAUDE.md</code>, <code>AGENTS.md</code>), AI readiness scoring, and shortest JOIN path solving in sub-3ms.</p>
+                    <table class="param-table" style="margin-top: 1.5rem;">
+                        <thead>
+                            <tr>
+                                <th>Capability / Feature</th>
+                                <th>`db2md` (npm)</th>
+                                <th>Schemap v3.1.0</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Target Audience</strong></td>
+                                <td>Human software engineers (wikis/docs)</td>
+                                <td><strong>AI Coding Agents (Claude Code, Cursor, Codex, Copilot)</strong></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Context Window Optimization</strong></td>
+                                <td>❌ None (Heavy table formatting)</td>
+                                <td><strong>⚡ Up to 89.3% token compression</strong></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Anti-Hallucination Guardrails</strong></td>
+                                <td>❌ None (AI guesses JOIN sequences)</td>
+                                <td><strong>✅ Automatic <code>[SAFETY]</code> negative constraints</strong></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Native Agent Rule Files</strong></td>
+                                <td>❌ No (Plain Markdown only)</td>
+                                <td><strong>✅ <code>CLAUDE.md</code>, <code>AGENTS.md</code>, Cursor <code>.mdc</code></strong></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Role-Scoped Context Profiles</strong></td>
+                                <td>❌ No (Dumps all tables)</td>
+                                <td><strong>✅ <code>--scope analytics</code>, <code>backend</code>, <code>core</code></strong></td>
+                            </tr>
+                            <tr>
+                                <td><strong>AI Schema Health &amp; Readiness</strong></td>
+                                <td>❌ No</td>
+                                <td><strong>✅ <code>schemap doctor</code> (0-100 score + auto-fix)</strong></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Shortest JOIN Path Solver</strong></td>
+                                <td>❌ No</td>
+                                <td><strong>✅ <code>schemap join tableA tableB</code></strong></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Database Support</strong></td>
+                                <td>PostgreSQL, MySQL</td>
+                                <td><strong>PostgreSQL, SQLite, MySQL, Turso/libSQL, Oracle</strong></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Compilation Latency</strong></td>
+                                <td>~500ms - 3,000ms (Node runtime)</td>
+                                <td><strong>⚡ Sub-3ms local CLI compiler</strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="doc-section">
+                <h2>Why Human Docs Fail in AI Agent Workflows</h2>
+
+                <div class="doc-card" style="margin-bottom: 1.5rem;">
+                    <h3>1. Heavy Syntax Waste (The 80% Token Penalty)</h3>
+                    <p>Tools like <code>db2md</code> format schemas with extensive Markdown tables containing repeated column headers, alignments, and markdown formatting characters. For a 100-table database, this inflates token payloads to <strong>25,000+ tokens per prompt</strong>.</p>
+                    <p>In iterative agent loops (20 turns per task), passing raw Markdown tables burns millions of redundant tokens. Schemap's compact, hierarchy-aware syntax compresses the same 100-table database to under <strong>1,200 tokens</strong>—saving teams thousands of dollars annually.</p>
+                </div>
+
+                <div class="doc-card" style="margin-bottom: 1.5rem;">
+                    <h3>2. Explicit Anti-Hallucination Guardrails</h3>
+                    <p>Passive documentation lists columns but does not tell an AI agent which relationships are forbidden or ambiguous. Without explicit negative constraints, LLMs confidently generate queries joining mismatched foreign key names or querying sensitive columns.</p>
+                    <p>Schemap automatically compiles explicit negative rules directly into <code>CLAUDE.md</code>, <code>AGENTS.md</code>, and Cursor rules:</p>
+                    <pre style="background: var(--surface); padding: 12px; border-radius: 6px; color: #a6e5c9;"><code># Database Intelligence & Safety Rules (Compiled by Schemap)
+[SAFETY]
+- DO NOT join `orders` to `users` on `customer_id`. Schema uses `orders.account_id -> accounts.id`.
+- SENSITIVE: `users.password_hash`, `users.api_secret` must never be selected in API queries.</code></pre>
+                </div>
+
+                <div class="doc-card" style="margin-bottom: 1.5rem;">
+                    <h3>3. AI Health Scoring &amp; Missing Key Inference</h3>
+                    <p>Legacy databases frequently omit foreign key constraints in DDL despite relational dependencies existing in application code. <code>db2md</code> misses these implicit relationships entirely. Schemap's AI Readiness engine (<code>schemap doctor</code>) uses naming pattern heuristics and centrality algorithms to discover candidate foreign keys with up to 95% confidence.</p>
+                </div>
+            </section>
+
+            <section class="doc-section">
+                <h2>When to Use Which Tool</h2>
+                <div class="grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                    <div class="doc-card">
+                        <h3>Choose db2md if:</h3>
+                        <ul>
+                            <li>You need human-readable Markdown documentation with visual Mermaid ER diagrams for a project wiki.</li>
+                            <li>You are not using autonomous AI coding agents (Claude Code, Cursor, Copilot).</li>
+                        </ul>
+                    </div>
+                    <div class="doc-card" style="border-color: rgba(52, 211, 153, 0.4);">
+                        <h3>Choose Schemap if:</h3>
+                        <ul>
+                            <li>You want maximum token compression (89% savings) for <strong>Claude Code, Cursor, Codex, or Copilot</strong>.</li>
+                            <li>You want automated anti-hallucination guardrails and AI Readiness scoring.</li>
+                            <li>You need role-scoped context filtering (<code>--scope</code>) to keep prompt context hyper-focused.</li>
+                            <li>You need sub-3ms CLI compilation across Postgres, SQLite, MySQL, Turso, and Oracle.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <section class="doc-section" style="margin-top: 3rem; text-align: center;">
+                <h2>Upgrade to Full Database Intelligence</h2>
+                <p class="muted">Install the local-first CLI and compile your database in 60 seconds.</p>
+                <div style="margin-top: 1.5rem; display: flex; gap: 1rem; justify-content: center;">
+                    <a href="index.html#installation" class="btn btn-primary">Install Schemap Free</a>
+                    <a href="index.html#benchmarks" class="btn btn-secondary">View Verified Benchmarks</a>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <img src="assets/Icon Dark.png" alt="Schemap" height="24">
+            <p>© 2026 Schemap · Local-first database context for AI workflows.</p>
+            <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin:10px 0;font-size:0.85rem;">
+                <a href="docs.html#quickstart">Quickstart</a> ·
+                <a href="docs.html#context">Context Reference</a> ·
+                <a href="docs.html#agents">Agent Rules</a> ·
+                <a href="vs-llmschema.html">vs. LLMSchema</a> ·
+                <a href="vs-dbctx.html">vs. dbctx</a> ·
+                <a href="vs-db2md.html">vs. db2md</a> ·
+                <a href="vs-tbls.html">vs. tbls</a> ·
+                <a href="vs-pg-dump.html">vs. pg_dump</a> ·
+                <a href="vs-mcp-sql.html">vs. MCP SQL</a> ·
+                <a href="blog-preventing-ai-sql-hallucinations.html">AI Safety Guide</a> ·
+                <a href="blog-token-optimization-db-context.html">Token Economics</a>
+            </div>
+            <a href="https://billing.stripe.com/p/login/28EaEXgO9dZ36S44fddIA00" target="_blank" rel="noopener">Manage Subscription</a>
+            <a href="https://github.com/alansyahmi/Schemap" target="_blank" rel="noopener">GitHub</a>
+        </div>
+    </footer>
+</body>
+
+</html>

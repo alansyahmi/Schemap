@@ -76,6 +76,20 @@
                 <div class="grid feature-grid" style="margin-top:1.5rem;">
 
                     <article class="card feature-card">
+                        <div class="feature-icon" style="background:rgba(104,109,224,0.1);color:#686de0;display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:8px;margin-bottom:12px;font-size:1.2rem;">🎯</div>
+                        <h3>Cursor Database Rules (.mdc)</h3>
+                        <p>How to configure persistent, scoped database schema context in Cursor using <code>.cursor/rules/*.mdc</code> and avoid token bloat.</p>
+                        <a href="guide-cursor-database-rules.html" style="color:var(--accent);font-weight:600;text-decoration:none;display:inline-block;margin-top:12px;">Read Cursor Guide ↗</a>
+                    </article>
+
+                    <article class="card feature-card">
+                        <div class="feature-icon" style="background:rgba(224,86,36,0.1);color:#e056fd;display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:8px;margin-bottom:12px;font-size:1.2rem;">🤖</div>
+                        <h3>Claude Code Context (CLAUDE.md)</h3>
+                        <p>How to give Claude Code instant schema awareness with <code>CLAUDE.md</code> vs runtime MCP servers with 0ms latency.</p>
+                        <a href="guide-claude-code-database-context.html" style="color:var(--accent);font-weight:600;text-decoration:none;display:inline-block;margin-top:12px;">Read Claude Code Guide ↗</a>
+                    </article>
+
+                    <article class="card feature-card">
                         <div class="feature-icon" style="background:rgba(255,107,107,0.1);color:#ff6b6b;display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:8px;margin-bottom:12px;font-size:1.2rem;">🛡️</div>
                         <h3>Stop AI SQL Hallucinations</h3>
                         <p>Learn how to prevent Claude Code, Cursor, and Copilot from hallucinating invalid JOINs or exposing credentials with automated guardrails.</p>
@@ -97,10 +111,24 @@
                 <div class="grid feature-grid" style="margin-top:1.5rem;">
 
                     <article class="card feature-card">
+                        <div class="feature-icon" style="background:rgba(255,190,118,0.1);color:#ffbe76;display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:8px;margin-bottom:12px;font-size:1.2rem;">🛠️</div>
+                        <h3>Stop Custom Schema Scripts</h3>
+                        <p>Why homegrown <code>information_schema</code> scripts become maintenance liabilities and how Schemap replaces them.</p>
+                        <a href="vs-custom-scripts.html" style="color:var(--accent);font-weight:600;text-decoration:none;display:inline-block;margin-top:12px;">View Comparison ↗</a>
+                    </article>
+
+                    <article class="card feature-card">
                         <div class="feature-icon" style="background:rgba(255,190,118,0.1);color:#ffbe76;display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:8px;margin-bottom:12px;font-size:1.2rem;">⚔️</div>
-                        <h3>vs. LLMSchema &amp; DbSketch</h3>
-                        <p>Why raw Markdown dumpers fail on complex multi-table schemas and how Schemap's Database Intelligence Layer outperforms passive scripts.</p>
-                        <a href="vs-llmschema.html" style="color:var(--accent);font-weight:600;text-decoration:none;display:inline-block;margin-top:12px;">View Comparison ↗</a>
+                        <h3>vs. dbctx (.dtx SQLite)</h3>
+                        <p>Comparing zero-dependency native agent rules (<code>CLAUDE.md</code>, <code>AGENTS.md</code>) against custom SQLite binary slicing formats.</p>
+                        <a href="vs-dbctx.html" style="color:var(--accent);font-weight:600;text-decoration:none;display:inline-block;margin-top:12px;">View Comparison ↗</a>
+                    </article>
+
+                    <article class="card feature-card">
+                        <div class="feature-icon" style="background:rgba(80,211,154,0.1);color:#50d39a;display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:8px;margin-bottom:12px;font-size:1.2rem;">⚔️</div>
+                        <h3>vs. db2md (Markdown Docs)</h3>
+                        <p>Why human ER doc generators waste 80% of LLM context windows and how Schemap's Database Intelligence Layer solves it.</p>
+                        <a href="vs-db2md.html" style="color:var(--accent);font-weight:600;text-decoration:none;display:inline-block;margin-top:12px;">View Comparison ↗</a>
                     </article>
 
                     <article class="card feature-card">
@@ -122,6 +150,13 @@
                         <h3>vs. MCP SQL Servers</h3>
                         <p>Comparing zero-latency static local context maps against runtime RPC daemons requiring active database connection credentials.</p>
                         <a href="vs-mcp-sql.html" style="color:var(--accent);font-weight:600;text-decoration:none;display:inline-block;margin-top:12px;">View Comparison ↗</a>
+                    </article>
+
+                    <article class="card feature-card">
+                        <div class="feature-icon" style="background:rgba(255,190,118,0.1);color:#ffbe76;display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:8px;margin-bottom:12px;font-size:1.2rem;">⚔️</div>
+                        <h3>vs. LLMSchema &amp; DbSketch</h3>
+                        <p>Why raw Markdown dumpers fail on complex multi-table schemas and how Schemap's Database Intelligence Layer outperforms passive scripts.</p>
+                        <a href="vs-llmschema.html" style="color:var(--accent);font-weight:600;text-decoration:none;display:inline-block;margin-top:12px;">View Comparison ↗</a>
                     </article>
 
                 </div>
@@ -146,7 +181,13 @@
                 <a href="index.html">Home</a> ·
                 <a href="blog.html">Blog & Guides</a> ·
                 <a href="docs.html">Docs</a> ·
+                <a href="security.html">Security & Privacy</a> ·
+                <a href="guide-cursor-database-rules.html">Cursor Rules Guide</a> ·
+                <a href="guide-claude-code-database-context.html">Claude Code Guide</a> ·
+                <a href="vs-custom-scripts.html">vs. Custom Scripts</a> ·
                 <a href="vs-llmschema.html">vs. LLMSchema</a> ·
+                <a href="vs-dbctx.html">vs. dbctx</a> ·
+                <a href="vs-db2md.html">vs. db2md</a> ·
                 <a href="vs-tbls.html">vs. tbls</a> ·
                 <a href="vs-pg-dump.html">vs. pg_dump</a> ·
                 <a href="vs-mcp-sql.html">vs. MCP SQL</a> ·

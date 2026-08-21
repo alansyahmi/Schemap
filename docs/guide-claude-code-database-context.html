@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>How to Give Claude Code Database Schema Context (CLAUDE.md vs MCP) | Schemap</title>
+    <meta name="description"
+        content="Learn how to provide database schema context to Claude Code using CLAUDE.md. Compare static context vs runtime MCP servers, reduce token costs, and prevent SQL hallucinations.">
+    <link rel="canonical" href="https://schemap-tool.pages.dev/guide-claude-code-database-context.html">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://schemap-tool.pages.dev/guide-claude-code-database-context.html">
+    <meta property="og:title" content="How to Give Claude Code Database Schema Context (CLAUDE.md vs MCP)">
+    <meta property="og:description"
+        content="Complete technical guide for configuring Claude Code database context. Automate CLAUDE.md rules, compare against MCP servers, and protect credentials.">
+    <meta property="og:image" content="https://schemap-tool.pages.dev/assets/Icon%20Dark.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://schemap-tool.pages.dev/guide-claude-code-database-context.html">
+    <meta name="twitter:title" content="How to Give Claude Code Database Schema Context (CLAUDE.md vs MCP)">
+    <meta name="twitter:description"
+        content="Complete technical guide for configuring Claude Code database context. Automate CLAUDE.md rules, compare against MCP servers, and protect credentials.">
+    <meta name="twitter:image" content="https://schemap-tool.pages.dev/assets/Icon%20Dark.png">
+    <link rel="icon" href="assets/Icon Dark.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400&family=Red+Hat+Display:wght@400;500;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css?v=10">
+    <script async src="https://startupbar.co/widget/loader.js"
+        data-startup-id="6a520807-b62b-4145-8c05-b2c862af8e05"></script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "How to Give Claude Code Database Schema Context (CLAUDE.md vs MCP)",
+      "description": "Comprehensive guide comparing CLAUDE.md static database rules against Model Context Protocol (MCP) servers for Claude Code development workflows.",
+      "url": "https://schemap-tool.pages.dev/guide-claude-code-database-context.html",
+      "inLanguage": "en",
+      "articleSection": "Developer Guides",
+      "publisher": {
+        "@type": "Organization",
+        "name": "Schemap",
+        "url": "https://schemap-tool.pages.dev/"
+      }
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "How do I give Claude Code database schema context?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The fastest, most reliable method is adding a compiled database intelligence section to your repository's CLAUDE.md file using marker comments (<!-- schemap:start -->). This provides instant schema awareness with zero network latency and zero database credential exposure."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Should I use an MCP SQL Server or CLAUDE.md for Claude Code?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "CLAUDE.md is recommended for standard feature development, query writing, and refactoring because it operates at 0ms latency with 0 credential risk. MCP SQL servers are useful if Claude Code needs live row-level data inspection or test database execution."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Will Schemap overwrite my existing CLAUDE.md instructions?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. Schemap uses safe marker boundaries (<!-- schemap:start --> ... <!-- schemap:end -->) to update only the database section while preserving 100% of your existing custom developer guidelines, linting instructions, and architectural notes."
+          }
+        }
+      ]
+    }
+    </script>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a class="logo" href="index.html" aria-label="Schemap home">
+                <img src="assets/Text_Logo__Dark_-removebg-preview2.png" alt="Schemap">
+            </a>
+            <div class="nav-links">
+                <a href="index.html#how-it-works">How it works</a>
+                <a href="index.html#benchmarks">Benchmarks</a>
+                <a href="index.html#features">Features</a>
+                <a href="docs.html">Docs</a>
+                <a href="security.html">Security</a>
+                <a href="index.html#pricing">Pricing</a>
+                <a href="https://billing.stripe.com/p/login/28EaEXgO9dZ36S44fddIA00" target="_blank"
+                    rel="noopener">Manage Subscription</a>
+                <a class="nav-btn" href="https://github.com/alansyahmi/Schemap" target="_blank"
+                    rel="noopener">GitHub</a>
+            </div>
+            <a class="mobile-cta" href="index.html#installation">Install free</a>
+        </div>
+    </nav>
+
+    <main class="docs-container">
+        <header class="docs-hero">
+            <a href="docs.html" class="v3-banner"><span class="v3-badge">Claude Code Guide</span> CLAUDE.md &amp; MCP Architecture ↗</a>
+            <h1>How to Give Claude Code Database Schema Context</h1>
+            <p class="section-lead">A comprehensive technical guide comparing static <code>CLAUDE.md</code> database intelligence against runtime MCP servers for Anthropic's Claude Code terminal agent.</p>
+        </header>
+
+        <div class="docs-content" style="max-width: 900px; margin: 0 auto;">
+
+            <!-- DIRECT ANSWER CALLOUT (GEO / AEO) -->
+            <section class="doc-section">
+                <h2>Direct Answer: CLAUDE.md vs. MCP Server for Claude Code</h2>
+                <div class="doc-card" style="background: rgba(80,211,154,0.08); border-color: rgba(80,211,154,0.4);">
+                    <p style="font-size: 1.05rem; line-height: 1.6; margin: 0;">
+                        <strong style="color:var(--green);">Direct Answer:</strong> For feature development, migrations, and ORM query generation, embedding compiled database context into your repository's <code>CLAUDE.md</code> is significantly faster, cheaper, and safer than running an MCP database daemon. <code>CLAUDE.md</code> operates at <strong>0ms latency with 0 credential risk</strong>, whereas MCP SQL servers require running background RPC daemons, open live database credentials, and multi-roundtrip RPC overhead.
+                    </p>
+                </div>
+            </section>
+
+            <!-- THE TWO ARCHITECTURES -->
+            <section class="doc-section">
+                <h2>Comparing the Two Approaches</h2>
+
+                <div class="doc-card" style="margin-bottom: 1.5rem;">
+                    <h3>Approach 1: Static Context Compiler in `CLAUDE.md` (Recommended)</h3>
+                    <p>Claude Code automatically reads <code>CLAUDE.md</code> at the start of every terminal session. By compiling a compressed schema relationship map with explicit <code>[SAFETY]</code> guardrails into <code>CLAUDE.md</code>, Claude has instant schema clarity without executing external tools or holding database connections open.</p>
+                </div>
+
+                <div class="doc-card" style="margin-bottom: 1.5rem;">
+                    <h3>Approach 2: Model Context Protocol (MCP) SQL Daemon</h3>
+                    <p>Connecting Claude Code to an MCP PostgreSQL/MySQL server exposes runtime tools (e.g. <code>list_tables</code>, <code>describe_table</code>, <code>execute_query</code>). While helpful for querying live row data, it introduces 500–1,500ms RPC latency per turn and requires storing live database connection strings in Claude's configuration.</p>
+                </div>
+            </section>
+
+            <!-- ARCHITECTURE COMPARISON TABLE -->
+            <section class="doc-section">
+                <h2>CLAUDE.md vs. MCP SQL Daemon Architecture</h2>
+                <div class="doc-card">
+                    <table class="param-table" style="margin-top: 1.5rem;">
+                        <thead>
+                            <tr>
+                                <th>Dimension</th>
+                                <th>Runtime MCP SQL Server</th>
+                                <th>Schemap Compiled `CLAUDE.md`</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Query Latency</strong></td>
+                                <td>⚠️ 500–1,500ms per RPC roundtrip</td>
+                                <td><strong>⚡ 0ms (Inherent session context)</strong></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Database Credential Security</strong></td>
+                                <td>⚠️ Live DB connection held in memory</td>
+                                <td><strong>✅ Zero credentials stored or required</strong></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Offline / Air-Gapped Use</strong></td>
+                                <td>❌ Requires active DB connection daemon</td>
+                                <td><strong>✅ 100% offline &amp; air-gapped compatible</strong></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Token Payload Efficiency</strong></td>
+                                <td>⚠️ Repetitive tool calls &amp; raw dumps</td>
+                                <td><strong>⚡ 89.3% compressed relationship graph</strong></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Anti-Hallucination Guardrails</strong></td>
+                                <td>❌ None (Raw table metadata)</td>
+                                <td><strong>✅ Explicit <code>[SAFETY]</code> negative constraints</strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- STEP BY STEP TUTORIAL -->
+            <section class="doc-section">
+                <h2>Step-by-Step: Automating `CLAUDE.md` Database Context</h2>
+
+                <div class="doc-card" style="margin-bottom: 1.5rem;">
+                    <h3>Step 1: Install Schemap CLI</h3>
+                    <pre style="background: var(--surface); padding: 12px; border-radius: 6px; color: var(--text);"><code>$ pipx install schemap-tool
+# or with uv:
+$ uv tool install schemap-tool</code></pre>
+                </div>
+
+                <div class="doc-card" style="margin-bottom: 1.5rem;">
+                    <h3>Step 2: Inject Safe Database Rules into `CLAUDE.md`</h3>
+                    <p>Run the native agent rule compiler targeting Claude:</p>
+                    <pre style="background: var(--surface); padding: 12px; border-radius: 6px; color: var(--text);"><code>$ export DATABASE_URL="postgresql://user:pass@localhost:5432/mydb"
+$ schemap agents --targets claude</code></pre>
+                    <p>Schemap safely wraps the generated database intelligence inside deterministic marker comments:</p>
+                    <pre style="background: var(--surface); padding: 12px; border-radius: 6px; color: #a6e5c9;"><code># CLAUDE.md (Your Project Guidelines)
+- Use TypeScript strict mode
+- Always write unit tests with Vitest
+
+<!-- schemap:start -->
+# Database Context — Compiled by Schemap
+## Summary: 18 Tables | Key Central Tables: users, orders, subscriptions
+
+### Foreign Key Relationship Graph:
+- orders.user_id -> users.id
+- order_items.order_id -> orders.id
+- subscriptions.user_id -> users.id
+
+### [SAFETY] Anti-Hallucination Rules:
+- NEVER join `orders` to `users` on `customer_id`.
+- DO NOT SELECT `users.password_hash` in feature endpoints.
+<!-- schemap:end --></code></pre>
+                    <p style="color:var(--muted); font-size:0.88rem; margin-top:8px;">
+                        <em>Notice: Schemap will never overwrite or alter any custom instructions outside the <code><!-- schemap:start --></code> markers.</em>
+                    </p>
+                </div>
+
+                <div class="doc-card" style="margin-bottom: 1.5rem;">
+                    <h3>Step 3: Enable Automated Pre-Commit Git Sync</h3>
+                    <p>To keep <code>CLAUDE.md</code> continuously synchronized with your database migrations:</p>
+                    <pre style="background: var(--surface); padding: 12px; border-radius: 6px; color: var(--text);"><code>$ schemap hook install</code></pre>
+                </div>
+
+                <div class="doc-card" style="margin-bottom: 1.5rem;">
+                    <h3>Step 4: Launch Claude Code in Your Terminal</h3>
+                    <p>Run <code>claude</code>. Claude Code will instantly understand your entire database architecture, foreign key relationships, and safety boundaries from the very first prompt.</p>
+                </div>
+            </section>
+
+            <!-- BOTTOM CTA -->
+            <section class="doc-section" style="margin-top: 3rem; text-align: center;">
+                <h2>Give Claude Code Instant Database Intelligence</h2>
+                <p class="muted">Install Schemap in 60 seconds and compile your first CLAUDE.md database rules.</p>
+                <div style="margin-top: 1.5rem; display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                    <a href="index.html#installation" class="btn btn-primary">Install Schemap Free</a>
+                    <a href="docs.html" class="btn btn-secondary">Explore Full Documentation</a>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <img src="assets/Icon Dark.png" alt="Schemap" height="24">
+            <p>© 2026 Schemap · Local-first database context for AI workflows.</p>
+            <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin:10px 0;font-size:0.85rem;">
+                <a href="index.html">Home</a> ·
+                <a href="docs.html">Docs</a> ·
+                <a href="security.html">Security &amp; Privacy</a> ·
+                <a href="guide-cursor-database-rules.html">Cursor Database Rules</a> ·
+                <a href="guide-claude-code-database-context.html">Claude Code DB Context</a> ·
+                <a href="vs-custom-scripts.html">vs. Custom Scripts</a> ·
+                <a href="vs-llmschema.html">vs. LLMSchema</a> ·
+                <a href="vs-dbctx.html">vs. dbctx</a> ·
+                <a href="vs-db2md.html">vs. db2md</a> ·
+                <a href="vs-tbls.html">vs. tbls</a> ·
+                <a href="vs-pg-dump.html">vs. pg_dump</a> ·
+                <a href="vs-mcp-sql.html">vs. MCP SQL</a> ·
+                <a href="llms.txt">llms.txt</a>
+            </div>
+            <a href="https://billing.stripe.com/p/login/28EaEXgO9dZ36S44fddIA00" target="_blank" rel="noopener">Manage Subscription</a>
+            <a href="https://github.com/alansyahmi/Schemap" target="_blank" rel="noopener">GitHub</a>
+        </div>
+    </footer>
+</body>
+
+</html>

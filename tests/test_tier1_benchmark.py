@@ -23,12 +23,22 @@ def test_tier1_benchmark_execution():
         reduction_num = float(cl100k["reduction_percentage"].replace("%", ""))
         assert reduction_num > 40.0
 
-        # Verify Next-Gen Model ROI fields
-        assert "next_gen_models_roi" in r
-        roi_models = r["next_gen_models_roi"]
+        # Verify 2026 Next-Gen Frontier Model ROI fields
+        assert "frontier_models_roi" in r
+        roi_models = r["frontier_models_roi"]
+        assert "Claude Fable 5 (Anthropic)" in roi_models
+        assert "OpenAI o3 (OpenAI)" in roi_models
         assert "Claude Opus 5 (Anthropic)" in roi_models
+        assert "GPT-5.6 Sol (OpenAI)" in roi_models
+        assert "Gemini 3.7 Pro (Google)" in roi_models
+        assert "Claude Sonnet 5 (Anthropic)" in roi_models
         assert "GPT-5.6 Terra (OpenAI)" in roi_models
-        assert roi_models["Claude Opus 5 (Anthropic)"]["annual_savings_team_5"] > 0
+        assert "xAI Grok 4.6 (xAI)" in roi_models
+        assert "DeepSeek V4-Pro (DeepSeek)" in roi_models
+        assert "Gemini 3.7 Flash (Google)" in roi_models
+        assert "GPT-5.6 Luna (OpenAI)" in roi_models
+        assert roi_models["Claude Fable 5 (Anthropic)"]["annual_savings_team_5"] > 0
+        assert roi_models["DeepSeek V4-Pro (DeepSeek)"]["annual_savings_team_5"] > 0
 
         # Verify multi-turn agent loop
         assert "multi_turn_agent_loop" in r

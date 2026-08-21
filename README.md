@@ -44,12 +44,18 @@ Modern AI coding agents (Claude Code, Cursor, GitHub Copilot, Codex) struggle wi
 | **Enterprise Scale** | 100 | 8,577 tokens | **921 tokens** | 1,496 tokens | **89.3%** | `5.27 ms` |
 
 ### 2. Multi-Turn Autonomous Agent Loop Savings (20 Turns / Feature Task)
-| Model | Provider | Input Pricing | Tokens Saved / Task | Annual Savings (5-Dev Team) |
-| :--- | :---: | :---: | :---: | :---: |
-| **Claude Opus 5** | Anthropic | `$15.00` / 1M | 153,120 tokens | **$6,063.55 / yr** |
-| **GPT-5.6 Terra** | OpenAI | `$10.00` / 1M | 153,120 tokens | **$4,042.37 / yr** |
-| **Gemini 3.7 Pro** | Google | `$3.50` / 1M | 153,120 tokens | **$1,414.83 / yr** |
-| **Claude 3.7 Sonnet** | Anthropic | `$3.00` / 1M | 153,120 tokens | **$1,212.71 / yr** |
+| Model | Provider | Category | Input Pricing | Tokens Saved / Task | Annual Savings (5-Dev Team) |
+| :--- | :---: | :---: | :---: | :---: | :---: |
+| **Claude Fable 5** | Anthropic | Frontier Intelligence | `$10.00` / 1M | 158,480 tokens | **$4,183.87 / yr** |
+| **OpenAI o3** | OpenAI | Deep STEM Reasoning | `$10.00` / 1M | 158,480 tokens | **$4,183.87 / yr** |
+| **Claude Opus 5** | Anthropic | Flagship Reasoning | `$5.00` / 1M | 158,480 tokens | **$2,091.94 / yr** |
+| **GPT-5.6 Sol** | OpenAI | Flagship Generalist | `$5.00` / 1M | 158,480 tokens | **$2,091.94 / yr** |
+| **Gemini 3.7 Pro** | Google | Multimodal & Code | `$3.50` / 1M | 158,480 tokens | **$1,464.36 / yr** |
+| **Claude Sonnet 5** | Anthropic | Coding Workhorse | `$2.00` / 1M | 158,480 tokens | **$836.77 / yr** |
+| **GPT-5.6 Terra** | OpenAI | Coding Agent Workhorse | `$2.00` / 1M | 158,480 tokens | **$836.77 / yr** |
+| **xAI Grok 4.6** | xAI | Tool Use & Reasoning | `$2.00` / 1M | 158,480 tokens | **$836.77 / yr** |
+| **DeepSeek V4-Pro** | DeepSeek | Frontier Open-Weights | `$1.32` / 1M | 158,480 tokens | **$552.27 / yr** |
+
 
 ### 3. Live AI Text-to-SQL Accuracy & Hallucination Elimination
 | Evaluation Mode | Execution Pass Rate | Foreign Key JOIN Accuracy | Hallucination Rate |
@@ -296,7 +302,7 @@ schemap logout
   <p>Built with ❤️ for the AI developer community.</p>
   <p>
     <a href="https://schemap-tool.pages.dev/">Website</a> •
-    <a href="https://schemap-tool.pages.dev/#features">Documentation</a> •
+    <a href="https://schemap-tool.pages.dev/docs">Documentation</a> •
     <a href="https://github.com/alansyahmi/Schemap/issues">Issues & Support</a>
   </p>
 </div>

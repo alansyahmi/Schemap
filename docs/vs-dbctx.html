@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Schemap vs. dbctx | AI Database Context Architecture Comparison</title>
+    <meta name="description"
+        content="Compare Schemap against dbctx (.dtx SQLite bundles). Discover why native agent rules (CLAUDE.md, AGENTS.md) outperform proprietary binary index formats for AI coding agents.">
+    <link rel="canonical" href="https://schemap-tool.pages.dev/vs-dbctx.html">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://schemap-tool.pages.dev/vs-dbctx.html">
+    <meta property="og:title" content="Schemap vs. dbctx | AI Database Context Architecture Comparison">
+    <meta property="og:description"
+        content="Compare Schemap against dbctx. Learn the architectural differences between zero-overhead native workspace rules and proprietary binary database slicing.">
+    <meta property="og:image" content="https://schemap-tool.pages.dev/assets/Icon%20Dark.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://schemap-tool.pages.dev/vs-dbctx.html">
+    <meta name="twitter:title" content="Schemap vs. dbctx | AI Database Context Architecture Comparison">
+    <meta name="twitter:description"
+        content="Compare Schemap against dbctx. Learn the architectural differences between zero-overhead native workspace rules and proprietary binary database slicing.">
+    <meta name="twitter:image" content="https://schemap-tool.pages.dev/assets/Icon%20Dark.png">
+    <link rel="icon" href="assets/Icon Dark.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400&family=Red+Hat+Display:wght@400;500;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css?v=10">
+    <script async src="https://startupbar.co/widget/loader.js"
+        data-startup-id="6a520807-b62b-4145-8c05-b2c862af8e05"></script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "Schemap vs. dbctx Architectural Comparison",
+      "description": "In-depth technical comparison between dbctx (.dtx SQLite binary slicing) and Schemap's Database Intelligence Layer for AI coding agents.",
+      "url": "https://schemap-tool.pages.dev/vs-dbctx.html",
+      "inLanguage": "en",
+      "articleSection": "Developer Tool Comparison",
+      "publisher": {
+        "@type": "Organization",
+        "name": "Schemap",
+        "url": "https://schemap-tool.pages.dev/"
+      }
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is the main difference between Schemap and dbctx?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "dbctx compiles PostgreSQL schemas into a custom .dtx binary file (SQLite-based) requiring specialized runtime retrieval integration. Schemap statically compiles database context directly into standard workspace markdown and agent rules (CLAUDE.md, AGENTS.md, Cursor .mdc) in sub-3ms with zero runtime dependencies, multi-database support (PostgreSQL, SQLite, MySQL, Turso, Oracle), and automated anti-hallucination guardrails."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "When should I use dbctx vs Schemap?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Use dbctx if you are building a specialized RAG pipeline that specifically requires querying a SQLite-based .dtx slice database. Use Schemap if you want native, zero-latency database context inside developer workflows (Claude Code, Cursor, Codex, Copilot, CI/CD) without running extra background binaries or managing proprietary file formats."
+          }
+        }
+      ]
+    }
+    </script>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a class="logo" href="index.html" aria-label="Schemap home">
+                <img src="assets/Text_Logo__Dark_-removebg-preview2.png" alt="Schemap">
+            </a>
+            <div class="nav-links">
+                <a href="index.html#how-it-works">How it works</a>
+                <a href="index.html#benchmarks">Benchmarks</a>
+                <a href="index.html#features">Features</a>
+                <a href="docs.html">Docs</a>
+                <a href="index.html#pricing">Pricing</a>
+                <a href="https://billing.stripe.com/p/login/28EaEXgO9dZ36S44fddIA00" target="_blank"
+                    rel="noopener">Manage Subscription</a>
+                <a class="nav-btn" href="https://github.com/alansyahmi/Schemap" target="_blank"
+                    rel="noopener">GitHub</a>
+            </div>
+            <a class="mobile-cta" href="index.html#installation">Install free</a>
+        </div>
+    </nav>
+
+    <main class="docs-container">
+        <header class="docs-hero">
+            <a href="index.html#benchmarks" class="v3-banner"><span class="v3-badge">⚡ Benchmark Validated</span> 89% Token Reduction ↗</a>
+            <h1>Schemap vs. dbctx</h1>
+            <p class="section-lead">Comparing native repository context engineering against proprietary binary database slices. Why standard Markdown rules (<code>CLAUDE.md</code>, <code>AGENTS.md</code>) deliver superior reliability for AI coding agents.</p>
+        </header>
+
+        <div class="docs-content" style="max-width: 900px; margin: 0 auto;">
+
+            <section class="doc-section">
+                <h2>Direct Comparison Matrix</h2>
+                <div class="doc-card">
+                    <p><strong>Direct Answer:</strong> <em>dbctx</em> is a Go CLI that indexes PostgreSQL databases into a custom <code>.dtx</code> SQLite binary file meant for runtime query slicing. <strong>Schemap</strong> is a universal, zero-dependency Database Intelligence Layer that extracts metadata from PostgreSQL, SQLite, MySQL, Turso, and Oracle, compiling deterministic context maps and anti-hallucination guardrails directly into agent rule standards (<code>CLAUDE.md</code>, <code>AGENTS.md</code>, Cursor <code>.mdc</code>) in sub-3 milliseconds.</p>
+                    <table class="param-table" style="margin-top: 1.5rem;">
+                        <thead>
+                            <tr>
+                                <th>Capability / Feature</th>
+                                <th>`dbctx` (Go / `.dtx`)</th>
+                                <th>Schemap v3.1.0</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Output Format</strong></td>
+                                <td>Proprietary <code>.dtx</code> binary (SQLite)</td>
+                                <td><strong>Standard <code>.md</code>, <code>CLAUDE.md</code>, <code>AGENTS.md</code>, Cursor <code>.mdc</code>, JSON, MCP</strong></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Database Support</strong></td>
+                                <td>PostgreSQL primarily</td>
+                                <td><strong>PostgreSQL, SQLite, MySQL, Turso/libSQL, Oracle</strong></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Anti-Hallucination Guardrails</strong></td>
+                                <td>❌ None (Relies on raw table slices)</td>
+                                <td><strong>✅ Automatic <code>[SAFETY]</code> rule generation &amp; negative constraints</strong></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Native Agent IDE Integration</strong></td>
+                                <td>❌ Requires custom tool / runtime caller</td>
+                                <td><strong>✅ Zero-dependency: Auto-read by Claude Code, Cursor, Codex, Copilot</strong></td>
+                            </tr>
+                            <tr>
+                                <td><strong>AI Health &amp; Readiness Score</strong></td>
+                                <td>❌ No</td>
+                                <td><strong>✅ <code>schemap doctor</code> (0-100 score + auto-fix)</strong></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Shortest JOIN Path Solver</strong></td>
+                                <td>❌ No</td>
+                                <td><strong>✅ <code>schemap join tableA tableB</code> (multi-hop SQL)</strong></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Token Economics Inspector</strong></td>
+                                <td>❌ No</td>
+                                <td><strong>✅ <code>schemap benchmark --cost</code> ($ saved / dev)</strong></td>
+                            </tr>
+                            <tr>
+                                <td><strong>CI/CD Breaking Change Risk Gate</strong></td>
+                                <td>❌ No</td>
+                                <td><strong>✅ <code>schemap diff --risk --fail-on-breaking</code></strong></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Compilation Latency</strong></td>
+                                <td>~100ms - 2,000ms (database indexing)</td>
+                                <td><strong>⚡ Sub-3ms local CLI compiler</strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="doc-section">
+                <h2>Key Architectural Differences</h2>
+
+                <div class="doc-card" style="margin-bottom: 1.5rem;">
+                    <h3>1. Native Standards vs. Proprietary Binary Bundles</h3>
+                    <p><code>dbctx</code> requires you to compile your database into a custom <code>.dtx</code> SQLite binary file. This introduces vendor lock-in and forces your AI agent or developer environment to run extra tooling or background querying steps to inspect schema details.</p>
+                    <p><strong>Schemap embraces native workspace standards:</strong> It writes human-readable, token-compressed Markdown directly into your repository. Coding agents like <strong>Claude Code</strong>, <strong>Cursor</strong>, <strong>Codex</strong>, and <strong>Copilot</strong> read these context files instantly at zero computational overhead and with zero extra tooling.</p>
+                </div>
+
+                <div class="doc-card" style="margin-bottom: 1.5rem;">
+                    <h3>2. Proactive Anti-Hallucination Rules vs. Passive Slices</h3>
+                    <p>Slicing a database table does not tell an LLM how to avoid broken JOINs. When schemas contain ambiguous column names like <code>user_id</code> across multiple tables, LLMs frequently fabricate invalid join conditions.</p>
+                    <p>Schemap automatically detects foreign key ambiguities and injects explicit negative rules into your project:</p>
+                    <pre style="background: var(--surface); padding: 12px; border-radius: 6px; color: #a6e5c9;"><code>[SAFETY RULES - AUTO-GENERATED BY SCHEMAP]
+- NEVER join `payments` directly to `users` on `payments.id = users.id`.
+- ALWAYS join via: `users.id = orders.user_id` -> `orders.id = payments.order_id`.
+- DO NOT query `users.password_hash` or `users.mfa_secret` in feature queries.</code></pre>
+                </div>
+
+                <div class="doc-card" style="margin-bottom: 1.5rem;">
+                    <h3>3. Multi-Database Support &amp; Local Speed</h3>
+                    <p>While <code>dbctx</code> focuses almost exclusively on PostgreSQL, production engineering stacks often span multiple database engines. Schemap natively supports <strong>PostgreSQL, SQLite, MySQL, Turso (libSQL), and Oracle</strong> with sub-3ms compilation speed, making it suitable for pre-commit hooks and rapid CI/CD deployment gates.</p>
+                </div>
+            </section>
+
+            <section class="doc-section">
+                <h2>When to Use Which Tool</h2>
+                <div class="grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                    <div class="doc-card">
+                        <h3>Choose dbctx if:</h3>
+                        <ul>
+                            <li>You are building a custom RAG retrieval pipeline specifically designed to query a SQLite <code>.dtx</code> slice archive.</li>
+                            <li>You exclusively use PostgreSQL and want representative data value samples indexed inside a binary file.</li>
+                        </ul>
+                    </div>
+                    <div class="doc-card" style="border-color: rgba(52, 211, 153, 0.4);">
+                        <h3>Choose Schemap if:</h3>
+                        <ul>
+                            <li>You want instant, zero-overhead database intelligence inside <strong>Claude Code, Cursor, Codex, or Copilot</strong>.</li>
+                            <li>You want automated anti-hallucination guardrails and AI readiness health checks (<code>schemap doctor</code>).</li>
+                            <li>You need multi-database support (Postgres, SQLite, MySQL, Turso, Oracle).</li>
+                            <li>You want to protect CI/CD builds against breaking database schema changes with <code>schemap diff --risk</code>.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <section class="doc-section" style="margin-top: 3rem; text-align: center;">
+                <h2>Ready for Instant AI Database Context?</h2>
+                <p class="muted">Get started in 60 seconds with our free local CLI.</p>
+                <div style="margin-top: 1.5rem; display: flex; gap: 1rem; justify-content: center;">
+                    <a href="index.html#installation" class="btn btn-primary">Install Schemap Free</a>
+                    <a href="index.html#benchmarks" class="btn btn-secondary">View Verified Benchmarks</a>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <img src="assets/Icon Dark.png" alt="Schemap" height="24">
+            <p>© 2026 Schemap · Local-first database context for AI workflows.</p>
+            <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin:10px 0;font-size:0.85rem;">
+                <a href="docs.html#quickstart">Quickstart</a> ·
+                <a href="docs.html#context">Context Reference</a> ·
+                <a href="docs.html#agents">Agent Rules</a> ·
+                <a href="vs-llmschema.html">vs. LLMSchema</a> ·
+                <a href="vs-dbctx.html">vs. dbctx</a> ·
+                <a href="vs-db2md.html">vs. db2md</a> ·
+                <a href="vs-tbls.html">vs. tbls</a> ·
+                <a href="vs-pg-dump.html">vs. pg_dump</a> ·
+                <a href="vs-mcp-sql.html">vs. MCP SQL</a> ·
+                <a href="blog-preventing-ai-sql-hallucinations.html">AI Safety Guide</a> ·
+                <a href="blog-token-optimization-db-context.html">Token Economics</a>
+            </div>
+            <a href="https://billing.stripe.com/p/login/28EaEXgO9dZ36S44fddIA00" target="_blank" rel="noopener">Manage Subscription</a>
+            <a href="https://github.com/alansyahmi/Schemap" target="_blank" rel="noopener">GitHub</a>
+        </div>
+    </footer>
+</body>
+
+</html>

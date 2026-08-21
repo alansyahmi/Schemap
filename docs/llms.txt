@@ -36,6 +36,12 @@ schemap context --scope analytics
 ```
 
 ## Competitor Comparisons & Technical Guides
+- Guide: How to Provide Database Schema Context in Cursor (.cursor/rules/*.mdc): https://schemap-tool.pages.dev/guide-cursor-database-rules.html
+- Guide: How to Give Claude Code Database Schema Context (CLAUDE.md vs MCP): https://schemap-tool.pages.dev/guide-claude-code-database-context.html
+- Stop Maintaining Custom Schema Scripts: https://schemap-tool.pages.dev/vs-custom-scripts.html
+- Security & Privacy Guide (Where Does Your Schema Go?): https://schemap-tool.pages.dev/security.html
+- Schemap vs dbctx (Native Rules vs Binary SQLite Indexes): https://schemap-tool.pages.dev/vs-dbctx.html
+- Schemap vs db2md (AI Intelligence Layer vs Markdown Tables): https://schemap-tool.pages.dev/vs-db2md.html
 - Schemap vs LLMSchema & DbSketch: https://schemap-tool.pages.dev/vs-llmschema.html
 - Schemap vs tbls (Human Documentation vs AI Context): https://schemap-tool.pages.dev/vs-tbls.html
 - Schemap vs Raw pg_dump SQL DDL: https://schemap-tool.pages.dev/vs-pg-dump.html

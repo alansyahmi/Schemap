@@ -1,6 +1,9 @@
 document.addEventListener("DOMContentLoaded", () => {
     const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+    // ============================================================
+    // HERO INTERACTIVE TERMINAL
+    // ============================================================
     const heroTabCommands = {
         context: "schemap context",
         doctor: "schemap doctor",
@@ -66,6 +69,9 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
+    // ============================================================
+    // PROBLEM & PROOF TABS
+    // ============================================================
     document.querySelectorAll("[data-proof-tab]").forEach((tab) => {
         tab.addEventListener("click", () => {
             const target = tab.dataset.proofTab;
@@ -82,6 +88,153 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
+    // ============================================================
+    // BENCHMARK VISUALIZATION SUITE
+    // ============================================================
+    const benchmarkSchemas = {
+        chinook: {
+            name: "Chinook (Media Store)",
+            tables: "11 tables · 64 cols",
+            rawTokens: 995,
+            schemapTokens: 536,
+            reduction: "46.1%",
+            latency: "0.92 ms",
+            savedPerPrompt: "459 tokens",
+            fableTeamSavings: "$242.35/yr",
+            opusTeamSavings: "$121.18/yr",
+            geminiTeamSavings: "$84.82/yr",
+            sonnetTeamSavings: "$48.47/yr",
+            deepseekTeamSavings: "$31.99/yr",
+            flashTeamSavings: "$18.18/yr"
+        },
+        northwind: {
+            name: "Northwind (ERP/Inventory)",
+            tables: "13 tables · 86 cols",
+            rawTokens: 1045,
+            schemapTokens: 590,
+            reduction: "43.5%",
+            latency: "1.05 ms",
+            savedPerPrompt: "455 tokens",
+            fableTeamSavings: "$240.24/yr",
+            opusTeamSavings: "$120.12/yr",
+            geminiTeamSavings: "$84.08/yr",
+            sonnetTeamSavings: "$48.05/yr",
+            deepseekTeamSavings: "$31.71/yr",
+            flashTeamSavings: "$18.02/yr"
+        },
+        pagila: {
+            name: "Pagila (Complex DVD Rental)",
+            tables: "15 tables · 82 cols",
+            rawTokens: 1222,
+            schemapTokens: 673,
+            reduction: "44.9%",
+            latency: "1.20 ms",
+            savedPerPrompt: "549 tokens",
+            fableTeamSavings: "$289.87/yr",
+            opusTeamSavings: "$144.94/yr",
+            geminiTeamSavings: "$101.46/yr",
+            sonnetTeamSavings: "$57.97/yr",
+            deepseekTeamSavings: "$38.26/yr",
+            flashTeamSavings: "$21.74/yr"
+        },
+        saas: {
+            name: "SaaS E-Commerce Platform",
+            tables: "30 tables · 360 cols",
+            rawTokens: 2572,
+            schemapTokens: 532,
+            reduction: "79.3%",
+            latency: "1.77 ms",
+            savedPerPrompt: "2,040 tokens",
+            fableTeamSavings: "$1,077.12/yr",
+            opusTeamSavings: "$538.56/yr",
+            geminiTeamSavings: "$376.99/yr",
+            sonnetTeamSavings: "$215.42/yr",
+            deepseekTeamSavings: "$142.18/yr",
+            flashTeamSavings: "$80.78/yr"
+        },
+        enterprise: {
+            name: "Enterprise Production Scale",
+            tables: "100 tables · 1,237 cols",
+            rawTokens: 9027,
+            schemapTokens: 1103,
+            reduction: "87.8%",
+            latency: "5.27 ms",
+            savedPerPrompt: "7,924 tokens",
+            fableTeamSavings: "$4,183.87/yr",
+            opusTeamSavings: "$2,091.94/yr",
+            geminiTeamSavings: "$1,464.36/yr",
+            sonnetTeamSavings: "$836.77/yr",
+            deepseekTeamSavings: "$552.27/yr",
+            flashTeamSavings: "$313.79/yr"
+        }
+    };
+
+    // Benchmark Main Tier Tabs
+    document.querySelectorAll("[data-bench-tab]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+            const targetTier = btn.dataset.benchTab;
+
+            document.querySelectorAll("[data-bench-tab]").forEach((b) => {
+                b.classList.toggle("is-active", b === btn);
+            });
+
+            document.querySelectorAll(".bench-tier-panel").forEach((p) => {
+                p.hidden = p.id !== `bench-panel-${targetTier}`;
+            });
+        });
+    });
+
+    // Tier 1 Schema Pills Selector
+    document.querySelectorAll("[data-bench-schema]").forEach((pill) => {
+        pill.addEventListener("click", () => {
+            const schemaKey = pill.dataset.benchSchema;
+            const data = benchmarkSchemas[schemaKey];
+            if (!data) return;
+
+            document.querySelectorAll("[data-bench-schema]").forEach((p) => {
+                p.classList.toggle("is-active", p === pill);
+            });
+
+            // Update Text & Bars
+            const rawValEl = document.getElementById("bench-raw-tokens");
+            const schemapValEl = document.getElementById("bench-schemap-tokens");
+            const reductionBadge = document.getElementById("bench-reduction-badge");
+            const latencyBadge = document.getElementById("bench-latency-badge");
+            const savedBadge = document.getElementById("bench-saved-badge");
+            const schemapBar = document.getElementById("bench-schemap-bar");
+
+            if (rawValEl) rawValEl.textContent = `${data.rawTokens.toLocaleString()} tokens (100%)`;
+            if (schemapValEl) schemapValEl.textContent = `${data.schemapTokens.toLocaleString()} tokens (${(100 - parseFloat(data.reduction)).toFixed(1)}%)`;
+            if (reductionBadge) reductionBadge.textContent = `${data.reduction} Token Reduction`;
+            if (latencyBadge) latencyBadge.textContent = data.latency;
+            if (savedBadge) savedBadge.textContent = data.savedPerPrompt;
+
+            if (schemapBar) {
+                const schemapPct = Math.max(8, (data.schemapTokens / data.rawTokens) * 100);
+                schemapBar.style.width = `${schemapPct}%`;
+                schemapBar.textContent = `${data.schemapTokens.toLocaleString()} tokens`;
+            }
+
+            // Update 2026 Next-Gen Frontier Model ROI Grid
+            const fableEl = document.getElementById("bench-roi-fable");
+            const opusEl = document.getElementById("bench-roi-opus");
+            const geminiEl = document.getElementById("bench-roi-gemini");
+            const sonnetEl = document.getElementById("bench-roi-sonnet");
+            const deepseekEl = document.getElementById("bench-roi-deepseek");
+            const flashEl = document.getElementById("bench-roi-flash");
+
+            if (fableEl) fableEl.textContent = data.fableTeamSavings;
+            if (opusEl) opusEl.textContent = data.opusTeamSavings;
+            if (geminiEl) geminiEl.textContent = data.geminiTeamSavings;
+            if (sonnetEl) sonnetEl.textContent = data.sonnetTeamSavings;
+            if (deepseekEl) deepseekEl.textContent = data.deepseekTeamSavings;
+            if (flashEl) flashEl.textContent = data.flashTeamSavings;
+        });
+    });
+
+    // ============================================================
+    // PACKAGE MANAGER SWITCHER
+    // ============================================================
     const pmCommands = {
         pipx: {
             install: "pipx install schemap-tool",
@@ -139,6 +292,9 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    // ============================================================
+    // PRICING SUBSCRIPTION TOGGLE
+    // ============================================================
     const plans = {
         monthly: ["$1.99", "/mo", "$8.99/mo", "78% launch discount", "Launch Special: Flexible monthly billing (Includes 7-Day Free Trial).", "https://buy.stripe.com/dRm00jeG13kpfoA131dIA01"],
         quarterly: ["$4.99", "/3mo", "$24.99 / 3mo", "80% launch discount", "Launch Special: Billed every three months (~$1.66/mo).", "https://buy.stripe.com/9B6bJ1gO94otekw275dIA02"],
@@ -161,6 +317,9 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
+    // ============================================================
+    // MATRIX RAIN ANIMATION
+    // ============================================================
     const canvas = document.getElementById("matrix-bg");
     if (canvas && !reduced) {
         const ctx = canvas.getContext("2d");
@@ -238,39 +397,6 @@ document.addEventListener("DOMContentLoaded", () => {
         draw();
     }
 
-    // Documentation Page Live Search & Sidebar Active Link Highlighting
-    const docSearch = document.getElementById("doc-search");
-    if (docSearch) {
-        docSearch.addEventListener("input", (e) => {
-            const query = e.target.value.toLowerCase().strip ? e.target.value.toLowerCase().strip() : e.target.value.toLowerCase().trim();
-            const docCards = document.querySelectorAll(".doc-card");
-            docCards.forEach((card) => {
-                const text = card.textContent.toLowerCase();
-                const match = !query || text.includes(query);
-                card.style.display = match ? "block" : "none";
-            });
-        });
-    }
-
-    const docSections = document.querySelectorAll(".doc-section");
-    const docNavLinks = document.querySelectorAll(".docs-nav-link");
-    if (docSections.length && docNavLinks.length) {
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach((entry) => {
-                if (entry.isIntersecting) {
-                    const id = entry.target.getAttribute("id");
-                    docNavLinks.forEach((link) => {
-                        const href = link.getAttribute("href");
-                        const active = href === `#${id}`;
-                        link.classList.toggle("is-active", active);
-                    });
-                }
-            });
-        }, { threshold: 0.2 });
-
-        docSections.forEach((section) => observer.observe(section));
-    }
-
     // Dynamic Founder Seats Counter (200 Cap)
     const claimedEl = document.getElementById("founder-claimed-count");
     const remainingEl = document.getElementById("founder-remaining-count");
@@ -306,4 +432,3 @@ document.addEventListener("DOMContentLoaded", () => {
         fetchFounderSeats();
     }
 });
-

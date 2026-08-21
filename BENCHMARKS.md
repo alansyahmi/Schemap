@@ -1,16 +1,16 @@
 # 📊 Schemap Complete Benchmark Suite & Performance Metrics
 
 This document contains full, reproducible benchmarks across all three performance dimensions:
-1. **Tier 1:** Token Efficiency, Next-Gen AI Models & Multi-Turn Agent Economics
+1. **Tier 1:** Token Efficiency, 2026 Next-Gen Frontier AI Models & Multi-Turn Agent Economics
 2. **Tier 2:** Live AI Text-to-SQL Accuracy & Hallucination Elimination
 3. **Tier 3:** Compiler Latency, Memory Footprint & Scaling (10 to 1,000 Tables)
 
 ---
 
-## 🎯 Tier 1: Next-Gen AI Models & Multi-Turn Agent Economics
+## 🎯 Tier 1: 2026 Next-Gen Frontier AI Models & Multi-Turn Agent Economics
 
 ### Methodology
-We benchmarked Schemap using OpenAI's `tiktoken` tokenizer (`cl100k_base` for Claude 3.5/3.7 & GPT-4, and `o200k_base` for GPT-4o) across 5 canonical database architectures:
+We benchmarked Schemap using OpenAI's `tiktoken` tokenizer (`cl100k_base` and `o200k_base`) across 5 canonical database architectures:
 
 1. **Chinook (11 Tables)** — Media store with audio tracks, artists, invoices, and customers.
 2. **Northwind (13 Tables)** — Enterprise inventory and order processing schema.
@@ -25,33 +25,42 @@ We benchmarked Schemap using OpenAI's `tiktoken` tokenizer (`cl100k_base` for Cl
 | **Chinook** | 11 | 64 | 995 tokens | **536 tokens** | 953 tokens | **46.1%** | `0.92 ms` |
 | **Northwind** | 13 | 86 | 1,045 tokens | **590 tokens** | 999 tokens | **43.5%** | `1.05 ms` |
 | **Pagila (PostgreSQL)** | 15 | 82 | 1,222 tokens | **673 tokens** | 1,054 tokens | **44.9%** | `1.20 ms` |
-| **SaaS E-Commerce** | 30 | 349 | 2,446 tokens | **516 tokens** | 834 tokens | **78.9%** | `1.77 ms` |
-| **Enterprise Scale** | 100 | 1,198 | 8,577 tokens | **921 tokens** | 1,496 tokens | **89.3%** | `5.27 ms` |
+| **SaaS E-Commerce** | 30 | 360 | 2,572 tokens | **532 tokens** | 918 tokens | **79.3%** | `1.77 ms` |
+| **Enterprise Scale** | 100 | 1,237 | 9,027 tokens | **1,103 tokens** | 1,789 tokens | **87.8%** | `5.27 ms` |
 
-### 🤖 Next-Gen Frontier Model ROI Matrix (100-Table Database)
+### 🤖 2026 Next-Gen Frontier AI Model ROI Matrix (100-Table Database)
 
-Comparison of annual savings for a **5-developer team** across next-generation model pricing tiers:
+Financial savings comparison for a **5-developer team** across next-generation model architectures:
 
-| Model | Provider | Input Rate / 1M | Tokens Saved / Task (20 Turns) | Cost Saved / 1K Prompts | Annual Team Savings (5 Devs) |
+| Next-Gen Frontier Model | Provider | Category / Tier | Input Rate / 1M | Cost Saved / 1K Prompts | Annual Team Savings (5 Devs) |
 | :--- | :---: | :---: | :---: | :---: | :---: |
-| **Claude Opus 5** | Anthropic | `$15.00` | 153,120 tokens | `$114.84` | **$6,063.55** |
-| **GPT-5.6 Terra** | OpenAI | `$10.00` | 153,120 tokens | `$76.56` | **$4,042.37** |
-| **Gemini 3.7 Pro** | Google | `$3.50` | 153,120 tokens | `$26.80` | **$1,414.83** |
-| **Claude 3.7 Sonnet** | Anthropic | `$3.00` | 153,120 tokens | `$22.97` | **$1,212.71** |
-| **OpenAI o3-mini** | OpenAI | `$1.10` | 153,120 tokens | `$8.42` | **$444.66** |
-| **Gemini 3.7 Flash** | Google | `$0.35` | 153,120 tokens | `$2.68` | **$141.48** |
+| **Claude Fable 5** | Anthropic | High-End Frontier Intelligence | `$10.00` | `$79.24` | **$4,183.87 / yr** |
+| **OpenAI o3** | OpenAI | High-Compute Deep Reasoning | `$10.00` | `$79.24` | **$4,183.87 / yr** |
+| **Claude Opus 5** | Anthropic | Flagship Autonomous Reasoning | `$5.00` | `$39.62` | **$2,091.94 / yr** |
+| **GPT-5.6 Sol** | OpenAI | Flagship Generalist | `$5.00` | `$39.62` | **$2,091.94 / yr** |
+| **Gemini 3.7 Pro** | Google | Deep Multimodal & Long Context | `$3.50` | `$27.73` | **$1,464.36 / yr** |
+| **Claude Sonnet 5** | Anthropic | Workhorse Coding Agent | `$2.00` | `$15.85` | **$836.77 / yr** |
+| **GPT-5.6 Terra** | OpenAI | Standard Agentic Workhorse | `$2.00` | `$15.85` | **$836.77 / yr** |
+| **Gemini 3.1 Pro** | Google | Enterprise Multimodal | `$2.00` | `$15.85` | **$836.77 / yr** |
+| **xAI Grok 4.6** | xAI | Next-Gen Tool Use & Reasoning | `$2.00` | `$15.85` | **$836.77 / yr** |
+| **DeepSeek V4-Pro** | DeepSeek | Frontier Open-Weights Reasoning | `$1.32` | `$10.46` | **$552.27 / yr** |
+| **OpenAI o3-mini** | OpenAI | Fast STEM & Code Reasoning | `$1.10` | `$8.72` | **$460.23 / yr** |
+| **Claude Haiku 4.5** | Anthropic | High-Speed Agent Loops | `$1.00` | `$7.92` | **$418.39 / yr** |
+| **Gemini 3.7 Flash** | Google | High-Efficiency Frontier | `$0.75` | `$5.94` | **$313.79 / yr** |
+| **DeepSeek V4-Flash** | DeepSeek | High-Throughput Inference | `$0.44` | `$3.49` | **$184.09 / yr** |
+| **GPT-5.6 Luna** | OpenAI | Ultra-Fast Subagent Tier | `$0.20` | `$1.58` | **$83.68 / yr** |
 
-### 🔄 Multi-Turn Autonomous Agent Loop Economics
+### 🔄 Multi-Turn Autonomous Agent Loop Economics (20 Turns / Feature Task)
 
-Autonomous coding agents (Claude Code, Cursor Agent, Operator) execute iterative tool loops. Dumping raw DDL vs. Schemap across 20 turns per task:
+Autonomous coding agents (Claude Code, Cursor Agent, Operator) execute iterative tool loops. Ingesting raw DDL vs. Schemap across 20 turns per task (44 feature tasks / dev / month):
 
-| Database Scale | Raw DDL Context (20 Turns) | Schemap Context (20 Turns) | Tokens Saved per Task | Annual Savings on Opus 5 |
-| :--- | :---: | :---: | :---: | :---: |
-| **Chinook (11t)** | 19,900 tokens | **10,720 tokens** | **9,180 tokens** | **$363.53** |
-| **Northwind (13t)** | 20,900 tokens | **11,800 tokens** | **9,100 tokens** | **$360.36** |
-| **Pagila (15t)** | 24,440 tokens | **13,460 tokens** | **10,980 tokens** | **$434.81** |
-| **SaaS E-Commerce (30t)** | 48,920 tokens | **10,320 tokens** | **38,600 tokens** | **$1,528.56** |
-| **Enterprise Scale (100t)** | 171,540 tokens | **18,420 tokens** | **153,120 tokens** | **$6,063.55** |
+| Database Scale | Raw DDL Context (20 Turns) | Schemap Context (20 Turns) | Tokens Saved per Task | Annual Savings (Fable 5 / o3) | Annual Savings (Opus 5 / GPT-5.6 Sol) |
+| :--- | :---: | :---: | :---: | :---: | :---: |
+| **Chinook (11t)** | 19,900 tokens | **10,720 tokens** | **9,180 tokens** | **$242.35** | **$121.18** |
+| **Northwind (13t)** | 20,900 tokens | **11,800 tokens** | **9,100 tokens** | **$240.24** | **$120.12** |
+| **Pagila (15t)** | 24,440 tokens | **13,460 tokens** | **10,980 tokens** | **$289.87** | **$144.94** |
+| **SaaS E-Commerce (30t)** | 51,440 tokens | **10,640 tokens** | **40,800 tokens** | **$1,077.12** | **$538.56** |
+| **Enterprise Scale (100t)** | 180,540 tokens | **22,060 tokens** | **158,480 tokens** | **$4,183.87** | **$2,091.94** |
 
 ---
 
@@ -110,7 +119,7 @@ We evaluated Schemap compiler performance across dense synthetic schemas (40% fo
 git clone https://github.com/alansyahmi/Schemap.git
 cd Schemap
 
-# 1. Tier 1: Token & Next-Gen Cost Benchmark
+# 1. Tier 1: Token & Next-Gen Frontier Cost Benchmark
 uv run python benchmarks/tier1_token_benchmark.py
 
 # 2. Tier 2: Live AI Text-to-SQL Accuracy Benchmark

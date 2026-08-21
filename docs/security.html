@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Where Does Your Schema Go? | Security &amp; Privacy Architecture | Schemap</title>
+    <meta name="description"
+        content="Learn how Schemap protects your database privacy. 100% local-first extraction, zero row data inspection, no telemetry, and air-gapped compatibility for enterprise teams.">
+    <link rel="canonical" href="https://schemap-tool.pages.dev/security.html">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://schemap-tool.pages.dev/security.html">
+    <meta property="og:title" content="Where Does Your Schema Go? | Security &amp; Privacy at Schemap">
+    <meta property="og:description"
+        content="100% local-first database intelligence. Zero row data leaves your machine. Learn about Schemap's security model, credential safety, and privacy architecture.">
+    <meta property="og:image" content="https://schemap-tool.pages.dev/assets/Icon%20Dark.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://schemap-tool.pages.dev/security.html">
+    <meta name="twitter:title" content="Where Does Your Schema Go? | Security &amp; Privacy at Schemap">
+    <meta name="twitter:description"
+        content="100% local-first database intelligence. Zero row data leaves your machine. Learn about Schemap's security model, credential safety, and privacy architecture.">
+    <meta name="twitter:image" content="https://schemap-tool.pages.dev/assets/Icon%20Dark.png">
+    <link rel="icon" href="assets/Icon Dark.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400&family=Red+Hat+Display:wght@400;500;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css?v=10">
+    <script async src="https://startupbar.co/widget/loader.js"
+        data-startup-id="6a520807-b62b-4145-8c05-b2c862af8e05"></script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "Where Does Your Schema Go? Security & Privacy Architecture",
+      "description": "Comprehensive security and privacy documentation for Schemap local-first AI database context compiler.",
+      "url": "https://schemap-tool.pages.dev/security.html",
+      "inLanguage": "en",
+      "articleSection": "Security & Privacy",
+      "publisher": {
+        "@type": "Organization",
+        "name": "Schemap",
+        "url": "https://schemap-tool.pages.dev/"
+      }
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Does Schemap send my database data to an AI or cloud server?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. Schemap runs 100% locally. It extracts structural metadata only (table names, column names, types, foreign keys) and compiles context maps on your machine. Your database rows, customer PII, and sensitive records are never queried, dumped, or transmitted."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Does Schemap query database table row data?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. Schemap only queries system catalog tables (such as information_schema in PostgreSQL/MySQL or sqlite_master in SQLite). It executes zero SELECT * queries against your data tables."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can Schemap run in air-gapped or SOC2/HIPAA environments?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. Schemap requires zero network access for all core operations (extract, doctor, context, join, diff). It contains no analytics tracking, no telemetry beacons, and no external dependencies at runtime."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "When does Schemap make network requests?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Network requests only occur in two explicit scenarios: (1) When you explicitly pass the optional --enrich flag using your own OpenAI API key, and (2) During one-time license key activation for Pro tier."
+          }
+        }
+      ]
+    }
+    </script>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a class="logo" href="index.html" aria-label="Schemap home">
+                <img src="assets/Text_Logo__Dark_-removebg-preview2.png" alt="Schemap">
+            </a>
+            <div class="nav-links">
+                <a href="index.html#how-it-works">How it works</a>
+                <a href="index.html#benchmarks">Benchmarks</a>
+                <a href="index.html#features">Features</a>
+                <a href="docs.html">Docs</a>
+                <a href="security.html" style="color:var(--text);font-weight:600;">Security</a>
+                <a href="index.html#pricing">Pricing</a>
+                <a href="https://billing.stripe.com/p/login/28EaEXgO9dZ36S44fddIA00" target="_blank"
+                    rel="noopener">Manage Subscription</a>
+                <a class="nav-btn" href="https://github.com/alansyahmi/Schemap" target="_blank"
+                    rel="noopener">GitHub</a>
+            </div>
+            <a class="mobile-cta" href="index.html#installation">Install free</a>
+        </div>
+    </nav>
+
+    <main class="docs-container">
+        <header class="docs-hero">
+            <a href="docs.html" class="v3-banner"><span class="v3-badge">🛡️ Trust &amp; Privacy</span> 100% Local-First Architecture ↗</a>
+            <h1>Where Does Your Schema Go?</h1>
+            <p class="section-lead">A transparent breakdown of Schemap's security model, local-first execution pipeline, zero-telemetry design, and credential protection for enterprise teams.</p>
+        </header>
+
+        <div class="docs-content" style="max-width: 900px; margin: 0 auto;">
+
+            <!-- DIRECT ANSWER CALLOUT -->
+            <section class="doc-section">
+                <h2>Direct Answer: Zero Data Leaves Your Machine</h2>
+                <div class="doc-card" style="background: rgba(80,211,154,0.08); border-color: rgba(80,211,154,0.4);">
+                    <p style="font-size: 1.05rem; line-height: 1.6; margin: 0;">
+                        <strong style="color:var(--green);">Short Answer:</strong> <strong>Nowhere.</strong> Schemap runs entirely on your local workstation or CI/CD runner. It only reads database structural catalogs (tables, columns, foreign keys) and writes compiled Markdown directly to your project repository. <strong>Your database row data, customer PII, passwords, and records are never read, dumped, or transmitted.</strong>
+                    </p>
+                </div>
+            </section>
+
+            <!-- 4 CORE PILLARS OF SECURITY -->
+            <section class="doc-section">
+                <h2>The 4 Pillars of Schemap Security</h2>
+
+                <div class="doc-card" style="margin-bottom: 1.5rem;">
+                    <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+                        <span style="background:rgba(80,211,154,0.15);color:var(--green);padding:4px 8px;border-radius:var(--radius);font-weight:700;font-size:0.8rem;">01</span>
+                        <h3 style="margin:0;">System Catalog Queries Only (Zero Row Inspection)</h3>
+                    </div>
+                    <p>Schemap connects to your database using standard SQL driver connections (PostgreSQL, SQLite, MySQL, Turso, Oracle), but it <strong>never</strong> issues <code>SELECT *</code> or queries customer data tables.</p>
+                    <p>It exclusively inspects read-only system catalog metadata:</p>
+                    <pre style="background: var(--surface); padding: 12px; border-radius: 6px; color: #a6e5c9;"><code>-- What Schemap queries (Metadata only):
+SELECT table_name, column_name, data_type, is_nullable
+FROM information_schema.columns
+WHERE table_schema = 'public';
+
+-- What Schemap NEVER queries:
+SELECT * FROM users;          -- ❌ NEVER EXECUTED
+SELECT email, ssn FROM customers; -- ❌ NEVER EXECUTED</code></pre>
+                </div>
+
+                <div class="doc-card" style="margin-bottom: 1.5rem;">
+                    <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+                        <span style="background:rgba(78,205,196,0.15);color:#4ecdc4;padding:4px 8px;border-radius:var(--radius);font-weight:700;font-size:0.8rem;">02</span>
+                        <h3 style="margin:0;">Sub-3ms Local Deterministic Compilation</h3>
+                    </div>
+                    <p>All core CLI commands (<code>schemap context</code>, <code>schemap doctor</code>, <code>schemap join</code>, <code>schemap agents</code>, <code>schemap diff</code>) execute using local Python algorithms—including foreign key graph traversal, centrality ranking, and safety rule generation. No generative AI or cloud endpoints are queried during normal compilation.</p>
+                </div>
+
+                <div class="doc-card" style="margin-bottom: 1.5rem;">
+                    <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+                        <span style="background:rgba(255,190,118,0.15);color:#ffbe76;padding:4px 8px;border-radius:var(--radius);font-weight:700;font-size:0.8rem;">03</span>
+                        <h3 style="margin:0;">Zero Telemetry &amp; Zero Tracking</h3>
+                    </div>
+                    <p>Schemap contains <strong>no usage tracking, no Google Analytics, no PostHog telemetry, and no behavioral logging</strong>. Your schema names, column structures, and query patterns remain strictly confidential to your git repository.</p>
+                </div>
+
+                <div class="doc-card" style="margin-bottom: 1.5rem;">
+                    <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+                        <span style="background:rgba(224,86,36,0.15);color:#e056fd;padding:4px 8px;border-radius:var(--radius);font-weight:700;font-size:0.8rem;">04</span>
+                        <h3 style="margin:0;">Automated Credential &amp; PII Guardrails</h3>
+                    </div>
+                    <p>When compiling agent rules (<code>CLAUDE.md</code>, <code>AGENTS.md</code>, Cursor rules), Schemap actively searches for sensitive columns (e.g. <code>password_hash</code>, <code>api_secret</code>, <code>stripe_token</code>, <code>ssn</code>) and injects explicit negative guardrails instructing coding agents never to query them in feature SQL.</p>
+                </div>
+            </section>
+
+            <!-- ARCHITECTURAL SECURITY COMPARISON -->
+            <section class="doc-section">
+                <h2>Security Architecture Comparison</h2>
+                <div class="doc-card">
+                    <p>How Schemap compares against other database tools in the AI ecosystem:</p>
+                    <table class="param-table" style="margin-top: 1.5rem;">
+                        <thead>
+                            <tr>
+                                <th>Security Dimension</th>
+                                <th>Runtime MCP SQL Daemons</th>
+                                <th>Hosted SaaS DB Tools</th>
+                                <th>Schemap (Local-First)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Database Credentials in Agent Process</strong></td>
+                                <td>⚠️ Active DB connection held by daemon</td>
+                                <td>⚠️ Stored in cloud database backend</td>
+                                <td><strong>✅ Zero credentials stored in context files</strong></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Database Row Data Transmission</strong></td>
+                                <td>⚠️ Queries table rows on demand</td>
+                                <td>⚠️ Streams query results to SaaS</td>
+                                <td><strong>✅ 0 row data accessed or transmitted</strong></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Air-Gapped Offline Execution</strong></td>
+                                <td>❌ Requires active local server RPC</td>
+                                <td>❌ Requires external cloud connection</td>
+                                <td><strong>✅ 100% offline &amp; air-gapped compatible</strong></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Telemetry &amp; Usage Logging</strong></td>
+                                <td>Varies by daemon</td>
+                                <td>⚠️ Cloud behavioral telemetry</td>
+                                <td><strong>✅ Zero telemetry, zero tracking</strong></td>
+                            </tr>
+                            <tr>
+                                <td><strong>SOC2 / HIPAA Compliance Risk</strong></td>
+                                <td>High (Live query execution)</td>
+                                <td>High (Third-party data processor)</td>
+                                <td><strong>✅ Zero risk (Static repo files only)</strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- TRANSPARENCY: THE ONLY TWO NETWORK SCENARIOS -->
+            <section class="doc-section">
+                <h2>Full Transparency: When Does Schemap Make Network Calls?</h2>
+                <div class="doc-card" style="margin-bottom: 1.5rem;">
+                    <p>To ensure complete transparency, there are only two circumstances where network communication can ever occur:</p>
+
+                    <div style="margin-top: 1rem; padding: 12px; background: var(--surface); border-radius: 6px;">
+                        <strong>1. Optional LLM Description Enrichment (<code>--enrich</code>)</strong>
+                        <p style="margin: 6px 0 0; color: var(--muted); font-size: 0.88rem;">
+                            If you explicitly pass <code>schemap context --enrich</code>, Schemap will send <em>structural table/column names only</em> to your configured OpenAI API key to generate plain-English descriptions. This is 100% optional and disabled by default.
+                        </p>
+                    </div>
+
+                    <div style="margin-top: 1rem; padding: 12px; background: var(--surface); border-radius: 6px;">
+                        <strong>2. Pro License Key Activation &amp; CI/CD Validation</strong>
+                        <p style="margin: 6px 0 0; color: var(--muted); font-size: 0.88rem;">
+                            When activating a Pro key (<code>schemap activate KEY</code>) or executing in CI/CD environments, Schemap verifies license validity against Cloudflare Workers. Only the hashed license key and machine identifier are sent; <strong>zero schema metadata or database information is ever transmitted.</strong>
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- BEST PRACTICES -->
+            <section class="doc-section">
+                <h2>Recommended Enterprise Best Practices</h2>
+                <div class="doc-card">
+                    <ul style="margin: 0; padding-left: 1.2rem; line-height: 1.8;">
+                        <li><strong>Use Read-Only Credentials:</strong> When configuring <code>DATABASE_URL</code>, provide a database user with read-only access to system catalogs (e.g., <code>GRANT USAGE ON SCHEMA public</code>).</li>
+                        <li><strong>Commit Context Maps to Git:</strong> Commit <code>schemap_database_context.md</code>, <code>CLAUDE.md</code>, and <code>AGENTS.md</code> directly into your repository. Your team members can consume full database intelligence without needing direct database access.</li>
+                        <li><strong>Run in CI/CD Pre-Commit Gates:</strong> Use <code>schemap diff --risk --fail-on-breaking</code> in your automated deployment pipeline to catch destructive schema changes before they hit production.</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- BOTTOM CTA -->
+            <section class="doc-section" style="margin-top: 3rem; text-align: center;">
+                <h2>Local-First Database Intelligence</h2>
+                <p class="muted">Install Schemap in 60 seconds. Inspect and compile context with zero data leakage.</p>
+                <div style="margin-top: 1.5rem; display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                    <a href="index.html#installation" class="btn btn-primary">Install Schemap Free</a>
+                    <a href="index.html#benchmarks" class="btn btn-secondary">View Verified Benchmarks</a>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <img src="assets/Icon Dark.png" alt="Schemap" height="24">
+            <p>© 2026 Schemap · Local-first database context for AI workflows.</p>
+            <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin:10px 0;font-size:0.85rem;">
+                <a href="index.html">Home</a> ·
+                <a href="docs.html">Docs</a> ·
+                <a href="security.html">Security &amp; Privacy</a> ·
+                <a href="vs-llmschema.html">vs. LLMSchema</a> ·
+                <a href="vs-dbctx.html">vs. dbctx</a> ·
+                <a href="vs-db2md.html">vs. db2md</a> ·
+                <a href="vs-tbls.html">vs. tbls</a> ·
+                <a href="vs-pg-dump.html">vs. pg_dump</a> ·
+                <a href="vs-mcp-sql.html">vs. MCP SQL</a> ·
+                <a href="blog-preventing-ai-sql-hallucinations.html">AI Safety Guide</a> ·
+                <a href="llms.txt">llms.txt</a>
+            </div>
+            <a href="https://billing.stripe.com/p/login/28EaEXgO9dZ36S44fddIA00" target="_blank" rel="noopener">Manage Subscription</a>
+            <a href="https://github.com/alansyahmi/Schemap" target="_blank" rel="noopener">GitHub</a>
+        </div>
+    </footer>
+</body>
+
+</html>

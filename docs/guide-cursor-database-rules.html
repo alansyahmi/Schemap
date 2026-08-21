@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>How to Provide Database Schema Context in Cursor (.cursor/rules/*.mdc) | Schemap</title>
+    <meta name="description"
+        content="Learn how to provide database schema context to Cursor AI using .cursor/rules/*.mdc files. Stop SQL hallucinations, reduce prompt token tax by 89%, and automate schema updates.">
+    <link rel="canonical" href="https://schemap-tool.pages.dev/guide-cursor-database-rules.html">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://schemap-tool.pages.dev/guide-cursor-database-rules.html">
+    <meta property="og:title" content="How to Provide Database Schema Context in Cursor (.cursor/rules/*.mdc)">
+    <meta property="og:description"
+        content="Complete technical guide for configuring Cursor AI database rules. Automate .mdc rules, prevent broken JOINs, and optimize context window tokens.">
+    <meta property="og:image" content="https://schemap-tool.pages.dev/assets/Icon%20Dark.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://schemap-tool.pages.dev/guide-cursor-database-rules.html">
+    <meta name="twitter:title" content="How to Provide Database Schema Context in Cursor (.cursor/rules/*.mdc)">
+    <meta name="twitter:description"
+        content="Complete technical guide for configuring Cursor AI database rules. Automate .mdc rules, prevent broken JOINs, and optimize context window tokens.">
+    <meta name="twitter:image" content="https://schemap-tool.pages.dev/assets/Icon%20Dark.png">
+    <link rel="icon" href="assets/Icon Dark.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400&family=Red+Hat+Display:wght@400;500;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css?v=10">
+    <script async src="https://startupbar.co/widget/loader.js"
+        data-startup-id="6a520807-b62b-4145-8c05-b2c862af8e05"></script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "How to Provide Database Schema Context in Cursor (.cursor/rules/*.mdc)",
+      "description": "Step-by-step guide to configuring persistent database schema rules in Cursor AI using .mdc files and automated compilation with Schemap.",
+      "url": "https://schemap-tool.pages.dev/guide-cursor-database-rules.html",
+      "inLanguage": "en",
+      "articleSection": "Developer Guides",
+      "publisher": {
+        "@type": "Organization",
+        "name": "Schemap",
+        "url": "https://schemap-tool.pages.dev/"
+      }
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is the best way to give Cursor database schema context?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The recommended approach is creating a modular rule file at .cursor/rules/database.mdc with targeted globs (such as globs: ['**/*.sql', 'src/services/**']) and alwaysApply: false. Instead of pasting raw SQL DDL, use a compressed context compiler like Schemap to generate topological join graphs and anti-hallucination guardrails."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Why shouldn't I put full pg_dump DDL in Cursor rules?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Raw DDL dumps consume 20,000+ tokens per session, inflate your prompt costs, and confuse LLMs with internal indexes and trigger syntax without providing explicit multi-hop JOIN paths."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How does Schemap automate Cursor .mdc rules?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Running 'schemap agents --targets cursor' automatically extracts your database schema, ranks central entities, resolves foreign key relationships, synthesizes [SAFETY] rules, and generates a scoped .cursor/rules/database.mdc file in under 3 milliseconds."
+          }
+        }
+      ]
+    }
+    </script>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a class="logo" href="index.html" aria-label="Schemap home">
+                <img src="assets/Text_Logo__Dark_-removebg-preview2.png" alt="Schemap">
+            </a>
+            <div class="nav-links">
+                <a href="index.html#how-it-works">How it works</a>
+                <a href="index.html#benchmarks">Benchmarks</a>
+                <a href="index.html#features">Features</a>
+                <a href="docs.html">Docs</a>
+                <a href="security.html">Security</a>
+                <a href="index.html#pricing">Pricing</a>
+                <a href="https://billing.stripe.com/p/login/28EaEXgO9dZ36S44fddIA00" target="_blank"
+                    rel="noopener">Manage Subscription</a>
+                <a class="nav-btn" href="https://github.com/alansyahmi/Schemap" target="_blank"
+                    rel="noopener">GitHub</a>
+            </div>
+            <a class="mobile-cta" href="index.html#installation">Install free</a>
+        </div>
+    </nav>
+
+    <main class="docs-container">
+        <header class="docs-hero">
+            <a href="docs.html" class="v3-banner"><span class="v3-badge">Cursor Guide</span> Cursor Rules &amp; Database Architecture ↗</a>
+            <h1>How to Provide Database Schema Context in Cursor</h1>
+            <p class="section-lead">A complete guide to configuring persistent, token-optimized database schema rules in Cursor using <code>.cursor/rules/*.mdc</code> files and automated compiler tooling.</p>
+        </header>
+
+        <div class="docs-content" style="max-width: 900px; margin: 0 auto;">
+
+            <!-- DIRECT ANSWER CALLOUT (GEO / AEO) -->
+            <section class="doc-section">
+                <h2>Direct Answer: The Recommended Cursor Architecture</h2>
+                <div class="doc-card" style="background: rgba(80,211,154,0.08); border-color: rgba(80,211,154,0.4);">
+                    <p style="font-size: 1.05rem; line-height: 1.6; margin: 0;">
+                        <strong style="color:var(--green);">Direct Answer:</strong> To give Cursor database context without blowing up your context window or manually pasting DDL, create a scoped rule at <code>.cursor/rules/database.mdc</code> configured with file <code>globs</code> (e.g. <code>["**/*.sql", "src/backend/**"]</code>) and <code>alwaysApply: false</code>. Rather than dumping raw SQL tables, compile a compressed relationship graph with explicit <code>[SAFETY]</code> guardrails using <code>schemap agents --targets cursor</code>.
+                    </p>
+                </div>
+            </section>
+
+            <!-- THE PROBLEM WITH LEGACY APPROACHES -->
+            <section class="doc-section">
+                <h2>The 3 Major Flaws of Pasting Raw SQL in Cursor</h2>
+
+                <div class="doc-card" style="margin-bottom: 1.5rem;">
+                    <h3>1. The Global "Context Window Tax"</h3>
+                    <p>Putting 500 lines of raw SQL into a global <code>.cursorrules</code> file injects 15,000+ tokens into <em>every single chat and Composer prompt</em>—even when you are simply tweaking CSS or writing React frontend components. This slows down generation latency and dramatically increases API costs.</p>
+                </div>
+
+                <div class="doc-card" style="margin-bottom: 1.5rem;">
+                    <h3>2. Lack of Explicit JOIN Topologies</h3>
+                    <p>Raw <code>CREATE TABLE</code> statements list column names alphabetically or sequentially. LLMs struggle to deduce multi-hop relational paths across junction tables (e.g., finding the shortest path from <code>invoices</code> to <code>customer_profiles</code> via <code>accounts</code>).</p>
+                </div>
+
+                <div class="doc-card" style="margin-bottom: 1.5rem;">
+                    <h3>3. Frequent Schema Drift &amp; Stale Context</h3>
+                    <p>Whenever a team member runs an ORM migration (Prisma, Drizzle, Alembic), static markdown files quickly become stale unless they are compiled into git pre-commit hooks.</p>
+                </div>
+            </section>
+
+            <!-- STEP BY STEP TUTORIAL -->
+            <section class="doc-section">
+                <h2>Step-by-Step: Setting Up Automated Cursor Database Rules</h2>
+
+                <div class="doc-card" style="margin-bottom: 1.5rem;">
+                    <h3>Step 1: Install Schemap CLI</h3>
+                    <p>Install Schemap globally on your development machine in 5 seconds:</p>
+                    <pre style="background: var(--surface); padding: 12px; border-radius: 6px; color: var(--text);"><code>$ pipx install schemap-tool
+# or with uv:
+$ uv tool install schemap-tool</code></pre>
+                </div>
+
+                <div class="doc-card" style="margin-bottom: 1.5rem;">
+                    <h3>Step 2: Generate `.cursor/rules/database.mdc`</h3>
+                    <p>Run the native agent rule generator pointing to your database connection string:</p>
+                    <pre style="background: var(--surface); padding: 12px; border-radius: 6px; color: var(--text);"><code>$ export DATABASE_URL="postgresql://user:pass@localhost:5432/mydb"
+$ schemap agents --targets cursor</code></pre>
+                    <p>In less than 3 milliseconds, Schemap inspects your database catalogs and generates a perfectly formatted <code>.cursor/rules/database.mdc</code>:</p>
+                    <pre style="background: var(--surface); padding: 12px; border-radius: 6px; color: #a6e5c9;"><code>---
+description: Database schema context and anti-hallucination rules
+globs: ["**/*.sql", "src/services/**", "app/api/**", "src/models/**"]
+alwaysApply: false
+---
+
+# Database Context (Compiled by Schemap)
+## Summary: 12 Tables | Key Entities: users, orders, subscriptions
+
+### Relationships & Join Map:
+- orders.user_id -> users.id
+- order_items.order_id -> orders.id
+- order_items.product_id -> products.id
+- subscriptions.account_id -> accounts.id
+
+### [SAFETY] Anti-Hallucination Guardrails:
+- NEVER join `orders` to `users` on `customer_id`.
+- DO NOT SELECT `users.password_hash` in API responses.</code></pre>
+                </div>
+
+                <div class="doc-card" style="margin-bottom: 1.5rem;">
+                    <h3>Step 3: Enable Automated Pre-Commit Sync</h3>
+                    <p>Ensure Cursor always has up-to-date schema context whenever migrations are modified:</p>
+                    <pre style="background: var(--surface); padding: 12px; border-radius: 6px; color: var(--text);"><code>$ schemap hook install</code></pre>
+                    <p>This registers a lightweight pre-commit hook that re-compiles <code>.cursor/rules/database.mdc</code> whenever database migration files or schemas are modified.</p>
+                </div>
+
+                <div class="doc-card" style="margin-bottom: 1.5rem;">
+                    <h3>Step 4: Use `@` Mentions in Cursor Chat &amp; Composer</h3>
+                    <p>When working on complex backend tasks, you can explicitly summon your database rule by typing <code>@database.mdc</code> in Cursor Chat or Composer, or rely on Cursor's glob matching when editing SQL and backend files.</p>
+                </div>
+            </section>
+
+            <!-- COMPARISON TABLE -->
+            <section class="doc-section">
+                <h2>Raw DDL Paste vs. Schemap Cursor Rule</h2>
+                <div class="doc-card">
+                    <table class="param-table" style="margin-top: 1.5rem;">
+                        <thead>
+                            <tr>
+                                <th>Feature</th>
+                                <th>Raw DDL in .cursorrules</th>
+                                <th>Schemap .cursor/rules/database.mdc</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Context Window Overhead</strong></td>
+                                <td>⚠️ 15,000–30,000 tokens / prompt</td>
+                                <td><strong>⚡ 800–2,500 tokens (89% compression)</strong></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Scoped Activation</strong></td>
+                                <td>❌ Injected globally on every file</td>
+                                <td><strong>✅ Activated only on SQL/backend globs</strong></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Anti-Hallucination Rules</strong></td>
+                                <td>❌ None (AI guesses join keys)</td>
+                                <td><strong>✅ Explicit <code>[SAFETY]</code> negative constraints</strong></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Join Topology Graph</strong></td>
+                                <td>❌ Flat alphabetical tables</td>
+                                <td><strong>✅ Topological graph with central table ranking</strong></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Automated Migration Sync</strong></td>
+                                <td>❌ Manual copy-pasting</td>
+                                <td><strong>✅ Automated Git pre-commit hook</strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- BOTTOM CTA -->
+            <section class="doc-section" style="margin-top: 3rem; text-align: center;">
+                <h2>Supercharge Cursor with Deterministic Database Context</h2>
+                <p class="muted">Install Schemap in 60 seconds and compile your first Cursor database rule.</p>
+                <div style="margin-top: 1.5rem; display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                    <a href="index.html#installation" class="btn btn-primary">Install Schemap Free</a>
+                    <a href="docs.html" class="btn btn-secondary">Explore Full CLI Docs</a>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <img src="assets/Icon Dark.png" alt="Schemap" height="24">
+            <p>© 2026 Schemap · Local-first database context for AI workflows.</p>
+            <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin:10px 0;font-size:0.85rem;">
+                <a href="index.html">Home</a> ·
+                <a href="docs.html">Docs</a> ·
+                <a href="security.html">Security &amp; Privacy</a> ·
+                <a href="guide-cursor-database-rules.html">Cursor Database Rules</a> ·
+                <a href="guide-claude-code-database-context.html">Claude Code DB Context</a> ·
+                <a href="vs-custom-scripts.html">vs. Custom Scripts</a> ·
+                <a href="vs-llmschema.html">vs. LLMSchema</a> ·
+                <a href="vs-dbctx.html">vs. dbctx</a> ·
+                <a href="vs-db2md.html">vs. db2md</a> ·
+                <a href="vs-tbls.html">vs. tbls</a> ·
+                <a href="vs-pg-dump.html">vs. pg_dump</a> ·
+                <a href="vs-mcp-sql.html">vs. MCP SQL</a> ·
+                <a href="llms.txt">llms.txt</a>
+            </div>
+            <a href="https://billing.stripe.com/p/login/28EaEXgO9dZ36S44fddIA00" target="_blank" rel="noopener">Manage Subscription</a>
+            <a href="https://github.com/alansyahmi/Schemap" target="_blank" rel="noopener">GitHub</a>
+        </div>
+    </footer>
+</body>
+
+</html>
