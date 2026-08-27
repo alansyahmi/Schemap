@@ -27,6 +27,7 @@ export interface LicenseRecord {
   stripe_price_id?: string;
   plan_tier: string;
   billing_mode: string;
+  seats_purchased?: number;
   status: string;
   expires_at?: string;
   raw_key_temp?: string;
@@ -68,6 +69,7 @@ export async function createLicense(
     stripe_payment_intent_id?: string;
     plan_tier: string;
     billing_mode: string;
+    seats_purchased?: number;
     status: string;
     expires_at?: string;
     raw_key_temp?: string;
@@ -77,8 +79,8 @@ export async function createLicense(
     INSERT INTO licenses (
       key_hash, key_prefix, customer_id, stripe_customer_id, stripe_subscription_id,
       stripe_checkout_session_id, stripe_price_id, stripe_payment_intent_id,
-      plan_tier, billing_mode, status, expires_at, raw_key_temp
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      plan_tier, billing_mode, seats_purchased, status, expires_at, raw_key_temp
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `).bind(
     data.key_hash,
     data.key_prefix,
@@ -90,14 +92,26 @@ export async function createLicense(
     data.stripe_payment_intent_id || null,
     data.plan_tier,
     data.billing_mode,
+    data.seats_purchased || (data.plan_tier === "team" ? 10 : (data.plan_tier === "enterprise" ? 100 : 3)),
     data.status,
     data.expires_at || null,
     data.raw_key_temp || null
   ).run();
 }
 
-export async function updateLicenseStatusBySubId(db: D1Database, subId: string, status: string, expiresAt?: string): Promise<void> {
-  if (expiresAt) {
+
+export async function updateLicenseStatusBySubId(
+  db: D1Database,
+  subId: string,
+  status: string,
+  expiresAt?: string,
+  seatsPurchased?: number
+): Promise<void> {
+  if (seatsPurchased && expiresAt) {
+    await db.prepare("UPDATE licenses SET status = ?, expires_at = ?, seats_purchased = ?, updated_at = datetime('now') WHERE stripe_subscription_id = ?").bind(status, expiresAt, seatsPurchased, subId).run();
+  } else if (seatsPurchased) {
+    await db.prepare("UPDATE licenses SET status = ?, seats_purchased = ?, updated_at = datetime('now') WHERE stripe_subscription_id = ?").bind(status, seatsPurchased, subId).run();
+  } else if (expiresAt) {
     await db.prepare("UPDATE licenses SET status = ?, expires_at = ?, updated_at = datetime('now') WHERE stripe_subscription_id = ?").bind(status, expiresAt, subId).run();
   } else {
     await db.prepare("UPDATE licenses SET status = ?, updated_at = datetime('now') WHERE stripe_subscription_id = ?").bind(status, subId).run();
@@ -129,6 +143,14 @@ export async function getActivationsCount(db: D1Database, licenseId: number): Pr
   const result = await db.prepare("SELECT COUNT(*) as count FROM license_activations WHERE license_id = ?").bind(licenseId).first<{ count: number }>();
   return result?.count || 0;
 }
+
+export async function getActivationsList(db: D1Database, licenseId: number): Promise<ActivationRecord[]> {
+  const result = await db.prepare(
+    "SELECT id, license_id, device_fingerprint, instance_name, created_at, last_seen_at FROM license_activations WHERE license_id = ? ORDER BY last_seen_at DESC"
+  ).bind(licenseId).all<ActivationRecord>();
+  return result.results || [];
+}
+
 
 export async function registerDeviceActivation(
   db: D1Database,

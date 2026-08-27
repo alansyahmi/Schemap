@@ -1,6 +1,7 @@
-import { Env, getLicenseByHash, getLicenseBySessionId, updateLicenseAudit, registerDeviceActivation, removeDeviceActivation } from "./db";
+import { Env, getLicenseByHash, getLicenseBySessionId, updateLicenseAudit, registerDeviceActivation, removeDeviceActivation, getActivationsList } from "./db";
 import { hashLicenseKey, hashDeviceFingerprint } from "./security";
 import { verifyStripeSignature, processStripeEvent } from "./stripe";
+
 
 const CORS_HEADERS = {
   "Access-Control-Allow-Origin": "*",
@@ -121,7 +122,12 @@ export default {
         // Device Fingerprint & Seat Limit Registration
         const deviceId = body.device_id || body.instance_name || "default_device";
         const deviceFingerprint = await hashDeviceFingerprint(deviceId);
-        const maxSeats = 3; // Pro & Founder Lifetime = 3 seats
+        
+        let maxSeats = license.seats_purchased || 3;
+        if (!license.seats_purchased) {
+          if (license.plan_tier === "team") maxSeats = 10;
+          else if (license.plan_tier === "enterprise") maxSeats = 100;
+        }
 
         const activation = await registerDeviceActivation(
           env.DB,
@@ -176,6 +182,39 @@ export default {
         return jsonResponse({ valid: true, deactivated: true });
       } catch (err: any) {
         return jsonResponse({ valid: true, deactivated: true });
+      }
+    }
+
+    // 6. GET /v1/licenses/seats?license_key=...
+    if (url.pathname === "/v1/licenses/seats" && method === "GET") {
+      try {
+        const rawKey = url.searchParams.get("license_key")?.trim() || "";
+        if (!rawKey) {
+          return jsonResponse({ error: "Missing license_key parameter." }, 400);
+        }
+        const pepper = env.SERVER_PEPPER || "schemap_prod_pepper_v1_secret";
+        const keyHash = await hashLicenseKey(rawKey, pepper);
+        const license = await getLicenseByHash(env.DB, keyHash);
+        const activations = await getActivationsList(env.DB, license.id);
+        const seatsUsed = activations.length;
+        let maxSeats = license.seats_purchased || (license.plan_tier === "team" ? 10 : (license.plan_tier === "enterprise" ? 100 : 3));
+        return jsonResponse({
+          tier: license.plan_tier,
+          plan: license.billing_mode,
+          seats_used: seatsUsed,
+          max_seats: maxSeats,
+          status: license.status,
+          devices: activations.map(a => ({
+            id: a.id,
+            device_fingerprint: a.device_fingerprint,
+            instance_name: a.instance_name || "developer-machine",
+            last_seen_at: a.last_seen_at
+          }))
+        }, 200);
+
+
+      } catch (err: any) {
+        return jsonResponse({ error: err.message || "Seats query error" }, 500);
       }
     }
 

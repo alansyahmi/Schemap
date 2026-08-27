@@ -293,29 +293,127 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // ============================================================
-    // PRICING SUBSCRIPTION TOGGLE
+    // DUAL-ENGINE PRICING & TAB SWITCHER
     // ============================================================
-    const plans = {
-        monthly: ["$1.99", "/mo", "$8.99/mo", "78% launch discount", "Launch Special: Flexible monthly billing (Includes 7-Day Free Trial).", "https://buy.stripe.com/dRm00jeG13kpfoA131dIA01"],
-        quarterly: ["$4.99", "/3mo", "$24.99 / 3mo", "80% launch discount", "Launch Special: Billed every three months (~$1.66/mo).", "https://buy.stripe.com/9B6bJ1gO94otekw275dIA02"],
-        semiannual: ["$8.99", "/6mo", "$45.99 / 6mo", "80% launch discount", "Launch Special: Billed every six months (~$1.50/mo).", "https://buy.stripe.com/9B6fZh0Pb6wB0tG5jhdIA03"],
-        annual: ["$15.99", "/yr", "$79.99/yr", "80% launch discount", "Best Value Launch Deal: Only ~$1.33/mo.", "https://buy.stripe.com/6oU8wP9lH3kpgsE275dIA04"]
+    const tabIndivBtn = document.getElementById("btn-tab-individual");
+    const tabTeamBtn = document.getElementById("btn-tab-team");
+    const paneIndiv = document.getElementById("pricing-pane-individual");
+    const paneTeam = document.getElementById("pricing-pane-team");
+
+    if (tabIndivBtn && tabTeamBtn && paneIndiv && paneTeam) {
+        tabIndivBtn.addEventListener("click", () => {
+            tabIndivBtn.classList.add("is-active");
+            tabTeamBtn.classList.remove("is-active");
+            paneIndiv.style.display = "block";
+            paneTeam.style.display = "none";
+        });
+        tabTeamBtn.addEventListener("click", () => {
+            tabTeamBtn.classList.add("is-active");
+            tabIndivBtn.classList.remove("is-active");
+            paneTeam.style.display = "block";
+            paneIndiv.style.display = "none";
+        });
+    }
+
+    // Individual Developer Plans (Monthly vs Annual)
+    const indivPlans = {
+        monthly: ["$1.99", "/mo", "$8.99/mo", "78% discount", "Flexible monthly billing for solo engineers & indie hackers (Includes 7-Day Trial).", "https://buy.stripe.com/dRm00jeG13kpfoA131dIA01"],
+        annual: ["$15.99", "/yr", "$79.99/yr", "80% discount", "Best Value Individual Deal: Only ~$1.33/mo billed annually.", "https://buy.stripe.com/6oU8wP9lH3kpgsE275dIA04"]
     };
-    document.querySelectorAll("[data-sub-interval]").forEach((button) => {
-        button.addEventListener("click", () => {
-            const plan = plans[button.dataset.subInterval];
+    document.querySelectorAll("[data-indiv-interval]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+            const plan = indivPlans[btn.dataset.indivInterval];
             if (!plan) return;
-            document.querySelectorAll("[data-sub-interval]").forEach((item) => {
-                item.classList.toggle("is-active", item === button);
-            });
-            document.getElementById("sub-price").firstChild.textContent = plan[0];
-            document.getElementById("sub-period").textContent = plan[1];
-            document.getElementById("sub-original").textContent = plan[2];
-            document.getElementById("sub-discount").textContent = plan[3];
-            document.getElementById("sub-desc").textContent = plan[4];
-            document.getElementById("sub-checkout-btn").href = plan[5];
+            document.querySelectorAll("[data-indiv-interval]").forEach((item) => item.classList.toggle("is-active", item === btn));
+            document.getElementById("indiv-price").firstChild.textContent = plan[0];
+            document.getElementById("indiv-period").textContent = plan[1];
+            document.getElementById("indiv-original").textContent = plan[2];
+            document.getElementById("indiv-discount").textContent = plan[3];
+            document.getElementById("indiv-desc").textContent = plan[4];
+            document.getElementById("indiv-checkout-btn").href = plan[5];
         });
     });
+
+    // Team Plans (Monthly vs Annual)
+    const teamPlans = {
+        monthly: ["$19", "/seat/mo", "$29/seat/mo", "Flexible Team Monthly", "For fast-moving engineering teams. Flexible per-seat monthly billing.", "https://buy.stripe.com/6oU8wP9lH3kpgsE275dIA04"],
+        annual: ["$15", "/seat/mo", "$19/seat/mo", "Billed annually ($180/seat/yr)", "Save 20% with annual team billing. Includes CI/CD gates & PR bot.", "https://buy.stripe.com/6oU8wP9lH3kpgsE275dIA04"]
+    };
+    document.querySelectorAll("[data-team-interval]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+            const plan = teamPlans[btn.dataset.teamInterval];
+            if (!plan) return;
+            document.querySelectorAll("[data-team-interval]").forEach((item) => item.classList.toggle("is-active", item === btn));
+            document.getElementById("team-price").firstChild.textContent = plan[0];
+            document.getElementById("team-period").textContent = plan[1];
+            document.getElementById("team-original").textContent = plan[2];
+            document.getElementById("team-discount").textContent = plan[3];
+            document.getElementById("team-desc").textContent = plan[4];
+            document.getElementById("team-checkout-btn").href = plan[5];
+        });
+    });
+
+    // ============================================================
+    // INTERACTIVE TOKEN & PAYROLL ROI CALCULATOR
+    // ============================================================
+    const sliderDevs = document.getElementById("roi-devs");
+    const sliderTables = document.getElementById("roi-tables");
+    const selectModel = document.getElementById("roi-model");
+    const outTokens = document.getElementById("roi-out-tokens");
+    const outTokenDollars = document.getElementById("roi-out-token-dollars");
+    const outPayroll = document.getElementById("roi-out-payroll");
+    const outNetRoi = document.getElementById("roi-out-net-roi");
+
+    function updateRoiCalculator() {
+        if (!sliderDevs || !sliderTables || !selectModel || !outTokens) return;
+        const devs = parseInt(sliderDevs.value, 10);
+        const tables = parseInt(sliderTables.value, 10);
+        const modelRate = parseFloat(selectModel.value);
+
+        document.getElementById("roi-devs-val").textContent = `${devs} ${devs === 1 ? 'Engineer' : 'Engineers'}`;
+        document.getElementById("roi-tables-val").textContent = `${tables} Tables`;
+
+        // 44 feature tasks per dev per month (2 PRs/day * 22 work days)
+        // 20 turns per task in modern agent loops
+        // Raw DDL: ~90.2 tokens per table * 20 turns
+        // Schemap Context: ~11.0 tokens per table * 20 turns
+        // Savings per task = (79.2 * tables + 30) * 20 turns
+        const taskTokensSaved = Math.round((79.2 * tables + 30) * 20);
+        const monthlyTokensSaved = devs * 44 * taskTokensSaved;
+        const annualTokensSaved = monthlyTokensSaved * 12;
+
+        // Hard Token Dollar Savings
+        const annualTokenSavingsDollars = (annualTokensSaved / 1000000.0) * modelRate;
+
+        // Soft Payroll / Hallucination Savings
+        // 2 broken SQL debugging incidents prevented per dev per month @ $65/hr salary = $65 * 1hr * 12 = $780/yr per dev
+        const annualPayrollSavings = devs * 780;
+
+        // Cost of Schemap Team ($15/mo billed annually = $180/yr per dev)
+        const annualSchemapCost = devs * 180;
+        const totalValueDelivered = annualTokenSavingsDollars + annualPayrollSavings;
+        const netValue = totalValueDelivered - annualSchemapCost;
+        const roiMultiplier = (totalValueDelivered / Math.max(1, annualSchemapCost)).toFixed(1);
+
+        // Display formatting
+        if (monthlyTokensSaved >= 1000000) {
+            outTokens.textContent = (monthlyTokensSaved / 1000000.0).toFixed(1) + "M";
+        } else {
+            outTokens.textContent = (monthlyTokensSaved / 1000.0).toFixed(0) + "K";
+        }
+
+        outTokenDollars.textContent = "$" + annualTokenSavingsDollars.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        outPayroll.textContent = "$" + annualPayrollSavings.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        outNetRoi.textContent = (netValue >= 0 ? "+$" : "-$") + Math.abs(netValue).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ` (${roiMultiplier}x)`;
+    }
+
+    if (sliderDevs && sliderTables && selectModel) {
+        sliderDevs.addEventListener("input", updateRoiCalculator);
+        sliderTables.addEventListener("input", updateRoiCalculator);
+        selectModel.addEventListener("change", updateRoiCalculator);
+        updateRoiCalculator();
+    }
+
 
     // ============================================================
     // MATRIX RAIN ANIMATION

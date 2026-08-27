@@ -1,3 +1,4 @@
+import os
 import click
 import sys
 import time
@@ -5,6 +6,12 @@ from pathlib import Path
 import tiktoken
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
+
+if sys.platform == "win32" and hasattr(sys.stdout, "reconfigure"):
+    try:
+        sys.stdout.reconfigure(encoding="utf-8")
+    except Exception:
+        pass
 
 from .config import load_config
 from .extractor import extract_schema
@@ -14,6 +21,7 @@ from .license import (
     verify_tier,
     verify_license_online,
     deactivate_license_online,
+    fetch_seats_status,
     get_or_create_device_id,
     resolve_license_key,
     resolve_license_endpoint,
@@ -33,6 +41,7 @@ from .context import generate_database_context
 from .agents import write_agent_files
 from .doctor import get_doctor_report
 from .benchmark import calculate_benchmark
+from .gate import evaluate_gate, generate_gate_markdown_report
 from .fingerprint import calculate_schema_fingerprint, get_cached_fingerprint, save_fingerprint
 from .quickstart import run_quickstart
 from .fix import run_fix
@@ -142,24 +151,38 @@ domain:
         
     click.secho("[OK] Created schemap.yaml", fg="green")
 
-def _process_schema(cfg, enrich: bool):
-    click.echo("-> Connecting to database... ", nl=False)
-    raw_tables = extract_schema(cfg.database.connection_url, cfg.database.exclude_tables)
-    click.secho(f"Connected. Found {len(raw_tables)} active tables", fg="green")
+def _process_schema(cfg, enrich: bool, quiet: bool = False, required_feature: str | None = None):
+    if not quiet:
+        click.echo("-> Connecting to database... ", nl=False)
+    db_schemas = getattr(cfg.database, "schemas", None)
+    raw_tables = extract_schema(cfg.database.connection_url, cfg.database.exclude_tables, schemas=db_schemas)
 
-    click.echo("-> Verifying license tier... ", nl=False)
+    if not quiet:
+        click.secho(f"Connected. Found {len(raw_tables)} active tables", fg="green")
+        click.echo("-> Verifying license tier... ", nl=False)
     try:
         active_key, _ = resolve_license_key(config_key=cfg.license_key)
-        verify_tier(len(raw_tables), active_key, resolve_license_endpoint(cfg.license_endpoint))
-        click.secho("OK", fg="green")
+        verified_tier = verify_tier(
+            tables_count=len(raw_tables),
+            license_key=active_key,
+            endpoint=resolve_license_endpoint(cfg.license_endpoint),
+            required_feature=required_feature
+        )
+        if not quiet:
+            tier_badge = f"OK [{verified_tier.upper()}]" if verified_tier != "free" else "OK [FREE]"
+            click.secho(tier_badge, fg="green")
     except LicenseError as le:
         click.secho(f"\n[ERROR] {str(le)}", fg="red")
         sys.exit(1)
+
         
     schema_model = DatabaseSchemaModel(tables=raw_tables)
     schema_model, unresolved = apply_heuristics(schema_model, cfg.domain.mappings, cfg.domain.ignore_abbreviations)
     schema_model = apply_description_overrides(schema_model, cfg.schema_descriptions)
     schema_model = apply_fk_overrides(schema_model, cfg.foreign_key_overrides)
+    if hasattr(cfg, "semantics") and cfg.semantics:
+        from .semantics import apply_semantics
+        schema_model = apply_semantics(schema_model, cfg.semantics)
 
     if enrich:
         if not active_key:
@@ -168,13 +191,16 @@ def _process_schema(cfg, enrich: bool):
             sys.exit(1)
 
         if cfg.llm.api_key:
-            click.echo("-> Calling Beta LLM Enrichment Layer... ", nl=False)
+            if not quiet:
+                click.echo("-> Calling Beta LLM Enrichment Layer... ", nl=False)
             schema_model = apply_llm(schema_model, cfg.llm.api_key, cfg.llm.model)
-            click.secho("OK", fg="green")
+            if not quiet:
+                click.secho("OK", fg="green")
         else:
-            click.secho("\n[WARNING] --enrich flag passed (Beta Feature) but no llm.api_key found in config. Using deterministic heuristics.", fg="yellow")
+            if not quiet:
+                click.secho("\n[WARNING] --enrich flag passed (Beta Feature) but no llm.api_key found in config. Using deterministic heuristics.", fg="yellow")
 
-    if unresolved:
+    if unresolved and not quiet:
         click.secho("\n[WARNING] Unresolved abbreviations detected. Add these to your domain mappings:", fg="yellow")
         for u in unresolved[:5]:
             click.echo(f"  - {u}")
@@ -396,23 +422,25 @@ def inspect(config, json_output, verbose):
 @click.option('--verbose', is_flag=True, help="Enable verbose output.")
 @click.option('--format', 'fmt', type=click.Choice(['markdown', 'json', 'yaml', 'xml', 'mcp', 'ai'], case_sensitive=False), help="Override the output format.")
 @click.option('--scope', default='all', help="Filter schema scope by role profile (all, analytics, backend, core).")
+@click.option('--sanitize', is_flag=True, help="Automatically redact sensitive PII and credential columns for AI safety.")
 @click.option('--enrich', is_flag=True, help="[BETA] Apply optional LLM enrichment for table descriptions.")
 @click.option('--track/--no-track', default=True, help="Track schema state for diff intelligence.")
-def context(config, verbose, fmt, scope, enrich, track):
+def context(config, verbose, fmt, scope, sanitize, enrich, track):
     """Generate AI-optimized database context (schemap_database_context.md)."""
     try:
         cfg = load_config(config)
-        schema_model, raw_tables, _ = _process_schema(cfg, enrich)
+        schema_model, raw_tables, _ = _process_schema(cfg, enrich, required_feature="sanitize" if sanitize else None)
         
         if track:
             save_current_state(schema_model)
+
             
         target_fmt = fmt if fmt else cfg.output.format
         out_path = Path(cfg.output.file_path) if cfg.output.file_path else Path("schemap_database_context.md")
         
-        click.echo(f"-> Compiling AI context engine [{target_fmt}] (scope: {scope})... ", nl=False)
+        click.echo(f"-> Compiling AI context engine [{target_fmt}] (scope: {scope}, sanitize: {sanitize})... ", nl=False)
         if target_fmt == "markdown":
-            rendered_output = generate_database_context(schema_model, scope=scope)
+            rendered_output = generate_database_context(schema_model, scope=scope, sanitize=sanitize)
         else:
             rendered_output = render_output(schema_model, fmt=target_fmt)
             
@@ -427,30 +455,7 @@ def context(config, verbose, fmt, scope, enrich, track):
             raise
 
 @cli.command()
-@click.option('--config', default="schemap.yaml", help="Path to configuration file.")
-@click.option('--dir', 'target_dir', default=".", help="Target directory for agent files.")
-@click.option('--verbose', is_flag=True, help="Enable verbose output.")
-def agents(config, target_dir, verbose):
-    """Generate CLAUDE.md and AGENTS.md for AI coding agents."""
-    try:
-        cfg = load_config(config)
-        schema_model, _, _ = _process_schema(cfg, enrich=False)
-        
-        click.echo("-> Compiling AI agent context rules... ", nl=False)
-        files = write_agent_files(schema_model, target_dir)
-        click.secho("OK", fg="green")
-        
-        click.secho("\n[SUCCESS] AI Agent Context files generated successfully:", fg="green", bold=True)
-        for fname, fpath in files.items():
-            click.echo(f"  [OK] {fname} -> {fpath}")
-        click.echo("")
-        
-    except Exception as e:
-        click.secho(f"\n[ERROR] {str(e)}", fg="red")
-        if verbose:
-            raise
 
-@cli.command()
 @click.option('--config', default="schemap.yaml", help="Path to configuration file.")
 @click.option('--verbose', is_flag=True, help="Enable verbose output.")
 def score(config, verbose):
@@ -780,6 +785,8 @@ def join_tables(ctx, tables, config, json_output, verbose):
 @cli.command()
 @click.option('--config', default="schemap.yaml", help="Path to configuration file.")
 @click.option('--targets', default=None, help="Target frameworks e.g. codex,claude,cursor or comma-separated.")
+@click.option('--scope', default='all', help="Filter schema scope by role profile (all, analytics, backend, core).")
+@click.option('--sanitize', is_flag=True, help="Automatically redact sensitive PII and credential columns for AI safety.")
 @click.option('--dir', 'target_dir', default=".", help="Target directory for agent files.")
 @click.option('--dry-run', is_flag=True, help="Preview output without writing files.")
 @click.option('--diff', is_flag=True, help="Show unified diff of proposed changes.")
@@ -787,14 +794,15 @@ def join_tables(ctx, tables, config, json_output, verbose):
 @click.option('--force', is_flag=True, help="Force overwrite existing agent files.")
 @click.option('--verbose', is_flag=True, help="Enable verbose output.")
 @click.pass_context
-def agents(ctx, config, targets, target_dir, dry_run, diff, merge, force, verbose):
+def agents(ctx, config, targets, scope, sanitize, target_dir, dry_run, diff, merge, force, verbose):
     """Generate CLAUDE.md, AGENTS.md, and agent rules for AI coding agents."""
     try:
         prof = ctx.obj.get('profile') if ctx.obj else None
         cfg = load_config(config, profile=prof)
-        schema_model, _, _ = _process_schema(cfg, enrich=False)
+        schema_model, _, _ = _process_schema(cfg, enrich=False, required_feature="sanitize" if sanitize else None)
+
         
-        click.echo("-> Compiling AI agent context rules... ", nl=False)
+        click.echo(f"-> Compiling AI agent context rules (scope: {scope}, sanitize: {sanitize})... ", nl=False)
         res = write_agent_files(
             schema_model=schema_model,
             target_dir=target_dir,
@@ -802,7 +810,9 @@ def agents(ctx, config, targets, target_dir, dry_run, diff, merge, force, verbos
             dry_run=dry_run,
             diff=diff,
             merge=merge,
-            force=force
+            force=force,
+            scope=scope,
+            sanitize=sanitize
         )
         click.secho("OK", fg="green")
         
@@ -838,6 +848,109 @@ def fix(config, interactive, accept_all, verbose):
         click.secho(f"\n[ERROR] {str(e)}", fg="red")
         if verbose:
             raise
+
+
+@cli.command()
+@click.option('--config', default="schemap.yaml", help="Path to configuration file.")
+@click.option('--min-score', default=None, type=int, help="Minimum AI readiness score threshold (default: 80 or config).")
+@click.option('--fail-on-breaking', is_flag=True, default=None, help="Fail gate on breaking schema changes (dropped tables/columns, removed FKs).")
+@click.option('--output-report', default=None, help="File path to write the markdown PR quality report (e.g. pr-report.md).")
+@click.option('--step-summary/--no-step-summary', default=True, help="Automatically append report to GITHUB_STEP_SUMMARY in CI.")
+@click.option('--json', 'json_output', is_flag=True, help="Output gate evaluation results in JSON format.")
+@click.option('--save-state', is_flag=True, help="Save current schema state to cache for next comparison.")
+@click.option('--verbose', is_flag=True, help="Enable verbose output.")
+@click.pass_context
+def gate(ctx, config, min_score, fail_on_breaking, output_report, step_summary, json_output, save_state, verbose):
+    """Evaluate AI readiness score & detect breaking changes as a CI/CD Quality Gate."""
+    try:
+        prof = ctx.obj.get('profile') if ctx.obj else None
+        cfg = load_config(config, profile=prof)
+        is_quiet = json_output or (ctx.obj and ctx.obj.get('quiet'))
+        schema_model, _, unresolved = _process_schema(cfg, enrich=False, quiet=is_quiet, required_feature="gate")
+
+
+        # Resolve thresholds from CLI flags or config defaults
+        threshold = min_score if min_score is not None else cfg.gate.min_score
+        breaking_flag = fail_on_breaking if fail_on_breaking is not None else cfg.gate.fail_on_breaking
+
+        prev_schema = load_previous_state()
+        gate_res = evaluate_gate(
+            current_schema=schema_model,
+            previous_schema=prev_schema,
+            min_score=threshold,
+            fail_on_breaking=breaking_flag,
+            unresolved_abbrs=unresolved
+        )
+
+        project_name = (cfg.domain.project_name or cfg.domain.name) if (hasattr(cfg, 'domain') and cfg.domain) else None
+        md_report = generate_gate_markdown_report(gate_res, project_name=project_name)
+
+        # 1. Output Report to file if requested
+        if output_report:
+            out_p = Path(output_report)
+            out_p.parent.mkdir(parents=True, exist_ok=True)
+            with open(out_p, "w", encoding="utf-8") as f:
+                f.write(md_report)
+
+        # 2. Append to GitHub Step Summary if running in CI
+        if step_summary:
+            gh_summary_file = os.environ.get("GITHUB_STEP_SUMMARY")
+            if gh_summary_file:
+                try:
+                    with open(gh_summary_file, "a", encoding="utf-8") as f:
+                        f.write("\n" + md_report + "\n")
+                except Exception:
+                    pass
+
+        # 3. Handle JSON output
+        if json_output:
+            import json
+            click.echo(json.dumps(gate_res.to_dict(), indent=2))
+        else:
+            # Console rendering
+            click.echo("")
+            if gate_res.passed:
+                click.secho("=======================================================", fg="green", bold=True)
+                click.secho(f" [PASSED] Schemap CI/CD AI Quality Gate: {gate_res.score}/100", fg="green", bold=True)
+                click.secho("=======================================================", fg="green", bold=True)
+                click.secho(f"  AI Readiness Score: {gate_res.score}/100 (Threshold: >= {gate_res.min_score}/100)", fg="cyan")
+                if gate_res.score_delta is not None:
+                    delta_sign = f"+{gate_res.score_delta}" if gate_res.score_delta >= 0 else str(gate_res.score_delta)
+                    click.secho(f"  Score Delta: {delta_sign} pts compared to cached schema state", fg="cyan")
+                if gate_res.blast_radius and gate_res.blast_radius.get("severity") != "NONE":
+                    sev = gate_res.blast_radius.get("severity")
+                    click.secho(f"  Blast Radius Risk: {sev} ({gate_res.blast_radius.get('impacted_tables_count')} tables affected)", fg="yellow")
+                click.secho("\n Schema is ready for AI coding agents (Claude Code, Cursor, Copilot).\n", fg="green")
+            else:
+                click.secho("=======================================================", fg="red", bold=True)
+                click.secho(f" [BLOCKED] Schemap CI/CD AI Quality Gate: {gate_res.score}/100", fg="red", bold=True)
+                click.secho("=======================================================", fg="red", bold=True)
+                click.secho(f"  AI Readiness Score: {gate_res.score}/100 (Threshold: >= {gate_res.min_score}/100)", fg="yellow")
+                click.secho("\n Gate Violations:", fg="red", bold=True)
+                for reason in gate_res.failure_reasons:
+                    click.secho(f"  [X] {reason}", fg="red")
+                if gate_res.issues:
+                    click.secho("\n Recommended Remediation:", fg="yellow", bold=True)
+                    for issue in gate_res.issues:
+                        click.echo(f"  - {issue}")
+                click.secho("\n Run 'schemap fix' or update schemap.yaml to resolve schema issues.\n", fg="yellow")
+
+        # 4. Save state if requested
+        if save_state:
+            save_current_state(schema_model)
+
+        if not gate_res.passed:
+            sys.exit(1)
+
+    except LicenseError as le:
+        click.secho(f"\n[LICENSE ERROR] {str(le)}", fg="red", bold=True)
+        sys.exit(1)
+    except Exception as e:
+        click.secho(f"\n[ERROR] {str(e)}", fg="red")
+        if verbose:
+            raise
+        sys.exit(1)
+
 
 
 
@@ -916,8 +1029,9 @@ def _show_license_status(config, verify):
         result = verify_license_online(active_key, endpoint)
         
         if result.get("activated") or result.get("valid"):
+            active_tier_name = (result.get("tier") or result.get("plan_tier") or "Pro").title()
             click.echo("  Tier:             ", nl=False)
-            click.secho("Pro (Active)", fg="green", bold=True)
+            click.secho(f"{active_tier_name} (Active)", fg="green", bold=True)
             click.echo(f"  Active Key:       {masked_key}")
             click.echo(f"  Key Source:       {source}")
             
@@ -934,8 +1048,10 @@ def _show_license_status(config, verify):
                 "quarterly": "Quarterly Pro",
                 "semiannual": "6-Month Pro",
                 "annual": "Annual Pro",
-                "lifetime": "Founder Lifetime Pro"
-            }.get(plan.lower(), f"{plan.capitalize()} Pro")
+                "lifetime": "Founder Lifetime Pro",
+                "team": "Team Subscription",
+                "enterprise": "Enterprise Subscription"
+            }.get(plan.lower(), f"{plan.capitalize()}")
             click.echo(f"  Plan:             {plan_label}")
             
             exp = result.get("expires_at")
@@ -949,11 +1065,12 @@ def _show_license_status(config, verify):
                 click.echo("  Expires:          Lifetime Access (No Expiration)")
         else:
             from .license import _read_cache
-            last_verified = _read_cache(active_key)
+            last_verified, cached_tier = _read_cache(active_key)
             if last_verified is not None:
                 age_days = (time.time() - last_verified) / 86400.0
+                tier_title = (cached_tier or "Pro").title()
                 click.echo("  Tier:             ", nl=False)
-                click.secho("Pro (Active via Local Cache)", fg="green", bold=True)
+                click.secho(f"{tier_title} (Active via Local Cache)", fg="green", bold=True)
                 click.echo(f"  Active Key:       {masked_key}")
                 click.echo(f"  Key Source:       {source}")
                 click.echo(f"  Device ID:        {device_id}")
@@ -965,6 +1082,7 @@ def _show_license_status(config, verify):
                 click.echo(f"  Key Source:       {source}")
                 click.echo(f"  Device ID:        {device_id}")
                 click.secho(f"  Verification:     Failed ({result.get('error', 'Invalid or expired license.')})", fg="red")
+
 
         click.echo("-" * 50)
         click.secho("  Tip: Run 'schemap deactivate' to disconnect this device.", fg="yellow")
@@ -1123,6 +1241,287 @@ fi
         
     click.secho(f"[OK] Installed Git pre-commit hook at {hook_file}", fg="green", bold=True)
 
+
+@cli.command()
+@click.option('--config', default="schemap.yaml", help="Path to configuration file.")
+@click.option('--json', 'json_output', is_flag=True, help="Output glossary in JSON format.")
+@click.option('--verbose', is_flag=True, help="Enable verbose output.")
+@click.pass_context
+def glossary(ctx, config, json_output, verbose):
+    """View compiled domain business glossary and calculations."""
+    try:
+        prof = ctx.obj.get('profile') if ctx.obj else None
+        cfg = load_config(config, profile=prof)
+        is_quiet = json_output or (ctx.obj and ctx.obj.get('quiet'))
+        schema_model, _, _ = _process_schema(cfg, enrich=False, quiet=is_quiet)
+
+        if json_output:
+            import json
+            click.echo(json.dumps({
+                "glossary": schema_model.glossary,
+                "global_guardrails": schema_model.global_guardrails
+            }, indent=2))
+            return
+
+        click.echo("")
+        click.secho("=" * 60, fg="cyan", bold=True)
+        click.secho("  Schemap Business Semantics & Glossary", fg="cyan", bold=True)
+        click.secho("=" * 60, fg="cyan", bold=True)
+
+        if schema_model.glossary:
+            click.secho("\n  [Business Glossary]", fg="yellow", bold=True)
+            for term, defn in schema_model.glossary.items():
+                click.echo(f"  * {term:15} : {defn}")
+        else:
+            click.echo("  No glossary terms defined. Add them under 'semantics.glossary' in schemap.yaml.")
+
+        if schema_model.global_guardrails:
+            click.secho("\n  [Global AI Guardrails & Policies]", fg="yellow", bold=True)
+            for r in schema_model.global_guardrails:
+                click.echo(f"  - {r}")
+
+        click.secho("\n" + "=" * 60 + "\n", fg="cyan", bold=True)
+
+    except Exception as e:
+        click.secho(f"\n[ERROR] {str(e)}", fg="red")
+        if verbose:
+            raise
+
+
+@cli.command()
+@click.option('--config', default="schemap.yaml", help="Path to configuration file.")
+@click.option('--output', default=".schemap/semantics.yaml", help="Output path for starter semantics file.")
+@click.option('--force', is_flag=True, help="Overwrite existing semantics file.")
+@click.option('--verbose', is_flag=True, help="Enable verbose output.")
+@click.pass_context
+def annotate(ctx, config, output, force, verbose):
+    """Scaffold a starter business semantics template populated with discovered tables."""
+    try:
+        prof = ctx.obj.get('profile') if ctx.obj else None
+        cfg = load_config(config, profile=prof)
+        schema_model, _, _ = _process_schema(cfg, enrich=False)
+        from .semantics import generate_default_semantics_template
+
+        out_path = Path(output)
+        if out_path.exists() and not force:
+            click.secho(f"\n[WARNING] {out_path} already exists. Use --force to overwrite.", fg="yellow")
+            return
+
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+        content = generate_default_semantics_template(schema_model)
+        with open(out_path, "w", encoding="utf-8") as f:
+            f.write(content)
+
+        click.secho(f"\n[SUCCESS] Generated starter semantics template at {out_path}", fg="green", bold=True)
+        click.echo("Edit this file to define owners, glossary terms, virtual relations, and query guardrails.")
+
+    except Exception as e:
+        click.secho(f"\n[ERROR] {str(e)}", fg="red")
+        if verbose:
+            raise
+
+
+@cli.command()
+@click.option('--config', default="schemap.yaml", help="Path to configuration file.")
+@click.option('--snippet', type=click.Choice(['cursor', 'claude', 'all'], case_sensitive=False), default=None, help="Print MCP client configuration JSON snippet.")
+@click.option('--verbose', is_flag=True, help="Enable verbose output.")
+@click.pass_context
+def mcp(ctx, config, snippet, verbose):
+    """Start Schemap Model Context Protocol (MCP) server for dynamic AI agent integration."""
+    try:
+        from .mcp import run_mcp_server, generate_mcp_config_snippet
+
+        if snippet:
+            click.echo(generate_mcp_config_snippet(platform=snippet.lower()))
+            return
+
+        prof = ctx.obj.get('profile') if ctx.obj else None
+        cfg = load_config(config, profile=prof)
+        schema_model, _, _ = _process_schema(cfg, enrich=False, quiet=True)
+        run_mcp_server(schema_model)
+
+    except Exception as e:
+        sys.stderr.write(f"[MCP ERROR] {str(e)}\n")
+        if verbose:
+            raise
+
+
+@cli.command()
+@click.option('--config', default="schemap.yaml", help="Path to configuration file.")
+@click.option('--team-size', default=10, type=int, help="Engineering team size using AI tools (default: 10).")
+@click.option('--prompts-per-day', default=50, type=int, help="Estimated AI queries/prompts per developer per day (default: 50).")
+@click.option('--hourly-rate', default=85.0, type=float, help="Average developer hourly loaded cost in USD (default: $85.00).")
+@click.option('--output-report', default=None, help="File path to write the markdown ROI report (e.g. roi-summary.md).")
+@click.option('--json', 'json_output', is_flag=True, help="Output ROI metrics in JSON format.")
+@click.option('--verbose', is_flag=True, help="Enable verbose output.")
+@click.pass_context
+def roi(ctx, config, team_size, prompts_per_day, hourly_rate, output_report, json_output, verbose):
+    """Calculate and export enterprise token savings & team productivity ROI metrics."""
+    try:
+        from .roi import calculate_team_roi, generate_roi_report
+
+        prof = ctx.obj.get('profile') if ctx.obj else None
+        cfg = load_config(config, profile=prof)
+        is_quiet = json_output or (ctx.obj and ctx.obj.get('quiet'))
+        schema_model, raw_tables, unresolved = _process_schema(cfg, enrich=False, quiet=is_quiet, required_feature="roi")
+
+        roi_data = calculate_team_roi(
+            schema_model=schema_model,
+            raw_tables=raw_tables,
+            team_size=team_size,
+            prompts_per_dev_day=prompts_per_day,
+            dev_hourly_rate=hourly_rate,
+            unresolved_abbrs=unresolved
+        )
+
+        project_name = (cfg.domain.project_name or cfg.domain.name) if (hasattr(cfg, 'domain') and cfg.domain) else None
+        report_md = generate_roi_report(roi_data, project_name=project_name)
+
+        if output_report:
+            out_p = Path(output_report)
+            out_p.parent.mkdir(parents=True, exist_ok=True)
+            with open(out_p, "w", encoding="utf-8") as f:
+                f.write(report_md)
+
+        if json_output:
+            import json
+            click.echo(json.dumps(roi_data, indent=2))
+        else:
+            click.echo("")
+            click.secho("================================================================", fg="cyan", bold=True)
+            click.secho(f"  Schemap Enterprise ROI Dashboard ({team_size} Developers)", fg="cyan", bold=True)
+            click.secho("================================================================", fg="cyan", bold=True)
+            rs = roi_data["roi_summary"]
+            te = roi_data["token_economics"]
+            pe = roi_data["productivity_economics"]
+            click.secho(f"  * Estimated Annual Economic ROI: {rs['roi_multiple']} ({rs['net_economic_benefit_usd']:,.2f} Net Benefit)", fg="green", bold=True)
+            click.echo(f"  * Direct Annual Token Savings:   ${te['annual_token_savings_usd']:,.2f} (Compression: {te['compression_percentage']})")
+            click.echo(f"  * Engineering Velocity Gain:     ${pe['annual_productivity_value_usd']:,.2f} ({pe['total_annual_hours_saved']} dev hours saved)")
+            click.echo(f"  * Schemap Team Subscription:     ${rs['schemap_annual_cost_usd']:,.2f}/yr")
+            click.secho("================================================================\n", fg="cyan", bold=True)
+            if output_report:
+                click.secho(f"[SUCCESS] Exported detailed executive ROI report to: {output_report}\n", fg="green")
+
+    except Exception as e:
+        click.secho(f"\n[ERROR] {str(e)}", fg="red")
+        if verbose:
+            raise
+
+
+@cli.command()
+@click.option('--config', default="schemap.yaml", help="Path to configuration file.")
+@click.option('--revoke', default=None, help="Device ID to revoke from active license seats.")
+@click.option('--json', 'json_output', is_flag=True, help="Output seat status in JSON format.")
+def seats(config, revoke, json_output):
+    """View team seat allocation, active devices, and manage license concurrency."""
+    try:
+        config_key = None
+        cfg_endpoint = None
+        try:
+            cfg = load_config(config)
+            config_key = cfg.license_key
+            cfg_endpoint = cfg.license_endpoint
+        except Exception:
+            pass
+
+        active_key, source = resolve_license_key(config_key=config_key)
+        if not active_key:
+            click.secho("\n[ERROR] No active license key found. Run `schemap activate <LICENSE_KEY>` first.", fg="red")
+            sys.exit(1)
+
+        endpoint = resolve_license_endpoint(config_endpoint=cfg_endpoint)
+
+        if revoke:
+            click.echo(f"-> Revoking seat for device '{revoke}'... ", nl=False)
+            res = deactivate_license_online(active_key, endpoint, device_id_to_revoke=revoke)
+            if res.get("valid") or res.get("deactivated"):
+                click.secho("OK", fg="green")
+                click.secho(f"\n[SUCCESS] Revoked device '{revoke}' from team license.", fg="green", bold=True)
+            else:
+                click.secho(f"\n[ERROR] Failed to revoke device: {res.get('error')}", fg="red")
+            return
+
+        status = fetch_seats_status(active_key, endpoint)
+        if json_output:
+            import json
+            click.echo(json.dumps(status, indent=2))
+            return
+
+        click.echo("")
+        click.secho("=======================================================", fg="cyan", bold=True)
+        click.secho("  Schemap Team Seat & Device Management", fg="cyan", bold=True)
+        click.secho("=======================================================", fg="cyan", bold=True)
+        click.echo(f"  Plan Tier:        {status.get('tier', 'team').upper()}")
+        click.echo(f"  Billing Mode:     {status.get('plan', 'subscription')}")
+        click.echo(f"  Seats Active:     {status.get('seats_used', 1)} / {status.get('max_seats', 10)}")
+        click.echo(f"  Current Device:   {get_or_create_device_id()}")
+
+        devices = status.get("devices", [])
+        if devices:
+            click.secho("\n  [Connected Devices / CI Runners]", fg="yellow", bold=True)
+            for d in devices:
+                fp = d.get("device_fingerprint", "")
+                fp_short = fp[:12] + "..." if len(fp) > 12 else fp
+                inst = d.get("instance_name", "developer-machine")
+                seen = d.get("last_seen_at", "active")
+                click.echo(f"  * [{fp_short}] {inst:<24} (Last seen: {seen})")
+            click.echo("\n  Tip: Run 'schemap seats --revoke <device_id>' to free up a seat.")
+
+        click.secho("=======================================================\n", fg="cyan", bold=True)
+
+
+    except Exception as e:
+        click.secho(f"\n[ERROR] {str(e)}", fg="red")
+        sys.exit(1)
+
+
+
+@cli.command()
+@click.option('--config', default="schemap.yaml", help="Path to configuration file.")
+@click.option('--watch-path', '-w', multiple=True, help="Additional files or directories to watch (e.g. prisma/migrations).")
+@click.option('--poll-db', default=0, type=int, help="Periodic database polling interval in seconds (0 = disabled).")
+@click.option('--webhook-url', default=None, help="Slack, Discord, or HTTP webhook URL for breaking change alerts.")
+@click.option('--once', is_flag=True, help="Perform a single synchronization cycle and exit.")
+@click.option('--verbose', is_flag=True, help="Enable verbose output.")
+@click.pass_context
+def watch(ctx, config, watch_path, poll_db, webhook_url, once, verbose):
+    """Run continuous schema watcher to auto-regenerate AI agent context on migrations/changes."""
+    try:
+        from .watcher import SchemaWatcher
+
+        prof = ctx.obj.get('profile') if ctx.obj else None
+        
+        watcher = SchemaWatcher(
+            config_path=config,
+            profile=prof,
+            custom_watch_paths=list(watch_path),
+            poll_db_interval=poll_db,
+            webhook_url=webhook_url,
+            logger=lambda msg: click.echo(msg)
+        )
+
+        if once:
+            res = watcher.sync_once()
+            click.secho(f"\n[SUCCESS] Synchronized AI agent context files (Score: {res['ai_readiness_score']}/100)", fg="green", bold=True)
+            if res["breaking_changes"]:
+                click.secho(f"[WARNING] {len(res['breaking_changes'])} breaking changes detected!", fg="yellow")
+            return
+
+        click.secho("\n================================================================", fg="cyan", bold=True)
+        click.secho("  Schemap Continuous Schema & AI Agent Synchronizer", fg="cyan", bold=True)
+        click.secho("================================================================\n", fg="cyan", bold=True)
+        watcher.start()
+
+    except Exception as e:
+        click.secho(f"\n[ERROR] {str(e)}", fg="red")
+        if verbose:
+            raise
+
+
 if __name__ == "__main__":
     cli()
+
+
+
+
 

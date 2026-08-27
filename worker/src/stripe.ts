@@ -82,9 +82,23 @@ export async function fetchStripeObject(path: string, apiKey: string): Promise<a
 export function determineBillingInfo(session: any, extraData?: { lineItems?: any; subObj?: any; plinkObj?: any }): { billingMode: string; planTier: string; expiresAt: string | null } {
   const now = new Date();
   let billingMode = "monthly";
-  const planTier = "pro";
+  let planTier = "pro";
 
   const mode = (session.mode || "").toLowerCase();
+  const metaTier = (
+    session.metadata?.tier ||
+    session.metadata?.plan_tier ||
+    extraData?.plinkObj?.metadata?.tier ||
+    extraData?.subObj?.metadata?.tier ||
+    ""
+  ).toLowerCase();
+
+  if (metaTier.includes("team") || metaTier.includes("b2b")) {
+    planTier = "team";
+  } else if (metaTier.includes("enterprise") || metaTier.includes("org")) {
+    planTier = "enterprise";
+  }
+
   const metaPlan = (
     session.metadata?.plan || 
     session.metadata?.billing_mode || 
@@ -92,6 +106,12 @@ export function determineBillingInfo(session: any, extraData?: { lineItems?: any
     extraData?.plinkObj?.metadata?.billing_mode ||
     ""
   ).toLowerCase();
+
+  if (metaPlan.includes("team")) {
+    planTier = "team";
+  } else if (metaPlan.includes("enterprise")) {
+    planTier = "enterprise";
+  }
   
   const amountCents = Number(session.amount_total || session.amount_subtotal || 0);
 
@@ -192,10 +212,12 @@ export async function processStripeEvent(event: any, env: Env): Promise<{ status
       const subStatus = dataObj.status;
       const periodEnd = dataObj.current_period_end;
       const expiresAt = periodEnd ? new Date(periodEnd * 1000 + 2 * 86400 * 1000).toISOString() : undefined;
+      const newQuantity = dataObj.items?.data?.[0]?.quantity ? Number(dataObj.items.data[0].quantity) : undefined;
       const statusMap: Record<string, string> = { active: "active", past_due: "past_due", unpaid: "past_due", canceled: "canceled" };
       if (subId) {
-        await updateLicenseStatusBySubId(env.DB, subId, statusMap[subStatus] || "active", expiresAt);
+        await updateLicenseStatusBySubId(env.DB, subId, statusMap[subStatus] || "active", expiresAt, newQuantity);
       }
+
     } else if (eventType === "customer.subscription.deleted") {
       if (dataObj.id) {
         await updateLicenseStatusBySubId(env.DB, dataObj.id, "canceled");
@@ -246,6 +268,17 @@ export async function handleCheckoutCompleted(session: any, env: Env): Promise<v
     const keyHash = await hashLicenseKey(rawKey, pepper);
     const keyPrefix = getKeyPrefix(rawKey);
 
+    let seatsPurchased = Number(session.metadata?.seats || session.metadata?.quantity || 0);
+    if (!seatsPurchased && extraData?.subObj?.items?.data?.[0]?.quantity) {
+      seatsPurchased = Number(extraData.subObj.items.data[0].quantity);
+    }
+    if (!seatsPurchased && session.line_items?.data?.[0]?.quantity) {
+      seatsPurchased = Number(session.line_items.data[0].quantity);
+    }
+    if (!seatsPurchased) {
+      seatsPurchased = planTier === "team" ? 10 : (planTier === "enterprise" ? 100 : 3);
+    }
+
     await createLicense(env.DB, {
       key_hash: keyHash,
       key_prefix: keyPrefix,
@@ -257,9 +290,11 @@ export async function handleCheckoutCompleted(session: any, env: Env): Promise<v
       stripe_payment_intent_id: paymentIntentId,
       plan_tier: planTier,
       billing_mode: billingMode,
+      seats_purchased: seatsPurchased,
       status: "active",
       expires_at: expiresAt || undefined,
       raw_key_temp: rawKey
     });
   }
 }
+

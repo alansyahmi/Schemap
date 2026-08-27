@@ -176,8 +176,9 @@ output:
     client.post("/webhooks/stripe", json=refund_event)
 
     # Force bypass cache to trigger online verification check
-    mocker.patch("schemap.license._read_cache", return_value=None)
+    mocker.patch("schemap.license._read_cache", return_value=(None, None))
     
     context_blocked_res = runner.invoke(cli, ["context", "--config", str(config_path)])
     assert context_blocked_res.exit_code == 1
     assert "License verification failed: License revoked or expired" in context_blocked_res.output
+

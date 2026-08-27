@@ -247,9 +247,15 @@ schemap init --full
 Keep your AI context maps up to date automatically on every migration commit:
 
 ```yaml
-name: Update Schemap Context
+name: Schemap CI/CD AI Database Intelligence & Gate
 
 on:
+  pull_request:
+    paths:
+      - 'migrations/**'
+      - 'alembic/versions/**'
+      - 'prisma/schema.prisma'
+      - 'schema.sql'
   push:
     branches: [main]
     paths:
@@ -258,35 +264,51 @@ on:
       - 'prisma/schema.prisma'
 
 jobs:
-  update-schema-map:
+  schemap-gate-and-sync:
+    name: AI Quality Gate & Agent Rules Sync
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v3
         with:
           version: "latest"
-      - name: Compile Schemap Context
+      - name: 1. Evaluate AI Quality Gate (Blocks PRs on Low AI Readiness)
         env:
           SCHEMAP_LICENSE_KEY: ${{ secrets.SCHEMAP_LICENSE_KEY }}
-        run: uvx schemap-tool context
-      - name: Commit and Push Updated Context
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: uvx schemap-tool gate --min-score 80 --fail-on-breaking
+      - name: 2. Compile Sanitized AI Context & Agent Rules
+        env:
+          SCHEMAP_LICENSE_KEY: ${{ secrets.SCHEMAP_LICENSE_KEY }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          uvx schemap-tool context --sanitize
+          uvx schemap-tool agents --targets claude,cursor,codex --sanitize
+      - name: 3. Commit and Push Synchronized Agent Rules
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git add schemap_database_context.md CLAUDE.md AGENTS.md
-          git diff --quiet && git diff --staged --quiet || (git commit -m "docs: auto-update AI database context" && git push)
+          git add schemap_database_context.md CLAUDE.md AGENTS.md .cursor/rules/*.mdc
+          git diff --quiet && git diff --staged --quiet || (git commit -m "chore(ai): auto-update deterministic database context [skip ci]" && git push)
 ```
 
 ---
 
-## 🔑 License & Editions
+## 🔑 Dual-Engine Editions & Licensing
 
-* **Free Tier:** Full local CLI for databases up to 100 tables, including diagnostics, scoring, context compilation, diffs, benchmarks, and exports.
-* **Pro Tier:** Unlimited tables, team seat management, CI/CD automated workflows, and production support.
+Schemap provides a **Dual-Engine Licensing Model**: an ultra-accessible developer edition for solo engineers and an enterprise intelligence layer for engineering teams.
+
+| Edition | Price | Intended Audience & Capabilities |
+| :--- | :---: | :--- |
+| **Free Community** | `$0` | Solo developers, local evaluation, up to 100 tables, full CLI suite. |
+| **Pro Individual** | `$1.99/mo` or `$29 once` | Freelancers & solo devs: unlimited tables, LLM enrichment (`--enrich`), 3 devices. |
+| **Team Plan** | `$19/seat/mo` *($15 annual)* | Engineering teams: CI/CD Quality Gates (`schemap gate`), PR bot, PII sanitization, seat pooling. |
+| **Enterprise** | Custom | Large orgs: air-gapped on-prem verification, SAML/SSO, SOC 2 pack, SLA. |
 
 ### License Management
 ```bash
-# Activate a Pro license key
+# Activate a license key
 schemap activate <LICENSE_KEY>
 
 # Verify active license status & device seats

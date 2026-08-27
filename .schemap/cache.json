@@ -4,6 +4,10 @@
       "name": "users",
       "description": null,
       "business_name": "Users",
+      "owner": null,
+      "criticality": null,
+      "tags": [],
+      "guardrails": [],
       "columns": [
         {
           "name": "id",
@@ -11,7 +15,10 @@
           "is_nullable": true,
           "primary_key": true,
           "description": null,
-          "business_name": "Identifier"
+          "business_name": "Identifier",
+          "tags": [],
+          "semantic_type": null,
+          "guardrails": []
         },
         {
           "name": "email",
@@ -19,16 +26,24 @@
           "is_nullable": true,
           "primary_key": false,
           "description": null,
-          "business_name": "Email"
+          "business_name": "Email",
+          "tags": [],
+          "semantic_type": null,
+          "guardrails": []
         }
       ],
       "foreign_keys": [],
+      "virtual_relationships": [],
       "hierarchy_tree": null
     },
     {
       "name": "orders",
       "description": null,
       "business_name": "Orders",
+      "owner": null,
+      "criticality": null,
+      "tags": [],
+      "guardrails": [],
       "columns": [
         {
           "name": "id",
@@ -36,7 +51,10 @@
           "is_nullable": true,
           "primary_key": true,
           "description": null,
-          "business_name": "Identifier"
+          "business_name": "Identifier",
+          "tags": [],
+          "semantic_type": null,
+          "guardrails": []
         },
         {
           "name": "user_id",
@@ -44,7 +62,10 @@
           "is_nullable": true,
           "primary_key": false,
           "description": null,
-          "business_name": "User Identifier"
+          "business_name": "User Identifier",
+          "tags": [],
+          "semantic_type": null,
+          "guardrails": []
         },
         {
           "name": "amount",
@@ -52,12 +73,18 @@
           "is_nullable": true,
           "primary_key": false,
           "description": null,
-          "business_name": "Amount"
+          "business_name": "Amount",
+          "tags": [],
+          "semantic_type": null,
+          "guardrails": []
         }
       ],
       "foreign_keys": [],
+      "virtual_relationships": [],
       "hierarchy_tree": null
     }
   ],
-  "common_journeys": []
+  "common_journeys": [],
+  "glossary": {},
+  "global_guardrails": []
 }

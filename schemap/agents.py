@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Dict, List, Union, Tuple
 
 from .models import DatabaseSchemaModel
-from .context import calculate_central_tables, generate_relationship_map
+from .context import calculate_central_tables, generate_relationship_map, filter_schema_by_scope, sanitize_schema_for_llm
 
 START_MARKER = "<!-- schemap:start -->"
 END_MARKER = "<!-- schemap:end -->"
@@ -12,7 +12,20 @@ def generate_safety_rules(schema_model: DatabaseSchemaModel) -> List[str]:
     """Generate explicit negative safety guardrails and anti-hallucination warnings for AI agents."""
     rules = []
     
-    # 1. Ambiguous JOIN warnings
+    # 0. Global Semantics Guardrails
+    if getattr(schema_model, "global_guardrails", None):
+        for gr in schema_model.global_guardrails:
+            rules.append(f"[GLOBAL POLICY] {gr}")
+
+    # 1. Table & Column Level Guardrails
+    for t in schema_model.tables:
+        for tg in getattr(t, "guardrails", []):
+            rules.append(f"[TABLE GUARDRAIL: `{t.name}`] {tg}")
+        for c in t.columns:
+            for cg in getattr(c, "guardrails", []):
+                rules.append(f"[COLUMN GUARDRAIL: `{t.name}.{c.name}`] {cg}")
+
+    # 2. Ambiguous JOIN warnings
     for t in schema_model.tables:
         for fk in t.foreign_keys:
             if isinstance(fk, dict):
@@ -30,19 +43,20 @@ def generate_safety_rules(schema_model: DatabaseSchemaModel) -> List[str]:
                 else:
                     rules.append(f"[SAFETY] Primary JOIN Rule: `{t.name}.{col}` references `{ref_tbl}.{ref_col}`.")
                     
-    # 2. Sensitive Column Warnings
+    # 3. Sensitive Column Warnings
     sensitive_keywords = {"password", "hash", "secret", "token", "ssn", "credit_card", "cvv", "auth_key", "private_key"}
     sensitive_found = []
     for t in schema_model.tables:
         for c in t.columns:
-            if any(k in c.name.lower() for k in sensitive_keywords):
+            is_pii = any(k in c.name.lower() for k in sensitive_keywords) or ("pii" in [tag.lower() for tag in getattr(c, "tags", [])])
+            if is_pii:
                 sensitive_found.append(f"`{t.name}.{c.name}`")
     if sensitive_found:
         rules.append(f"[SAFETY] Sensitive Data Protection: Never query or expose raw credentials: {', '.join(sensitive_found[:8])}")
 
-    # 3. Immutability Warnings for Audit/Financial Logs
+    # 4. Immutability Warnings for Audit/Financial Logs
     immutable_keywords = {"audit", "log", "ledger", "invoice", "payment", "transaction"}
-    immutable_tables = [f"`{t.name}`" for t in schema_model.tables if any(k in t.name.lower() for k in immutable_keywords)]
+    immutable_tables = [f"`{t.name}`" for t in schema_model.tables if any(k in t.name.lower() for k in immutable_keywords) or "immutable" in [tag.lower() for tag in getattr(t, "tags", [])]]
     if immutable_tables:
         rules.append(f"[SAFETY] Immutability Guardrail: Do not generate DELETE or UPDATE queries for audit/financial records: {', '.join(immutable_tables[:6])}")
 
@@ -64,6 +78,12 @@ def generate_claude_md(schema_model: DatabaseSchemaModel) -> str:
     out.append("## Core Statistics")
     out.append(f"- **Active Tables**: {total_tables}")
     out.append(f"- **Key Hub Entities**: {', '.join(top_tables)}\n")
+
+    if schema_model.glossary:
+        out.append("## Business Glossary & Domain Semantics")
+        for term, defn in schema_model.glossary.items():
+            out.append(f"- **`{term}`**: {defn}")
+        out.append("")
     
     if safety_rules:
         out.append("## AI Safety & Anti-Hallucination Guardrails")
@@ -77,7 +97,8 @@ def generate_claude_md(schema_model: DatabaseSchemaModel) -> str:
         if t_model:
             cols = [f"`{c.name}` ({c.data_type})" for c in t_model.columns[:6]]
             more = f" ...+{len(t_model.columns)-6} more" if len(t_model.columns) > 6 else ""
-            out.append(f"- **`{t_model.name}`**: {t_model.description or 'No description'}")
+            owner_str = f" [Owner: {t_model.owner}]" if t_model.owner else ""
+            out.append(f"- **`{t_model.name}`**{owner_str}: {t_model.description or 'No description'}")
             out.append(f"  Columns: {', '.join(cols)}{more}")
     out.append("")
     
@@ -107,6 +128,12 @@ def generate_agents_md(schema_model: DatabaseSchemaModel) -> str:
     out.append("## Database Summary")
     out.append(f"- Total Tables: {total_tables}")
     out.append(f"- Key Central Tables: {', '.join(top_tables)}\n")
+
+    if schema_model.glossary:
+        out.append("## Business Glossary & Domain Semantics")
+        for term, defn in schema_model.glossary.items():
+            out.append(f"- `{term}`: {defn}")
+        out.append("")
     
     safety_rules = generate_safety_rules(schema_model)
     if safety_rules:
@@ -119,6 +146,12 @@ def generate_agents_md(schema_model: DatabaseSchemaModel) -> str:
     for t in schema_model.tables:
         col_summary = ", ".join([c.name for c in t.columns])
         out.append(f"### Table: `{t.name}`")
+        if t.owner:
+            out.append(f"Owner: {t.owner}")
+        if t.criticality:
+            out.append(f"Criticality: {t.criticality}")
+        if t.tags:
+            out.append(f"Tags: {', '.join(t.tags)}")
         if t.description:
             out.append(f"Description: {t.description}")
         out.append(f"Columns: {col_summary}")
@@ -135,6 +168,21 @@ def generate_agents_md(schema_model: DatabaseSchemaModel) -> str:
                     ref_col = getattr(fk, 'foreign_column_name', getattr(fk, 'ref_column', None))
                 fk_strs.append(f"{col} -> {ref_tbl}.{ref_col}")
             out.append(f"Foreign Keys: {', '.join(fk_strs)}")
+        if getattr(t, "virtual_relationships", []):
+            vfk_strs = []
+            for vfk in t.virtual_relationships:
+                if isinstance(vfk, dict):
+                    col = vfk.get('column')
+                    ref_tbl = vfk.get('ref_table')
+                    ref_col = vfk.get('ref_column')
+                else:
+                    col = getattr(vfk, 'column_name', getattr(vfk, 'column', None))
+                    ref_tbl = getattr(vfk, 'foreign_table_name', getattr(vfk, 'ref_table', None))
+                    ref_col = getattr(vfk, 'foreign_column_name', getattr(vfk, 'ref_column', None))
+                vfk_strs.append(f"{col} -> {ref_tbl}.{ref_col} (Logical)")
+            out.append(f"Virtual Relations: {', '.join(vfk_strs)}")
+        if t.guardrails:
+            out.append(f"Guardrails: {'; '.join(t.guardrails)}")
         out.append("")
         
     return "\n".join(out)
@@ -169,12 +217,19 @@ def write_agent_files(
     dry_run: bool = False,
     diff: bool = False,
     merge: bool = True,
-    force: bool = False
+    force: bool = False,
+    scope: str = "all",
+    sanitize: bool = False
 ) -> Dict[str, str]:
     """
     Generate and write AI agent files (AGENTS.md, CLAUDE.md, .cursorrules)
-    supporting target filtering, marker preservation, dry-run, and unified diff.
+    supporting target filtering, marker preservation, dry-run, unified diff, role scopes, and PII sanitization.
     """
+    if sanitize:
+        schema_model, _ = sanitize_schema_for_llm(schema_model)
+    if scope and scope.lower() != "all":
+        schema_model = filter_schema_by_scope(schema_model, scope=scope)
+
     base = Path(target_dir)
     target_set = parse_targets(targets)
     

@@ -10,8 +10,8 @@ from schemap.license import (
     save_credentials,
     load_credentials,
     clear_credentials,
-    CREDENTIALS_FILE,
-    CACHE_FILE,
+    get_credentials_file,
+    get_cache_file,
     get_app_dir
 )
 from schemap.cli import cli
@@ -55,7 +55,7 @@ def test_save_and_clear_credentials():
     assert creds["license_key"] == "sch_live_abc123def456"
     
     clear_credentials()
-    assert not CREDENTIALS_FILE.exists()
+    assert not get_credentials_file().exists()
     assert load_credentials() is None
 
 def test_endpoint_resolution_uses_saved_endpoint(monkeypatch):
@@ -78,7 +78,7 @@ def test_cli_activate_success(mocker):
     
     assert result.exit_code == 0
     assert "License activated successfully" in result.output
-    assert CREDENTIALS_FILE.exists()
+    assert get_credentials_file().exists()
     
     creds = load_credentials()
     assert creds["license_key"] == "sch_live_0123456789abcdef0123456789abcdef"
@@ -97,7 +97,7 @@ def test_cli_activate_failure(mocker):
     
     assert result.exit_code == 1
     assert "License activation failed" in result.output
-    assert not CREDENTIALS_FILE.exists()
+    assert not get_credentials_file().exists()
 
 def test_cli_status_and_logout(mocker):
     runner = CliRunner()
@@ -119,4 +119,5 @@ def test_cli_status_and_logout(mocker):
     res_logout = runner.invoke(cli, ["logout"])
     assert res_logout.exit_code == 0
     assert "Successfully logged out" in res_logout.output
-    assert not CREDENTIALS_FILE.exists()
+    assert not get_credentials_file().exists()
+

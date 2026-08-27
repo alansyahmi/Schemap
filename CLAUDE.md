@@ -32,3 +32,29 @@ reviews (user_id) ──> users (id)
 ## Query Guidelines
 - Always verify foreign key constraints before building multi-table joins.
 - Use standard indexed columns (`id`, `*_id`) for joins.
+
+<!-- schemap:start -->
+# Database Architecture & Context for Claude
+
+This project relies on the database schema outlined below. Refer to this context when writing queries, migrations, or database-related business logic.
+
+## Core Statistics
+- **Active Tables**: 1
+- **Key Hub Entities**: logs
+
+## AI Safety & Anti-Hallucination Guardrails
+- [SAFETY] Immutability Guardrail: Do not generate DELETE or UPDATE queries for audit/financial records: `logs`
+
+## Central Tables Overview
+- **`logs`**: No description
+  Columns: `id` (INTEGER), `message` (TEXT)
+
+## Schema Relationships
+```
+No foreign key or virtual relationships detected.
+```
+
+## Query Guidelines
+- Always verify foreign key constraints before building multi-table joins.
+- Use standard indexed columns (`id`, `*_id`) for joins.
+<!-- schemap:end -->

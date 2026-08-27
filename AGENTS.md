@@ -35,3 +35,20 @@ Foreign Keys: product_id -> products.id, user_id -> users.id
 
 ### Table: `coupon_codes`
 Columns: id, code, discount_percent, is_active
+
+<!-- schemap:start -->
+# AGENTS.md - Database Context
+
+This file provides automated database context for AI agents working in this repository.
+
+## Database Summary
+- Total Tables: 1
+- Key Central Tables: logs
+
+## AI Safety & Anti-Hallucination Guardrails
+- [SAFETY] Immutability Guardrail: Do not generate DELETE or UPDATE queries for audit/financial records: `logs`
+
+## Table Map
+### Table: `logs`
+Columns: id, message
+<!-- schemap:end -->

@@ -6,6 +6,8 @@ from pydantic import BaseModel, Field
 class DatabaseConfig(BaseModel):
     connection_url: str
     exclude_tables: list[str] = Field(default_factory=list)
+    schemas: list[str] = Field(default_factory=lambda: ["public"])
+
 
 class OutputConfig(BaseModel):
     file_path: str = "./schemap_database_context.md"
@@ -18,6 +20,7 @@ class LLMConfig(BaseModel):
 
 class DomainConfig(BaseModel):
     name: str | None = None
+    project_name: str | None = None
     mappings: dict[str, str] = Field(default_factory=dict)
     ignore_abbreviations: list[str] = Field(default_factory=list)
 
@@ -36,11 +39,50 @@ class ForeignKeyOverride(BaseModel):
     ref_table: str
     ref_column: str
 
+class ColumnSemanticsConfig(BaseModel):
+    description: str | None = None
+    business_name: str | None = None
+    tags: list[str] = Field(default_factory=list)
+    semantic_type: str | None = None
+    guardrails: list[str] = Field(default_factory=list)
+
+class VirtualRelationshipConfig(BaseModel):
+    column: str
+    ref_table: str
+    ref_column: str
+
+class TableSemanticsConfig(BaseModel):
+    description: str | None = None
+    business_name: str | None = None
+    owner: str | None = None
+    criticality: str | None = None
+    tags: list[str] = Field(default_factory=list)
+    guardrails: list[str] = Field(default_factory=list)
+    virtual_relationships: list[VirtualRelationshipConfig] = Field(default_factory=list)
+    columns: dict[str, ColumnSemanticsConfig] = Field(default_factory=dict)
+
+class SemanticsConfig(BaseModel):
+    glossary: dict[str, str] = Field(default_factory=dict)
+    global_guardrails: list[str] = Field(default_factory=list)
+    tables: dict[str, TableSemanticsConfig] = Field(default_factory=dict)
+
+class SecurityConfig(BaseModel):
+    sanitize_pii: bool = False
+    ignore_columns: list[str] = Field(default_factory=list)
+    custom_sensitive_patterns: list[str] = Field(default_factory=list)
+
+class GateConfig(BaseModel):
+    min_score: int = 80
+    fail_on_breaking: bool = False
+
 class SchemapConfig(BaseModel):
     database: DatabaseConfig
     output: OutputConfig = Field(default_factory=OutputConfig)
     llm: LLMConfig = Field(default_factory=LLMConfig)
     domain: DomainConfig = Field(default_factory=DomainConfig)
+    security: SecurityConfig = Field(default_factory=SecurityConfig)
+    gate: GateConfig = Field(default_factory=GateConfig)
+    semantics: SemanticsConfig = Field(default_factory=SemanticsConfig)
     schema_descriptions: dict[str, TableOverride] = Field(default_factory=dict)
     foreign_key_overrides: list[ForeignKeyOverride] = Field(default_factory=list)
     profiles: dict[str, dict] = Field(default_factory=dict)
@@ -90,6 +132,24 @@ def load_config(config_path: str | None = None, profile: str | None = None) -> S
             raise ValueError(f"Profile '{profile}' not found in configuration.")
         prof_data = profiles[profile]
         _deep_merge(data, prof_data)
+
+    # Discover optional standalone semantics file
+    semantics_file = None
+    for cand in [Path(".schemap/semantics.yaml"), Path(".schemap/semantics.yml"), Path("semantics.yaml"), Path("semantics.yml")]:
+        if cand.exists() and cand.is_file():
+            semantics_file = cand
+            break
+            
+    if semantics_file:
+        try:
+            with open(semantics_file, "r", encoding="utf-8") as sf:
+                s_data = yaml.safe_load(sf)
+                if s_data and isinstance(s_data, dict):
+                    if "semantics" not in data:
+                        data["semantics"] = {}
+                    _deep_merge(data["semantics"], s_data.get("semantics", s_data))
+        except Exception:
+            pass
 
     env_url = os.environ.get("SCHEMAP_DATABASE_URL") or os.environ.get("DATABASE_URL")
     if env_url:

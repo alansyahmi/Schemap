@@ -1,0 +1,31 @@
+name: "Schemap AI Quality Gate"
+
+on:
+  pull_request:
+    branches: ["main", "master", "develop"]
+  push:
+    branches: ["main", "master"]
+
+jobs:
+  gate:
+    name: "Evaluate Schema AI Readiness"
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write # Required for posting PR quality reports
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Run Schemap Quality Gate
+        uses: ./ # or uses: schemap/gate@v1
+        with:
+          config: "schemap.yaml"
+          min-score: "80"
+          fail-on-breaking: "true"
+          output-report: "pr-report.md"
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          comment-on-pr: "true"
+        env:
+          SCHEMAP_LICENSE_KEY: ${{ secrets.SCHEMAP_LICENSE_KEY }}

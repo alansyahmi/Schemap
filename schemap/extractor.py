@@ -9,20 +9,31 @@ def _is_excluded(table_name: str, exclude_tables: list[str]) -> bool:
             return True
     return False
 
-def _extract_postgres(connection_url: str, exclude_tables: list[str]) -> list[dict[str, Any]]:
-    # Query for tables
+def _extract_postgres(
+    connection_url: str,
+    exclude_tables: list[str],
+    schemas: list[str] | None = None
+) -> list[dict[str, Any]]:
+    target_schemas = schemas if schemas and len(schemas) > 0 else ["public"]
+    is_single_public = len(target_schemas) == 1 and target_schemas[0] == "public"
+
+    # Query for tables across target schemas
     tables_query = """
-        SELECT table_name,
-               obj_description(pg_class.oid, 'pg_class') AS table_description
-        FROM information_schema.tables
-        JOIN pg_class ON pg_class.relname = information_schema.tables.table_name
-        WHERE table_schema = 'public' 
-          AND table_type = 'BASE TABLE'
+        SELECT 
+            t.table_schema,
+            t.table_name,
+            obj_description(pg_class.oid, 'pg_class') AS table_description
+        FROM information_schema.tables t
+        JOIN pg_namespace pn ON pn.nspname = t.table_schema
+        JOIN pg_class ON pg_class.relname = t.table_name AND pg_class.relnamespace = pn.oid
+        WHERE t.table_schema = ANY(%s) 
+          AND t.table_type = 'BASE TABLE'
     """
     
-    # Query for columns and primary keys
+    # Query for columns and primary keys across target schemas
     columns_query = """
         SELECT 
+            c.table_schema,
             c.table_name,
             c.column_name,
             c.data_type,
@@ -30,8 +41,8 @@ def _extract_postgres(connection_url: str, exclude_tables: list[str]) -> list[di
             col_description(pc.oid, c.ordinal_position) AS column_description,
             CASE WHEN pk.column_name IS NOT NULL THEN TRUE ELSE FALSE END AS is_primary_key
         FROM information_schema.columns c
-        JOIN pg_class pc ON pc.relname = c.table_name
-        JOIN pg_namespace pn ON pn.oid = pc.relnamespace AND pn.nspname = c.table_schema
+        JOIN pg_namespace pn ON pn.nspname = c.table_schema
+        JOIN pg_class pc ON pc.relname = c.table_name AND pc.relnamespace = pn.oid
         LEFT JOIN (
             SELECT kcu.table_schema, kcu.table_name, kcu.column_name
             FROM information_schema.table_constraints tc
@@ -42,17 +53,19 @@ def _extract_postgres(connection_url: str, exclude_tables: list[str]) -> list[di
         ) pk ON pk.table_schema = c.table_schema 
              AND pk.table_name = c.table_name 
              AND pk.column_name = c.column_name
-        WHERE c.table_schema = 'public'
-        ORDER BY c.table_name, c.ordinal_position;
+        WHERE c.table_schema = ANY(%s)
+        ORDER BY c.table_schema, c.table_name, c.ordinal_position;
     """
     
-    # Query for foreign keys
+    # Query for foreign keys (with cross-schema support)
     fk_query = """
         SELECT
-            tc.table_name,
-            kcu.column_name,
-            ccu.table_name AS foreign_table_name,
-            ccu.column_name AS foreign_column_name
+            tc.table_schema AS child_schema,
+            tc.table_name AS child_table,
+            kcu.column_name AS child_column,
+            ccu.table_schema AS parent_schema,
+            ccu.table_name AS parent_table,
+            ccu.column_name AS parent_column
         FROM information_schema.table_constraints AS tc
         JOIN information_schema.key_column_usage AS kcu
           ON tc.constraint_name = kcu.constraint_name
@@ -61,48 +74,68 @@ def _extract_postgres(connection_url: str, exclude_tables: list[str]) -> list[di
           ON ccu.constraint_name = tc.constraint_name
           AND ccu.table_schema = tc.table_schema
         WHERE tc.constraint_type = 'FOREIGN KEY'
-          AND tc.table_schema = 'public';
+          AND tc.table_schema = ANY(%s);
     """
 
     try:
         with psycopg.connect(connection_url) as conn:
             with conn.cursor() as cur:
                 # 1. Fetch tables
-                cur.execute(tables_query)
+                cur.execute(tables_query, (target_schemas,))
                 tables_raw = cur.fetchall()
                 
                 # 2. Fetch columns
-                cur.execute(columns_query)
+                cur.execute(columns_query, (target_schemas,))
                 columns_raw = cur.fetchall()
                 
                 # 3. Fetch foreign keys
-                cur.execute(fk_query)
+                cur.execute(fk_query, (target_schemas,))
                 fks_raw = cur.fetchall()
     except psycopg.OperationalError as e:
         raise ConnectionError(f"Failed to connect to the PostgreSQL database: {e}")
 
+    def format_table_name(schema: str, tbl: str) -> str:
+        if is_single_public:
+            return tbl
+        return f"{schema}.{tbl}"
+
     # Build the dictionary payload
     tables_dict = {}
     
-    for t_name, t_desc in tables_raw:
-        if _is_excluded(t_name, exclude_tables):
+    for t_schema, t_name, t_desc in tables_raw:
+        qualified_name = format_table_name(t_schema, t_name)
+        if _is_excluded(t_name, exclude_tables) or _is_excluded(qualified_name, exclude_tables):
             continue
-        tables_dict[t_name] = {"name": t_name, "description": t_desc, "columns": [], "foreign_keys": []}
+        tables_dict[(t_schema, t_name)] = {
+            "name": qualified_name,
+            "description": t_desc,
+            "columns": [],
+            "foreign_keys": []
+        }
         
-    for t_name, c_name, c_type, is_null, c_desc, is_pk in columns_raw:
-        if t_name in tables_dict:
-            tables_dict[t_name]["columns"].append({
-                "name": c_name, "data_type": c_type, "is_nullable": is_null == 'YES',
-                "primary_key": is_pk, "description": c_desc
+    for t_schema, t_name, c_name, c_type, is_null, c_desc, is_pk in columns_raw:
+        key = (t_schema, t_name)
+        if key in tables_dict:
+            tables_dict[key]["columns"].append({
+                "name": c_name,
+                "data_type": c_type,
+                "is_nullable": is_null == 'YES',
+                "primary_key": is_pk,
+                "description": c_desc
             })
             
-    for t_name, c_name, f_table, f_col in fks_raw:
-        if t_name in tables_dict:
-            tables_dict[t_name]["foreign_keys"].append({
-                "column_name": c_name, "foreign_table_name": f_table, "foreign_column_name": f_col
+    for c_schema, c_table, c_name, p_schema, p_table, p_col in fks_raw:
+        key = (c_schema, c_table)
+        if key in tables_dict:
+            parent_qualified = format_table_name(p_schema, p_table)
+            tables_dict[key]["foreign_keys"].append({
+                "column_name": c_name,
+                "foreign_table_name": parent_qualified,
+                "foreign_column_name": p_col
             })
             
     return list(tables_dict.values())
+
 
 def _extract_libsql(connection_url: str, exclude_tables: list[str]) -> list[dict[str, Any]]:
     import urllib.parse
@@ -311,7 +344,11 @@ def _extract_oracle(connection_url: str, exclude_tables: list[str]) -> list[dict
             
     return list(tables_dict.values())
 
-def extract_schema(connection_url: str, exclude_tables: list[str]) -> list[dict[str, Any]]:
+def extract_schema(
+    connection_url: str,
+    exclude_tables: list[str],
+    schemas: list[str] | None = None
+) -> list[dict[str, Any]]:
     """
     Connects to the database and extracts the schema metadata using native catalog queries.
     Routes to the correct extractor based on the connection scheme.
@@ -324,7 +361,8 @@ def extract_schema(connection_url: str, exclude_tables: list[str]) -> list[dict[
         )
 
     if connection_url.startswith(("postgresql://", "postgres://")):
-        return _extract_postgres(connection_url, exclude_tables)
+        return _extract_postgres(connection_url, exclude_tables, schemas=schemas)
+
     elif connection_url.startswith(("libsql://", "https://", "http://", "sqlite://", "file:")):
         return _extract_libsql(connection_url, exclude_tables)
     elif connection_url.startswith(("mysql://", "mysql+pymysql://")):

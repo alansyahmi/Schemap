@@ -657,89 +657,209 @@ Success: 100% accurate join path generated</pre>
             </div>
         </section>
 
-        <!-- 7. PRICING -->
+        <!-- 7. PRICING & ROI CALCULATOR -->
         <section id="pricing" class="section pricing">
             <div class="section-container">
                 <div
-                    style="display:inline-block;padding:4px 12px;background:rgba(245,200,101,.12);border:1px solid rgba(245,200,101,.3);border-radius:100px;font-size:0.8rem;font-weight:600;color:var(--yellow);margin-bottom:1rem;">
-                    🚀 Temporary Launch Pricing &amp; Public Benchmark Phase
+                    style="display:inline-block;padding:4px 12px;background:rgba(80,211,154,.12);border:1px solid rgba(80,211,154,.3);border-radius:100px;font-size:0.8rem;font-weight:600;color:var(--green);margin-bottom:1rem;">
+                    📊 Benchmark-Driven Economics &amp; Pricing Architecture
                 </div>
-                <p class="eyebrow">Launch Pricing</p>
-                <h2>Start free. Upgrade with zero friction.</h2>
-                <p class="section-lead">Enjoy a full local CLI for free, activate a 7-day trial with no credit card
-                    required, or lock in temporary launch rates before general pricing goes live.</p>
-                <div class="pricing-grid">
-                    <article class="price-card">
-                        <h3>Free Tier</h3>
-                        <div class="price">$0</div>
-                        <p>For local projects and evaluation.</p>
-                        <ul>
-                            <li>Up to 100 tables</li>
-                            <li>Full local CLI suite</li>
-                            <li>Inspect, doctor, context, diffs, &amp; exports</li>
-                            <li>No account or credit card required</li>
-                        </ul><a class="btn btn-secondary full-width" href="#installation">Install Free</a>
-                    </article>
-                    <article class="price-card featured"><span class="price-badge"
-                            style="background:var(--green);color:#0f172a;">🔥 80% Launch Discount</span>
-                        <h3>Pro</h3>
-                        <div class="price" id="sub-price">$1.99<span id="sub-period">/mo</span></div>
-                        <div class="price-anchor"><s id="sub-original">$8.99/mo</s><strong id="sub-discount">78% launch
-                                discount</strong></div>
-                        <p id="sub-desc">Launch Special: Flexible monthly billing (Includes 7-Day Free Trial).</p>
-                        <div class="sub-toggle"><button class="sub-btn is-active"
-                                data-sub-interval="monthly">Monthly</button><button class="sub-btn"
-                                data-sub-interval="quarterly">Quarterly</button><button class="sub-btn"
-                                data-sub-interval="semiannual">6 months</button><button class="sub-btn"
-                                data-sub-interval="annual">Annual</button></div>
-                        <ul>
-                            <li><strong>7-Day Free Trial</strong> included</li>
-                            <li>Unlimited tables &amp; large schemas</li>
-                            <li>CI/CD execution &amp; build gates</li>
-                            <li>LLM Schema Enrichment (<code>--enrich</code>)</li>
-                            <li>Production schema workflows &amp; profiles</li>
-                        </ul><a id="sub-checkout-btn" class="btn btn-primary full-width"
-                            href="https://buy.stripe.com/dRm00jeG13kpfoA131dIA01" target="_blank" rel="noopener">Start 7-Day Free Trial</a>
-                    </article>
-                    <article class="price-card founder-card">
-                        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-                            <span class="price-badge founder-badge" style="position:static;">Launch Special</span>
-                            <span id="founder-seats-badge"
-                                style="font:600 .72rem 'JetBrains Mono',monospace;color:var(--yellow);background:rgba(245,200,101,.12);padding:3px 8px;border:1px solid rgba(245,200,101,.3);border-radius:var(--radius);">
-                                <span id="founder-claimed-count">0</span>/200 Claimed
-                            </span>
-                        </div>
-                        <h3>Founder Lifetime</h3>
-                        <div class="price">$29<span> once</span></div>
-                        <div class="price-anchor"><s style="color:var(--subtle);">$149.00</s><strong
-                                style="color:var(--yellow);margin-left:6px;">Save 80%</strong></div>
-                        <p>One-time payment for lifetime Pro access across 3 devices.</p>
+                <p class="eyebrow">Predictable Pricing</p>
+                <h2>Start free. Scale across your entire engineering team.</h2>
+                <p class="section-lead">Enjoy a full local CLI for solo evaluation, or empower your engineering team with automated CI/CD schema verification gates and token optimization.</p>
 
-                        <!-- Founder Seats Progress Bar -->
-                        <div style="margin:8px 0 16px;">
-                            <div
-                                style="width:100%;height:6px;background:var(--bg);border:1px solid var(--line);border-radius:3px;overflow:hidden;">
-                                <div id="founder-progress-bar"
-                                    style="width:0%;height:100%;background:linear-gradient(90deg, var(--yellow), #ffae42);transition:width 0.4s ease;">
+                <!-- INTERACTIVE TOKEN & PAYROLL ROI CALCULATOR -->
+                <div class="roi-calculator-box">
+                    <div class="roi-header">
+                        <div class="roi-title-group">
+                            <h3>💡 Interactive AI Token &amp; Payroll ROI Calculator</h3>
+                            <p>Calculated live using our 2026 Tier 1 &amp; Tier 2 Multi-Turn Frontier Model Benchmark Data.</p>
+                        </div>
+                        <div class="flow-badge pro" style="font-size:0.75rem;">Sub-3ms Local Compiler</div>
+                    </div>
+
+                    <div class="roi-controls">
+                        <div class="roi-control-group">
+                            <label for="roi-devs">Team Size: <span id="roi-devs-val">5 Engineers</span></label>
+                            <input type="range" id="roi-devs" class="roi-slider" min="1" max="100" value="5" step="1">
+                        </div>
+                        <div class="roi-control-group">
+                            <label for="roi-tables">Database Scale: <span id="roi-tables-val">100 Tables</span></label>
+                            <input type="range" id="roi-tables" class="roi-slider" min="10" max="500" value="100" step="10">
+                        </div>
+                        <div class="roi-control-group">
+                            <label for="roi-model">Primary Frontier Model:</label>
+                            <select id="roi-model" class="roi-select">
+                                <option value="10.00" data-name="Claude Fable 5 / OpenAI o3">Claude Fable 5 / OpenAI o3 ($10.00/1M)</option>
+                                <option value="5.00" data-name="Claude Opus 5 / GPT-5.6 Sol" selected>Claude Opus 5 / GPT-5.6 Sol ($5.00/1M)</option>
+                                <option value="3.50" data-name="Gemini 3.7 Pro">Gemini 3.7 Pro ($3.50/1M)</option>
+                                <option value="2.00" data-name="Claude Sonnet 5 / GPT-5.6 Terra">Claude Sonnet 5 / GPT-5.6 Terra ($2.00/1M)</option>
+                                <option value="1.32" data-name="DeepSeek V4-Pro">DeepSeek V4-Pro ($1.32/1M)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="roi-results-grid">
+                        <div class="roi-result-card">
+                            <span class="roi-result-label">Monthly Tokens Saved</span>
+                            <span class="roi-result-value" id="roi-out-tokens">34.8M</span>
+                            <span class="roi-result-sub">87.8% Context Reduction</span>
+                        </div>
+                        <div class="roi-result-card">
+                            <span class="roi-result-label">Annual Token Cost Saved</span>
+                            <span class="roi-result-value" id="roi-out-token-dollars">$2,091.94</span>
+                            <span class="roi-result-sub">Direct API Bill Reduction</span>
+                        </div>
+                        <div class="roi-result-card">
+                            <span class="roi-result-label">SQL Debug Hours Saved</span>
+                            <span class="roi-result-value" id="roi-out-payroll">$1,950.00</span>
+                            <span class="roi-result-sub">Zero Broken AI JOINs</span>
+                        </div>
+                        <div class="roi-result-card">
+                            <span class="roi-result-label">Net Annual Value / ROI</span>
+                            <span class="roi-result-value roi-roi-highlight" id="roi-out-net-roi">+$3,141.94 (3.5x)</span>
+                            <span class="roi-result-sub" id="roi-out-sub">Day-1 Cash Positive</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DUAL-ENGINE PRICING TABS -->
+                <div class="pricing-tabs-wrapper">
+                    <div class="pricing-tabs">
+                        <button id="btn-tab-individual" class="pricing-tab-btn is-active" data-target-tab="individual">🧑‍💻 Developers &amp; Solo</button>
+                        <button id="btn-tab-team" class="pricing-tab-btn" data-target-tab="team">🏢 Engineering Teams &amp; Orgs</button>
+                    </div>
+                </div>
+
+                <!-- TAB 1: INDIVIDUAL DEVELOPER PRICING (PR & PLG MOAT) -->
+                <div id="pricing-pane-individual" class="pricing-pane">
+                    <div class="billing-toggle-container">
+                        <span>Billing:</span>
+                        <div class="billing-toggle-pill">
+                            <button class="interval-btn is-active" data-indiv-interval="monthly">Monthly</button>
+                            <button class="interval-btn" data-indiv-interval="annual">Annual <span class="discount-tag">Save 33%</span></button>
+                        </div>
+                    </div>
+
+                    <div class="pricing-grid">
+                        <article class="price-card">
+                            <h3>Free Community</h3>
+                            <div class="price">$0</div>
+                            <p>For solo developers, side projects, and local evaluation.</p>
+                            <ul>
+                                <li>Up to 100 tables</li>
+                                <li>Full local CLI suite (<code>doctor</code>, <code>context</code>, <code>inspect</code>)</li>
+                                <li><code>CLAUDE.md</code>, <code>AGENTS.md</code>, &amp; <code>.cursorrules</code></li>
+                                <li>100% local-first · No account needed</li>
+                            </ul>
+                            <a class="btn btn-secondary full-width" href="#installation">Install Free CLI</a>
+                        </article>
+
+                        <article class="price-card featured">
+                            <span class="price-badge" style="background:var(--green);color:#0f172a;">🔥 Developer Special</span>
+                            <h3>Pro Individual</h3>
+                            <div class="price" id="indiv-price">$1.99<span id="indiv-period">/mo</span></div>
+                            <div class="price-anchor"><s id="indiv-original">$8.99/mo</s><strong id="indiv-discount">78% discount</strong></div>
+                            <p id="indiv-desc">Flexible monthly billing for solo engineers &amp; indie hackers.</p>
+                            <ul>
+                                <li><strong>7-Day Free Trial</strong> included</li>
+                                <li><strong>Unlimited tables</strong> &amp; complex schemas</li>
+                                <li>LLM Schema Enrichment (<code>--enrich</code>)</li>
+                                <li>3 personal device activations</li>
+                                <li>All future compiler updates &amp; export formats</li>
+                            </ul>
+                            <a id="indiv-checkout-btn" class="btn btn-primary full-width"
+                                href="https://buy.stripe.com/dRm00jeG13kpfoA131dIA01" target="_blank" rel="noopener">Start 7-Day Free Trial</a>
+                        </article>
+
+                        <article class="price-card founder-card">
+                            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+                                <span class="price-badge founder-badge" style="position:static;">Launch Special</span>
+                                <span id="founder-seats-badge"
+                                    style="font:600 .72rem 'JetBrains Mono',monospace;color:var(--yellow);background:rgba(245,200,101,.12);padding:3px 8px;border:1px solid rgba(245,200,101,.3);border-radius:var(--radius);">
+                                    <span id="founder-claimed-count">0</span>/200 Claimed
+                                </span>
+                            </div>
+                            <h3>Founder Lifetime</h3>
+                            <div class="price">$29<span> once</span></div>
+                            <div class="price-anchor"><s style="color:var(--subtle);">$149.00</s><strong
+                                    style="color:var(--yellow);margin-left:6px;">Save 80%</strong></div>
+                            <p>One-time payment for lifetime individual Pro access.</p>
+
+                            <div style="margin:8px 0 16px;">
+                                <div
+                                    style="width:100%;height:6px;background:var(--bg);border:1px solid var(--line);border-radius:3px;overflow:hidden;">
+                                    <div id="founder-progress-bar"
+                                        style="width:0%;height:100%;background:linear-gradient(90deg, var(--yellow), #ffae42);transition:width 0.4s ease;">
+                                    </div>
+                                </div>
+                                <div
+                                    style="display:flex;justify-content:space-between;margin-top:6px;font:.7rem 'JetBrains Mono',monospace;color:var(--subtle);">
+                                    <span><strong id="founder-remaining-count" style="color:var(--yellow);">200</strong> seats remaining</span>
+                                    <span>Cap: 200</span>
                                 </div>
                             </div>
-                            <div
-                                style="display:flex;justify-content:space-between;margin-top:6px;font:.7rem 'JetBrains Mono',monospace;color:var(--subtle);">
-                                <span><strong id="founder-remaining-count" style="color:var(--yellow);">200</strong>
-                                    seats remaining</span>
-                                <span>Cap: 200</span>
-                            </div>
-                        </div>
 
-                        <ul>
-                            <li>Everything in Pro for lifetime</li>
-                            <li>3 device activations</li>
-                            <li>All future Pro features &amp; LLM enrichments</li>
-                            <li>Direct line to founders</li>
-                        </ul><a class="btn btn-secondary full-width"
-                            href="https://buy.stripe.com/28EaEXgO9dZ36S44fddIA00" target="_blank" rel="noopener">Claim
-                            $29 Lifetime Pass</a>
-                    </article>
+                            <ul>
+                                <li>Everything in Pro for lifetime</li>
+                                <li>3 device activations</li>
+                                <li>All future Pro features &amp; LLM enrichments</li>
+                                <li>Direct line to founders</li>
+                            </ul>
+                            <a class="btn btn-secondary full-width"
+                                href="https://buy.stripe.com/28EaEXgO9dZ36S44fddIA00" target="_blank" rel="noopener">Claim $29 Lifetime Pass</a>
+                        </article>
+                    </div>
+                </div>
+
+                <!-- TAB 2: ENGINEERING TEAMS & ORGS (B2B VALUE ENGINE) -->
+                <div id="pricing-pane-team" class="pricing-pane" style="display:none;">
+                    <div class="billing-toggle-container">
+                        <span>Billing:</span>
+                        <div class="billing-toggle-pill">
+                            <button class="interval-btn" data-team-interval="monthly">Monthly ($19/seat)</button>
+                            <button class="interval-btn is-active" data-team-interval="annual">Annual ($15/seat) <span class="discount-tag">Save 20%</span></button>
+                        </div>
+                    </div>
+
+                    <div class="pricing-grid" style="grid-template-columns: repeat(2, 1fr); max-width: 860px; margin-left: auto; margin-right: auto;">
+                        <article class="price-card featured" style="border-color:var(--blue);">
+                            <span class="price-badge" style="background:var(--blue);color:var(--bg);">⭐ Most Popular for Teams</span>
+                            <h3>Team Plan</h3>
+                            <div class="price" id="team-price">$15<span id="team-period">/seat/mo</span></div>
+                            <div class="price-anchor"><s id="team-original">$19/seat/mo</s><strong id="team-discount" style="color:var(--blue);background:rgba(141,184,255,0.15);border-color:rgba(141,184,255,0.3);">Billed annually ($180/seat/yr)</strong></div>
+                            <p id="team-desc">For fast-moving engineering teams building with Cursor, Claude Code, and Copilot.</p>
+                            <ul>
+                                <li><strong>Automated CI/CD Quality Gates</strong> (<code>schemap gate</code>)</li>
+                                <li><strong>Automated GitHub Actions PR Bot</strong> for context sync</li>
+                                <li><strong>PII &amp; Credential Sanitization</strong> (<code>--sanitize</code>)</li>
+                                <li><strong>Role-Based Context Scoping</strong> (<code>--scope</code>)</li>
+                                <li>Multi-seat centralized license pooling &amp; seat management</li>
+                                <li>Multi-environment <code>schemap.yaml</code> sync (Dev/Staging/Prod)</li>
+                                <li>Corporate invoicing &amp; centralized VAT/Tax billing</li>
+                            </ul>
+                            <a id="team-checkout-btn" class="btn btn-primary full-width"
+                                href="https://buy.stripe.com/6oU8wP9lH3kpgsE275dIA04" target="_blank" rel="noopener">Deploy Schemap for Team</a>
+                        </article>
+
+                        <article class="price-card">
+                            <span class="price-badge" style="background:var(--yellow);color:var(--bg);">Custom Architecture</span>
+                            <h3>Enterprise</h3>
+                            <div class="price">Custom</div>
+                            <div class="price-anchor"><span>Starting at $10,000 / yr</span></div>
+                            <p>For large engineering organizations, FinTech, HealthTech, and regulated industries.</p>
+                            <ul>
+                                <li>Everything in Team plan included</li>
+                                <li><strong>Air-Gapped / Self-Hosted Verification</strong> (Zero telemetry)</li>
+                                <li>Custom Private LLM &amp; VPC Gateway Integration</li>
+                                <li>SAML / SSO / Okta user directory provisioning</li>
+                                <li>SOC 2 Type II compliance pack &amp; custom DPA</li>
+                                <li>Dedicated Solutions Architect &amp; 99.9% SLA</li>
+                            </ul>
+                            <a class="btn btn-secondary full-width"
+                                href="mailto:enterprise@schemap.dev?subject=Schemap%20Enterprise%20Inquiry" target="_blank" rel="noopener">Contact Enterprise Sales</a>
+                        </article>
+                    </div>
                 </div>
             </div>
         </section>

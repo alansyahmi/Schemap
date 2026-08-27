@@ -1,35 +1,90 @@
-name: Update Schemap Context
+name: Schemap CI/CD AI Database Intelligence & Gate
 
 on:
+  pull_request:
+    paths:
+      - 'migrations/**'
+      - 'alembic/versions/**'
+      - 'prisma/schema.prisma'
+      - 'schema.sql'
+      - 'schemap.yaml'
   push:
     branches:
       - main
     paths:
       - 'migrations/**'
       - 'alembic/versions/**'
+      - 'prisma/schema.prisma'
+      - 'schema.sql'
+
+permissions:
+  contents: write
+  pull-requests: write
 
 jobs:
-  update-schema-map:
+  schemap-gate-and-sync:
+    name: AI Quality Gate & Agent Rules Sync
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
       
       - name: Install uv
         uses: astral-sh/setup-uv@v3
         with:
-          version: "0.1.0"
+          version: "0.5.0"
           
-      - name: Run Schemap Context
+      - name: 1. Run Schemap AI Quality Gate & Generate PR Report
         env:
           SCHEMAP_LICENSE_KEY: ${{ secrets.SCHEMAP_LICENSE_KEY }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
-          # Note: Ensure your CI environment variables include your database credentials.
-          uv run schemap context
+          uvx schemap-tool gate --min-score 80 --fail-on-breaking --output-report schemap-report.md --save-state
           
-      - name: Commit and Push Context Map
+      - name: 2. Post Quality Gate Report to PR
+        if: always() && github.event_name == 'pull_request' && hashFiles('schemap-report.md') != ''
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const report = fs.readFileSync('schemap-report.md', 'utf8');
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            const botComment = comments.find(comment => comment.body.includes('Schemap AI Quality Gate'));
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: report
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: report
+              });
+            }
+
+      - name: 3. Compile Deterministic AI Context & Agent Rules
+        env:
+          SCHEMAP_LICENSE_KEY: ${{ secrets.SCHEMAP_LICENSE_KEY }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          uvx schemap-tool context --sanitize
+          uvx schemap-tool agents --targets claude,cursor,codex --sanitize
+          
+      - name: 4. Commit and Push Synchronized Agent Rules (on main)
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git add llm_data_context.md
-          # Only commit if there are changes
-          git diff --quiet && git diff --staged --quiet || (git commit -m "docs: auto-update llm_data_context.md" && git push)
+          git add schemap_database_context.md CLAUDE.md AGENTS.md .cursor/rules/*.mdc
+          git diff --quiet && git diff --staged --quiet || (git commit -m "chore(ai): auto-update deterministic database context & agent rules [skip ci]" && git push)
+
