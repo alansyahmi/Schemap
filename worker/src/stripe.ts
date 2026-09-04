@@ -79,10 +79,42 @@ export async function fetchStripeObject(path: string, apiKey: string): Promise<a
  * - < 1600 cents          -> Monthly Pro
  * -----------------------------------------------------------------------------
  */
+export const STRIPE_PRICES = {
+  // Pro Tier Price IDs
+  PRO_MONTHLY: "price_pro_monthly",
+  PRO_ANNUAL: "price_pro_annual",
+  // Team Tier Price IDs
+  TEAM_MONTHLY: "price_team_monthly",
+  TEAM_ANNUAL: "price_team_annual",
+  // Founder Lifetime Tier Price ID
+  FOUNDER_LIFETIME: "price_founder_lifetime"
+} as const;
+
+export const PRICE_TO_TIER_MAP: Record<string, { planTier: string; billingMode: string }> = {
+  [STRIPE_PRICES.PRO_MONTHLY]: { planTier: "pro", billingMode: "monthly" },
+  [STRIPE_PRICES.PRO_ANNUAL]: { planTier: "pro", billingMode: "annual" },
+  [STRIPE_PRICES.TEAM_MONTHLY]: { planTier: "team", billingMode: "monthly" },
+  [STRIPE_PRICES.TEAM_ANNUAL]: { planTier: "team", billingMode: "annual" },
+  [STRIPE_PRICES.FOUNDER_LIFETIME]: { planTier: "pro", billingMode: "lifetime" },
+};
+
 export function determineBillingInfo(session: any, extraData?: { lineItems?: any; subObj?: any; plinkObj?: any }): { billingMode: string; planTier: string; expiresAt: string | null } {
   const now = new Date();
   let billingMode = "monthly";
   let planTier = "pro";
+
+  // Check explicit Stripe Price ID if present
+  const explicitPriceId =
+    session.line_items?.data?.[0]?.price?.id ||
+    extraData?.subObj?.items?.data?.[0]?.price?.id ||
+    session.price_id ||
+    session.metadata?.price_id ||
+    "";
+
+  if (explicitPriceId && PRICE_TO_TIER_MAP[explicitPriceId]) {
+    planTier = PRICE_TO_TIER_MAP[explicitPriceId].planTier;
+    billingMode = PRICE_TO_TIER_MAP[explicitPriceId].billingMode;
+  }
 
   const mode = (session.mode || "").toLowerCase();
   const metaTier = (
@@ -295,6 +327,38 @@ export async function handleCheckoutCompleted(session: any, env: Env): Promise<v
       expires_at: expiresAt || undefined,
       raw_key_temp: rawKey
     });
+  }
+}
+
+export async function createCustomerPortalSession(
+  stripeCustomerId: string,
+  returnUrl: string | undefined,
+  apiKey: string
+): Promise<{ url: string } | { error: string }> {
+  if (!apiKey || apiKey === "whsec_mock") {
+    return { url: "https://billing.stripe.com/p/session/test_mock_portal" };
+  }
+  try {
+    const params = new URLSearchParams();
+    params.append("customer", stripeCustomerId);
+    if (returnUrl) {
+      params.append("return_url", returnUrl);
+    }
+    const res = await fetch("https://api.stripe.com/v1/billing_portal/sessions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${apiKey}`,
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      body: params.toString()
+    });
+    const data: any = await res.json();
+    if (!res.ok) {
+      return { error: data.error?.message || "Failed to create customer portal session." };
+    }
+    return { url: data.url };
+  } catch (err: any) {
+    return { error: err.message || "Stripe portal request error." };
   }
 }
 

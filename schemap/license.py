@@ -311,6 +311,41 @@ def fetch_seats_status(license_key: str, endpoint: str | None = None) -> Dict[st
         return {"error": str(e)}
 
 
+def create_customer_portal_session(license_key: str, endpoint: str | None = None, return_url: str = "https://schemap.dev") -> Dict[str, Any]:
+    """
+    Requests a Stripe Customer Billing Portal session URL from the license API.
+    """
+    base_endpoint = resolve_license_endpoint(config_endpoint=endpoint)
+    portal_endpoint = base_endpoint.replace("/v1/licenses/verify", "/v1/billing/portal")
+    if not portal_endpoint.endswith("/v1/billing/portal"):
+        portal_endpoint = "https://schemap-license-api.alansyahmi2004.workers.dev/v1/billing/portal"
+
+    payload = {
+        "license_key": license_key,
+        "return_url": return_url
+    }
+    req = urllib.request.Request(
+        portal_endpoint,
+        data=json.dumps(payload).encode("utf-8"),
+        headers={
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+            "User-Agent": "SchemapCLI/3.1"
+        },
+        method="POST"
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=5) as response:
+            return json.loads(response.read().decode("utf-8"))
+    except urllib.error.HTTPError as e:
+        try:
+            return json.loads(e.read().decode("utf-8"))
+        except Exception:
+            return {"error": f"HTTP Error {e.code}"}
+    except Exception as e:
+        return {"error": f"Network error: {str(e)}"}
+
+
 def verify_tier(
     tables_count: int,
     license_key: str | None,

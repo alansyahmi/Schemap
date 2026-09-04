@@ -1,12 +1,23 @@
 import os
 import yaml
 from pathlib import Path
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 class DatabaseConfig(BaseModel):
     connection_url: str
     exclude_tables: list[str] = Field(default_factory=list)
     schemas: list[str] = Field(default_factory=lambda: ["public"])
+
+    @field_validator("schemas", mode="before")
+    @classmethod
+    def parse_schemas(cls, v):
+        if isinstance(v, str):
+            parts = [p.strip() for p in v.split(",") if p.strip()]
+            return parts if parts else ["public"]
+        elif isinstance(v, (list, tuple)):
+            cleaned = [str(p).strip() for p in v if str(p).strip()]
+            return cleaned if cleaned else ["public"]
+        return v
 
 
 class OutputConfig(BaseModel):

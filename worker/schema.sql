@@ -20,6 +20,7 @@ CREATE TABLE IF NOT EXISTS licenses (
     stripe_payment_intent_id TEXT,
     plan_tier TEXT DEFAULT 'pro',
     billing_mode TEXT NOT NULL,
+    seats_purchased INTEGER DEFAULT 3,
     status TEXT NOT NULL DEFAULT 'active',
     expires_at TEXT,
     raw_key_temp TEXT,

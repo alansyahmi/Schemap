@@ -17,6 +17,20 @@ def test_database_config_schemas_field():
     assert len(custom_cfg.schemas) == 4
     assert "billing" in custom_cfg.schemas
 
+    # Verify comma-separated string input is parsed into a clean list
+    csv_cfg = DatabaseConfig(
+        connection_url="postgresql://localhost/db",
+        schemas="public, auth, billing, analytics"
+    )
+    assert csv_cfg.schemas == ["public", "auth", "billing", "analytics"]
+
+    # Verify edge cases like extra whitespace, empty entries
+    edge_cfg = DatabaseConfig(
+        connection_url="postgresql://localhost/db",
+        schemas="  public,  auth,  "
+    )
+    assert edge_cfg.schemas == ["public", "auth"]
+
 
 @patch("psycopg.connect")
 def test_postgres_multi_schema_extraction(mock_connect):

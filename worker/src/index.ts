@@ -1,6 +1,6 @@
 import { Env, getLicenseByHash, getLicenseBySessionId, updateLicenseAudit, registerDeviceActivation, removeDeviceActivation, getActivationsList } from "./db";
 import { hashLicenseKey, hashDeviceFingerprint } from "./security";
-import { verifyStripeSignature, processStripeEvent } from "./stripe";
+import { verifyStripeSignature, processStripeEvent, createCustomerPortalSession } from "./stripe";
 
 
 const CORS_HEADERS = {
@@ -63,7 +63,7 @@ export default {
       try {
         const rawBody = await request.text();
         const sigHeader = request.headers.get("stripe-signature");
-        const secret = env.STRIPE_WEBHOOK_SECRET || env.STRIPE_WEBHOOK_KEY || "whsec_mock";
+        const secret = env.STRIPE_WEBHOOK_SECRET || "whsec_mock";
 
         const isValidSig = await verifyStripeSignature(rawBody, sigHeader, secret);
         if (!isValidSig) {
@@ -176,7 +176,7 @@ export default {
           const license = await getLicenseByHash(env.DB, keyHash);
           if (license) {
             const deviceFingerprint = await hashDeviceFingerprint(deviceId);
-            await removeDeviceActivation(env.DB, license.id, deviceFingerprint);
+            await removeDeviceActivation(env.DB, license.id, deviceFingerprint, deviceId);
           }
         }
         return jsonResponse({ valid: true, deactivated: true });
@@ -195,6 +195,9 @@ export default {
         const pepper = env.SERVER_PEPPER || "schemap_prod_pepper_v1_secret";
         const keyHash = await hashLicenseKey(rawKey, pepper);
         const license = await getLicenseByHash(env.DB, keyHash);
+        if (!license) {
+          return jsonResponse({ error: "License not found." }, 404);
+        }
         const activations = await getActivationsList(env.DB, license.id);
         const seatsUsed = activations.length;
         let maxSeats = license.seats_purchased || (license.plan_tier === "team" ? 10 : (license.plan_tier === "enterprise" ? 100 : 3));
@@ -215,6 +218,51 @@ export default {
 
       } catch (err: any) {
         return jsonResponse({ error: err.message || "Seats query error" }, 500);
+      }
+    }
+
+    // 7. POST /v1/billing/portal
+    if ((url.pathname === "/v1/billing/portal" || url.pathname === "/v1/portal") && method === "POST") {
+      try {
+        const body: any = await request.json().catch(() => ({}));
+        const rawKey = body.license_key?.trim() || url.searchParams.get("license_key")?.trim() || "";
+        const returnUrl = body.return_url || "https://schemap.dev";
+
+        if (!rawKey) {
+          return jsonResponse({ error: "Missing license_key parameter." }, 400);
+        }
+
+        const pepper = env.SERVER_PEPPER || "schemap_prod_pepper_v1_secret";
+        const keyHash = await hashLicenseKey(rawKey, pepper);
+        const license = await getLicenseByHash(env.DB, keyHash);
+
+        if (!license) {
+          return jsonResponse({ error: "License not found." }, 404);
+        }
+
+        if (!license.stripe_customer_id) {
+          return jsonResponse({ error: "No associated Stripe customer found for this license." }, 400);
+        }
+
+        const portalResult = await createCustomerPortalSession(
+          license.stripe_customer_id,
+          returnUrl,
+          env.STRIPE_SECRET_KEY || "whsec_mock"
+        );
+
+        if ("error" in portalResult) {
+          return jsonResponse({ error: portalResult.error }, 500);
+        }
+
+        return jsonResponse({
+          url: portalResult.url,
+          stripe_customer_id: license.stripe_customer_id,
+          plan_tier: license.plan_tier,
+          seats_purchased: license.seats_purchased
+        }, 200);
+
+      } catch (err: any) {
+        return jsonResponse({ error: err.message || "Portal session generation failed." }, 500);
       }
     }
 

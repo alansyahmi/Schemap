@@ -22,6 +22,7 @@ from .license import (
     verify_license_online,
     deactivate_license_online,
     fetch_seats_status,
+    create_customer_portal_session,
     get_or_create_device_id,
     resolve_license_key,
     resolve_license_endpoint,
@@ -1410,9 +1411,10 @@ def roi(ctx, config, team_size, prompts_per_day, hourly_rate, output_report, jso
 
 @cli.command()
 @click.option('--config', default="schemap.yaml", help="Path to configuration file.")
-@click.option('--revoke', default=None, help="Device ID to revoke from active license seats.")
+@click.option('--revoke', default=None, help="Device ID or fingerprint to revoke from active license seats.")
+@click.option('--portal', is_flag=True, help="Generate and open Stripe Customer Billing Portal link for seat adjustments.")
 @click.option('--json', 'json_output', is_flag=True, help="Output seat status in JSON format.")
-def seats(config, revoke, json_output):
+def seats(config, revoke, portal, json_output):
     """View team seat allocation, active devices, and manage license concurrency."""
     try:
         config_key = None
@@ -1430,6 +1432,23 @@ def seats(config, revoke, json_output):
             sys.exit(1)
 
         endpoint = resolve_license_endpoint(config_endpoint=cfg_endpoint)
+
+        if portal:
+            click.echo("-> Generating Stripe Customer Billing Portal link... ", nl=False)
+            res = create_customer_portal_session(active_key, endpoint)
+            portal_url = res.get("url")
+            if portal_url:
+                click.secho("OK", fg="green")
+                click.echo(f"\nBilling Portal URL:\n  {portal_url}\n")
+                try:
+                    import webbrowser
+                    webbrowser.open(portal_url)
+                    click.secho("Opened Customer Billing Portal in default browser.", fg="green")
+                except Exception:
+                    pass
+            else:
+                click.secho(f"\n[ERROR] Failed to generate portal link: {res.get('error')}", fg="red")
+            return
 
         if revoke:
             click.echo(f"-> Revoking seat for device '{revoke}'... ", nl=False)
@@ -1470,6 +1489,48 @@ def seats(config, revoke, json_output):
         click.secho("=======================================================\n", fg="cyan", bold=True)
 
 
+    except Exception as e:
+        click.secho(f"\n[ERROR] {str(e)}", fg="red")
+        sys.exit(1)
+
+
+@cli.command()
+@click.option('--config', default="schemap.yaml", help="Path to configuration file.")
+@click.option('--no-open', is_flag=True, help="Print URL only without opening browser.")
+def portal(config, no_open):
+    """Open Stripe Customer Billing Portal to adjust team seats, plans, and invoices."""
+    try:
+        config_key = None
+        cfg_endpoint = None
+        try:
+            cfg = load_config(config)
+            config_key = cfg.license_key
+            cfg_endpoint = cfg.license_endpoint
+        except Exception:
+            pass
+
+        active_key, _ = resolve_license_key(config_key=config_key)
+        if not active_key:
+            click.secho("\n[ERROR] No active license key found. Run `schemap activate <LICENSE_KEY>` first.", fg="red")
+            sys.exit(1)
+
+        endpoint = resolve_license_endpoint(config_endpoint=cfg_endpoint)
+        click.echo("-> Generating Stripe Customer Billing Portal link... ", nl=False)
+        res = create_customer_portal_session(active_key, endpoint)
+        portal_url = res.get("url")
+        if portal_url:
+            click.secho("OK", fg="green")
+            click.echo(f"\nBilling Portal URL:\n  {portal_url}\n")
+            if not no_open:
+                try:
+                    import webbrowser
+                    webbrowser.open(portal_url)
+                    click.secho("Opened Customer Billing Portal in default browser.", fg="green")
+                except Exception:
+                    pass
+        else:
+            click.secho(f"\n[ERROR] Failed to generate portal link: {res.get('error')}", fg="red")
+            sys.exit(1)
     except Exception as e:
         click.secho(f"\n[ERROR] {str(e)}", fg="red")
         sys.exit(1)

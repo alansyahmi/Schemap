@@ -10,7 +10,8 @@ from schemap.license import (
     _get_signature,
     LicenseError,
     fetch_seats_status,
-    deactivate_license_online
+    deactivate_license_online,
+    create_customer_portal_session
 )
 
 
@@ -145,4 +146,84 @@ license_key: "TEST-TEAM-KEY"
         assert "Seats Active:     2 / 10" in res.output
         assert "macbook-pro" in res.output
         assert "github-actions-ci" in res.output
+
+
+def test_cli_seats_revoke_command(tmp_path):
+    from click.testing import CliRunner
+    from schemap.cli import cli
+    from schemap.license import _write_cache
+
+    runner = CliRunner()
+    _write_cache("TEST-TEAM-KEY", plan_tier="team")
+
+    cfg_file = tmp_path / "schemap.yaml"
+    cfg_file.write_text("""
+database:
+  connection_url: "sqlite:///test.db"
+license_key: "TEST-TEAM-KEY"
+""")
+
+    with patch("schemap.cli.deactivate_license_online") as mock_deactivate:
+        mock_deactivate.return_value = {"valid": True, "deactivated": True}
+        res = runner.invoke(cli, ["seats", "--config", str(cfg_file), "--revoke", "dev_hash_001"])
+        assert res.exit_code == 0
+        assert "Revoking seat for device 'dev_hash_001'" in res.output
+        assert "Revoked device 'dev_hash_001' from team license" in res.output
+        mock_deactivate.assert_called_once()
+
+
+def test_cli_seats_portal_command(tmp_path):
+    from click.testing import CliRunner
+    from schemap.cli import cli
+    from schemap.license import _write_cache
+
+    runner = CliRunner()
+    _write_cache("TEST-TEAM-KEY", plan_tier="team")
+
+    cfg_file = tmp_path / "schemap.yaml"
+    cfg_file.write_text("""
+database:
+  connection_url: "sqlite:///test.db"
+license_key: "TEST-TEAM-KEY"
+""")
+
+    with patch("schemap.cli.create_customer_portal_session") as mock_portal:
+        mock_portal.return_value = {"url": "https://billing.stripe.com/session/test_123"}
+        res = runner.invoke(cli, ["seats", "--config", str(cfg_file), "--portal"])
+        assert res.exit_code == 0
+        assert "Generating Stripe Customer Billing Portal link" in res.output
+        assert "https://billing.stripe.com/session/test_123" in res.output
+
+
+def test_cli_portal_command(tmp_path):
+    from click.testing import CliRunner
+    from schemap.cli import cli
+    from schemap.license import _write_cache
+
+    runner = CliRunner()
+    _write_cache("TEST-TEAM-KEY", plan_tier="team")
+
+    cfg_file = tmp_path / "schemap.yaml"
+    cfg_file.write_text("""
+database:
+  connection_url: "sqlite:///test.db"
+license_key: "TEST-TEAM-KEY"
+""")
+
+    with patch("schemap.cli.create_customer_portal_session") as mock_portal:
+        mock_portal.return_value = {"url": "https://billing.stripe.com/session/portal_abc"}
+        res = runner.invoke(cli, ["portal", "--config", str(cfg_file), "--no-open"])
+        assert res.exit_code == 0
+        assert "Generating Stripe Customer Billing Portal link" in res.output
+        assert "https://billing.stripe.com/session/portal_abc" in res.output
+
+
+@patch("urllib.request.urlopen")
+def test_create_customer_portal_session_mock(mock_urlopen):
+    mock_resp = MagicMock()
+    mock_resp.read.return_value = b'{"url": "https://billing.stripe.com/session/test_mock"}'
+    mock_urlopen.return_value.__enter__.return_value = mock_resp
+
+    res = create_customer_portal_session("TEST-KEY-123")
+    assert res["url"] == "https://billing.stripe.com/session/test_mock"
 

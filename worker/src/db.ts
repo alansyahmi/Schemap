@@ -191,8 +191,15 @@ export async function registerDeviceActivation(
 export async function removeDeviceActivation(
   db: D1Database,
   licenseId: number,
-  deviceFingerprint: string
+  deviceFingerprint: string,
+  rawOrPartial?: string
 ): Promise<boolean> {
+  if (rawOrPartial && rawOrPartial !== deviceFingerprint) {
+    const result = await db.prepare(
+      "DELETE FROM license_activations WHERE license_id = ? AND (device_fingerprint = ? OR device_fingerprint = ? OR device_fingerprint LIKE ?)"
+    ).bind(licenseId, deviceFingerprint, rawOrPartial, `${rawOrPartial}%`).run();
+    return (result.meta?.changes ?? 0) > 0;
+  }
   const result = await db.prepare(
     "DELETE FROM license_activations WHERE license_id = ? AND device_fingerprint = ?"
   ).bind(licenseId, deviceFingerprint).run();
