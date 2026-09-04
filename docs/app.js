@@ -337,7 +337,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Team Plans (Monthly vs Annual)
     const teamPlans = {
         monthly: ["$19", "/seat/mo", "$29/seat/mo", "Flexible Team Monthly", "For fast-moving engineering teams. Flexible per-seat monthly billing.", "https://buy.stripe.com/6oU8wP9lH3kpgsE275dIA04"],
-        annual: ["$15", "/seat/mo", "$19/seat/mo", "Billed annually ($180/seat/yr)", "Save 20% with annual team billing. Includes CI/CD gates & PR bot.", "https://buy.stripe.com/6oU8wP9lH3kpgsE275dIA04"]
+        annual: ["$15", "/seat/mo", "$19/seat/mo", "Billed annually ($180/seat/yr)", "Save 20% with annual team billing. Includes CI/CD gates & PR bot.", "https://buy.stripe.com/5kQ14n1Tf4ot90c8vtdIA05"]
     };
     document.querySelectorAll("[data-team-interval]").forEach((btn) => {
         btn.addEventListener("click", () => {
