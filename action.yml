@@ -27,7 +27,7 @@ inputs:
     required: false
     default: ""
   github-token:
-    description: "GitHub token (e.g. ${{ secrets.GITHUB_TOKEN }}) for posting PR comments"
+    description: "GitHub token (e.g. secrets.GITHUB_TOKEN) for posting PR comments"
     required: false
     default: ""
   comment-on-pr:
