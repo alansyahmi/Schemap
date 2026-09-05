@@ -48,6 +48,7 @@ from .quickstart import run_quickstart
 from .fix import run_fix
 from .skills import install_agent_skills
 from .state import get_trial_status, start_trial, record_successful_run, mark_review_prompted
+from .updater import check_for_updates, run_upgrade, detect_installer
 import webbrowser
 import urllib.parse
 
@@ -1577,6 +1578,66 @@ def watch(ctx, config, watch_path, poll_db, webhook_url, once, verbose):
         click.secho(f"\n[ERROR] {str(e)}", fg="red")
         if verbose:
             raise
+
+
+@cli.command()
+@click.option('--check', is_flag=True, help="Check if an update is available without installing.")
+@click.option('--force', is_flag=True, help="Force re-install even if already on the latest version.")
+def update(check, force):
+    """Update Schemap CLI to the latest version published on PyPI."""
+    click.echo("-> Checking PyPI for updates... ", nl=False)
+    status = check_for_updates()
+
+    if status.get("error"):
+        click.secho("FAILED", fg="yellow")
+        click.secho(f"\n[WARNING] Could not check PyPI: {status['error']}", fg="yellow")
+        if not check:
+            click.echo("Attempting blind upgrade anyway...")
+            installer_name, cmd = detect_installer()
+            click.echo(f"Running: {' '.join(cmd)}")
+            ok, msg = run_upgrade()
+            if ok:
+                click.secho("[SUCCESS] Schemap updated successfully.", fg="green", bold=True)
+            else:
+                click.secho(f"[ERROR] Update failed:\n{msg}", fg="red")
+                sys.exit(1)
+        return
+
+    curr_ver = status["current_version"]
+    latest_ver = status["latest_version"]
+    has_update = status["has_update"]
+
+    if not has_update and not force:
+        click.secho("OK", fg="green")
+        click.secho(f"\n[OK] Schemap is already on the latest version (v{curr_ver}).", fg="green")
+        return
+
+    if check:
+        if has_update:
+            click.secho("UPDATE AVAILABLE", fg="yellow", bold=True)
+            click.echo(f"\nA newer version of Schemap is available: v{curr_ver} -> v{latest_ver}")
+            click.echo("Run 'schemap update' to install the upgrade.")
+        else:
+            click.secho("UP TO DATE", fg="green")
+            click.echo(f"\nSchemap is up to date (v{curr_ver}).")
+        return
+
+    click.secho("OK", fg="green")
+    if has_update:
+        click.secho(f"\n-> Upgrading Schemap from v{curr_ver} to v{latest_ver}...", fg="cyan", bold=True)
+    else:
+        click.secho(f"\n-> Force re-installing Schemap v{curr_ver}...", fg="cyan", bold=True)
+
+    installer_name, cmd = detect_installer()
+    click.echo(f"  Installer: {installer_name.upper()} ({' '.join(cmd)})")
+
+    success, output = run_upgrade(target_version=latest_ver if has_update else None)
+    if success:
+        click.secho(f"\n[SUCCESS] Successfully updated Schemap to v{latest_ver or curr_ver}!", fg="green", bold=True)
+    else:
+        click.secho(f"\n[ERROR] Update failed:\n{output}", fg="red")
+        click.secho(f"\nManual upgrade command: pip install --upgrade schemap-tool", fg="yellow")
+        sys.exit(1)
 
 
 if __name__ == "__main__":

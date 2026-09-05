@@ -94,6 +94,11 @@ pipx install schemap-tool
 > **Alternative installs:**
 > * `uv tool install schemap-tool`
 > * `pip install schemap-tool`
+> 
+> *To update Schemap anytime:*
+> ```bash
+> schemap update
+> ```
 
 ---
 
