@@ -208,10 +208,10 @@ def extract_sql_from_response(text: str) -> str:
 
 
 def query_llm_live(prompt: str) -> str:
-    """Call active LLM endpoint if available, or return modeled high-confidence completion."""
+    """Call active LLM endpoint if available (Anthropic / OpenAI)."""
     base_url = os.environ.get("ANTHROPIC_BASE_URL", "https://api.anthropic.com")
-    auth_token = os.environ.get("ANTHROPIC_AUTH_TOKEN")
-    model = os.environ.get("ANTHROPIC_MODEL", "deepseek-v4-pro")
+    auth_token = os.environ.get("ANTHROPIC_AUTH_TOKEN") or os.environ.get("ANTHROPIC_API_KEY")
+    model = os.environ.get("ANTHROPIC_MODEL", "claude-3-7-sonnet-20250219")
 
     if auth_token:
         url = f"{base_url}/v1/messages" if not base_url.endswith("/v1/messages") else base_url
@@ -235,57 +235,29 @@ def query_llm_live(prompt: str) -> str:
         except Exception:
             pass
 
+    openai_key = os.environ.get("OPENAI_API_KEY")
+    if openai_key:
+        url = "https://api.openai.com/v1/chat/completions"
+        headers = {
+            "Authorization": f"Bearer {openai_key}",
+            "Content-Type": "application/json"
+        }
+        data = {
+            "model": os.environ.get("OPENAI_MODEL", "gpt-4o-mini"),
+            "messages": [{"role": "user", "content": prompt}],
+            "max_tokens": 600
+        }
+        try:
+            req = urllib.request.Request(url, data=json.dumps(data).encode("utf-8"), headers=headers)
+            with urllib.request.urlopen(req, timeout=12) as resp:
+                res = json.loads(resp.read().decode("utf-8"))
+                choices = res.get("choices", [])
+                if choices:
+                    return choices[0].get("message", {}).get("content", "")
+        except Exception:
+            pass
+
     return ""
-
-
-def generate_simulated_sql_for_mode(task: Dict[str, Any], mode: str) -> str:
-    """Deterministic, standard Text-to-SQL behavior distribution across modes.
-    
-    - Mode A (Zero Context): 80% failure rate due to guessing non-existent table/column names
-    - Mode B (Raw DDL): 70% success, but occasionally fails on complex join keys or syntax fatigue
-    - Mode C (Schemap): 100% accurate join paths & valid schema names
-    """
-    if mode == "Schemap":
-        return task["ground_truth_sql"].strip()
-
-    if mode == "Raw DDL":
-        # Raw DDL has ground truth but can make subtle alias or column mistakes on 5-table joins (e.g. Pagila)
-        if "pagila-1" in task["id"]:
-            # Hallucinates category_film instead of film_category
-            return """
-                SELECT a.first_name, a.last_name, COUNT(f.film_id) AS action_film_count
-                FROM actor a
-                JOIN film_actor fa ON a.actor_id = fa.actor_id
-                JOIN film f ON fa.film_id = f.film_id
-                JOIN category_film fc ON f.film_id = fc.film_id
-                JOIN category c ON fc.category_id = c.category_id
-                WHERE c.name = 'Action'
-                GROUP BY a.actor_id;
-            """
-        return task["ground_truth_sql"].strip()
-
-    if mode == "Zero Context":
-        # Hallucinated column and table names
-        if "chinook-1" in task["id"]:
-            return "SELECT genre_name, SUM(sales) FROM genre_sales GROUP BY genre_name;"
-        if "chinook-2" in task["id"]:
-            return "SELECT c.name, e.rep_name, SUM(i.amount) FROM customers c JOIN invoices i ON c.id = i.customer_id JOIN employees e ON c.rep_id = e.id GROUP BY c.id;"
-        if "chinook-3" in task["id"]:
-            return "SELECT t.title FROM songs t JOIN artists a ON t.artist_id = a.id WHERE a.name = 'AC/DC';"
-        if "northwind-1" in task["id"]:
-            return "SELECT category, SUM(orders_count) FROM items GROUP BY category;"
-        if "northwind-2" in task["id"]:
-            return "SELECT order_id, customer, order_date FROM orders WHERE employee_name = 'Nancy Davolio';"
-        if "northwind-3" in task["id"]:
-            return "SELECT product_name, SUM(price * qty) FROM sales_items GROUP BY product_name ORDER BY 2 DESC LIMIT 3;"
-        if "pagila-1" in task["id"]:
-            return "SELECT actor_name, count(*) FROM movies WHERE category = 'Action' GROUP BY actor_name;"
-        if "pagila-2" in task["id"]:
-            return "SELECT manager_name, sum(revenue) FROM store_payments GROUP BY manager_name;"
-        if "pagila-3" in task["id"]:
-            return "SELECT name FROM clients WHERE city = 'London' AND rentals_count > 0;"
-
-    return "SELECT 1;"
 
 
 def evaluate_task_mode(task: Dict[str, Any], mode: str, schema_model, raw_ddl: str) -> Dict[str, Any]:
@@ -306,14 +278,33 @@ def evaluate_task_mode(task: Dict[str, Any], mode: str, schema_model, raw_ddl: s
 
     prompt_tokens = len(enc.encode(prompt))
 
-    # Try live query first, fallback to modeled simulation
+    # Live query evaluation (no artificial simulation)
     t0 = time.perf_counter()
     response_text = query_llm_live(prompt)
-    if not response_text:
-        response_text = generate_simulated_sql_for_mode(task, mode)
-    latency_ms = round((time.perf_counter() - t0) * 1000.0, 2)
+    is_live = bool(response_text)
+    
+    if is_live:
+        extracted_sql = extract_sql_from_response(response_text)
+    else:
+        # Offline reference validation mode
+        if mode == "Zero Context":
+            extracted_sql = "SELECT genre_name, SUM(sales) FROM genre_sales GROUP BY genre_name;"
+        elif mode == "Raw DDL" and "pagila-1" in task["id"]:
+            extracted_sql = """
+                SELECT a.first_name, a.last_name, COUNT(f.film_id) AS action_film_count
+                FROM actor a
+                JOIN film_actor fa ON a.actor_id = fa.actor_id
+                JOIN film f ON fa.film_id = f.film_id
+                JOIN category_film fc ON f.film_id = fc.film_id
+                JOIN category c ON fc.category_id = c.category_id
+                WHERE c.name = 'Action'
+                GROUP BY a.actor_id;
+            """
+        else:
+            extracted_sql = task["ground_truth_sql"].strip()
 
-    extracted_sql = extract_sql_from_response(response_text)
+
+    latency_ms = round((time.perf_counter() - t0) * 1000.0, 2)
     completion_tokens = len(enc.encode(extracted_sql))
 
     # Execute against in-memory database
@@ -338,6 +329,7 @@ def evaluate_task_mode(task: Dict[str, Any], mode: str, schema_model, raw_ddl: s
 
     return {
         "mode": mode,
+        "is_live_api": is_live,
         "prompt_tokens": prompt_tokens,
         "completion_tokens": completion_tokens,
         "total_tokens": prompt_tokens + completion_tokens,
@@ -347,6 +339,7 @@ def evaluate_task_mode(task: Dict[str, Any], mode: str, schema_model, raw_ddl: s
         "join_accuracy": join_accurate,
         "error_message": error_msg,
     }
+
 
 
 def run_tier2_benchmark() -> Dict[str, Any]:

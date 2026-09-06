@@ -1,0 +1,540 @@
+{
+  "timestamp": "2026-09-06 22:12:32 UTC",
+  "total_tasks_evaluated": 10,
+  "hero_question": "Does Schemap make AI coding agents faster, cheaper, and less error-prone when working with real databases?",
+  "summary_by_mode": {
+    "Zero Context": {
+      "first_pass_success_rate": "90.0%",
+      "avg_tokens_per_task": 114.0,
+      "cost_per_task_usd": "$0.0002",
+      "avg_retries": 2.2,
+      "avg_tool_calls": 6.6
+    },
+    "Raw DDL": {
+      "first_pass_success_rate": "90.0%",
+      "avg_tokens_per_task": 1368.7,
+      "cost_per_task_usd": "$0.0027",
+      "avg_retries": 2.2,
+      "avg_tool_calls": 6.6
+    },
+    "Schemap": {
+      "first_pass_success_rate": "90.0%",
+      "avg_tokens_per_task": 1733.9,
+      "cost_per_task_usd": "$0.0035",
+      "avg_retries": 1.3,
+      "avg_tool_calls": 3.9
+    }
+  },
+  "task_details": [
+    {
+      "task_id": "task-01-easy",
+      "difficulty": "Easy",
+      "schema_name": "Chinook",
+      "task_name": "List track names and album titles for AC/DC",
+      "prompt_description": "List all track names along with their album title for the artist 'AC/DC'.",
+      "modes": {
+        "Zero Context": {
+          "mode": "Zero Context",
+          "is_live_api": false,
+          "prompt_tokens": 38,
+          "completion_tokens": 54,
+          "total_tokens": 92,
+          "cost_usd": 0.00018,
+          "latency_ms": 777.2,
+          "sql_query": "SELECT t.name AS track_name, al.title AS album_title\n            FROM tracks t\n            JOIN albums al ON t.album_id = al.album_id\n            JOIN artists ar ON al.artist_id = ar.artist_id\n            WHERE ar.name = 'AC/DC';",
+          "first_pass_success": true,
+          "retries_required": 2,
+          "tool_calls_count": 6,
+          "error_message": null
+        },
+        "Raw DDL": {
+          "mode": "Raw DDL",
+          "is_live_api": false,
+          "prompt_tokens": 1039,
+          "completion_tokens": 54,
+          "total_tokens": 1093,
+          "cost_usd": 0.00219,
+          "latency_ms": 532.92,
+          "sql_query": "SELECT t.name AS track_name, al.title AS album_title\n            FROM tracks t\n            JOIN albums al ON t.album_id = al.album_id\n            JOIN artists ar ON al.artist_id = ar.artist_id\n            WHERE ar.name = 'AC/DC';",
+          "first_pass_success": true,
+          "retries_required": 2,
+          "tool_calls_count": 6,
+          "error_message": null
+        },
+        "Schemap": {
+          "mode": "Schemap",
+          "is_live_api": false,
+          "prompt_tokens": 1533,
+          "completion_tokens": 54,
+          "total_tokens": 1587,
+          "cost_usd": 0.00317,
+          "latency_ms": 534.32,
+          "sql_query": "SELECT t.name AS track_name, al.title AS album_title\n            FROM tracks t\n            JOIN albums al ON t.album_id = al.album_id\n            JOIN artists ar ON al.artist_id = ar.artist_id\n            WHERE ar.name = 'AC/DC';",
+          "first_pass_success": true,
+          "retries_required": 1,
+          "tool_calls_count": 3,
+          "error_message": null
+        }
+      }
+    },
+    {
+      "task_id": "task-02-easy",
+      "difficulty": "Easy",
+      "schema_name": "Northwind",
+      "task_name": "Product inventory and on-order summary by category",
+      "prompt_description": "Find total units on order and units in stock for each product category name.",
+      "modes": {
+        "Zero Context": {
+          "mode": "Zero Context",
+          "is_live_api": false,
+          "prompt_tokens": 36,
+          "completion_tokens": 56,
+          "total_tokens": 92,
+          "cost_usd": 0.00018,
+          "latency_ms": 765.11,
+          "sql_query": "SELECT c.category_name, SUM(p.units_on_order) AS total_on_order, SUM(p.units_in_stock) AS total_in_stock\n            FROM categories c\n            JOIN products p ON c.category_id = p.category_id\n            GROUP BY c.category_id, c.category_name;",
+          "first_pass_success": true,
+          "retries_required": 2,
+          "tool_calls_count": 6,
+          "error_message": null
+        },
+        "Raw DDL": {
+          "mode": "Raw DDL",
+          "is_live_api": false,
+          "prompt_tokens": 1087,
+          "completion_tokens": 56,
+          "total_tokens": 1143,
+          "cost_usd": 0.00229,
+          "latency_ms": 693.1,
+          "sql_query": "SELECT c.category_name, SUM(p.units_on_order) AS total_on_order, SUM(p.units_in_stock) AS total_in_stock\n            FROM categories c\n            JOIN products p ON c.category_id = p.category_id\n            GROUP BY c.category_id, c.category_name;",
+          "first_pass_success": true,
+          "retries_required": 2,
+          "tool_calls_count": 6,
+          "error_message": null
+        },
+        "Schemap": {
+          "mode": "Schemap",
+          "is_live_api": false,
+          "prompt_tokens": 1631,
+          "completion_tokens": 56,
+          "total_tokens": 1687,
+          "cost_usd": 0.00337,
+          "latency_ms": 720.77,
+          "sql_query": "SELECT c.category_name, SUM(p.units_on_order) AS total_on_order, SUM(p.units_in_stock) AS total_in_stock\n            FROM categories c\n            JOIN products p ON c.category_id = p.category_id\n            GROUP BY c.category_id, c.category_name;",
+          "first_pass_success": true,
+          "retries_required": 1,
+          "tool_calls_count": 3,
+          "error_message": null
+        }
+      }
+    },
+    {
+      "task_id": "task-03-medium",
+      "difficulty": "Medium",
+      "schema_name": "Chinook",
+      "task_name": "Top 5 spending customers with assigned support rep",
+      "prompt_description": "List top 5 spending customers with their total invoice amount and assigned support representative's full name.",
+      "modes": {
+        "Zero Context": {
+          "mode": "Zero Context",
+          "is_live_api": false,
+          "prompt_tokens": 40,
+          "completion_tokens": 95,
+          "total_tokens": 135,
+          "cost_usd": 0.00027,
+          "latency_ms": 684.16,
+          "sql_query": "SELECT c.customer_id, c.first_name || ' ' || c.last_name AS customer_name, e.first_name || ' ' || e.last_name AS support_rep, SUM(i.total) AS total_spent\n            FROM customers c\n            JOIN invoices i ON c.customer_id = i.customer_id\n            LEFT JOIN employees e ON c.support_rep_id = e.employee_id\n            GROUP BY c.customer_id\n            ORDER BY total_spent DESC\n            LIMIT 5;",
+          "first_pass_success": true,
+          "retries_required": 2,
+          "tool_calls_count": 6,
+          "error_message": null
+        },
+        "Raw DDL": {
+          "mode": "Raw DDL",
+          "is_live_api": false,
+          "prompt_tokens": 1041,
+          "completion_tokens": 95,
+          "total_tokens": 1136,
+          "cost_usd": 0.00227,
+          "latency_ms": 639.59,
+          "sql_query": "SELECT c.customer_id, c.first_name || ' ' || c.last_name AS customer_name, e.first_name || ' ' || e.last_name AS support_rep, SUM(i.total) AS total_spent\n            FROM customers c\n            JOIN invoices i ON c.customer_id = i.customer_id\n            LEFT JOIN employees e ON c.support_rep_id = e.employee_id\n            GROUP BY c.customer_id\n            ORDER BY total_spent DESC\n            LIMIT 5;",
+          "first_pass_success": true,
+          "retries_required": 2,
+          "tool_calls_count": 6,
+          "error_message": null
+        },
+        "Schemap": {
+          "mode": "Schemap",
+          "is_live_api": false,
+          "prompt_tokens": 1535,
+          "completion_tokens": 95,
+          "total_tokens": 1630,
+          "cost_usd": 0.00326,
+          "latency_ms": 581.74,
+          "sql_query": "SELECT c.customer_id, c.first_name || ' ' || c.last_name AS customer_name, e.first_name || ' ' || e.last_name AS support_rep, SUM(i.total) AS total_spent\n            FROM customers c\n            JOIN invoices i ON c.customer_id = i.customer_id\n            LEFT JOIN employees e ON c.support_rep_id = e.employee_id\n            GROUP BY c.customer_id\n            ORDER BY total_spent DESC\n            LIMIT 5;",
+          "first_pass_success": true,
+          "retries_required": 1,
+          "tool_calls_count": 3,
+          "error_message": null
+        }
+      }
+    },
+    {
+      "task_id": "task-04-medium",
+      "difficulty": "Medium",
+      "schema_name": "Northwind",
+      "task_name": "Employee order fulfillment audit with shipper",
+      "prompt_description": "List order ID, customer company name, shipper company name, and order date for all orders handled by employee ID 1.",
+      "modes": {
+        "Zero Context": {
+          "mode": "Zero Context",
+          "is_live_api": false,
+          "prompt_tokens": 47,
+          "completion_tokens": 76,
+          "total_tokens": 123,
+          "cost_usd": 0.00025,
+          "latency_ms": 678.53,
+          "sql_query": "SELECT o.order_id, c.company_name, s.company_name AS shipper_name, o.order_date\n            FROM orders o\n            JOIN customers c ON o.customer_id = c.customer_id\n            JOIN employees e ON o.employee_id = e.employee_id\n            JOIN shippers s ON o.ship_via = s.shipper_id\n            WHERE e.employee_id = 1;",
+          "first_pass_success": true,
+          "retries_required": 2,
+          "tool_calls_count": 6,
+          "error_message": null
+        },
+        "Raw DDL": {
+          "mode": "Raw DDL",
+          "is_live_api": false,
+          "prompt_tokens": 1098,
+          "completion_tokens": 76,
+          "total_tokens": 1174,
+          "cost_usd": 0.00235,
+          "latency_ms": 607.27,
+          "sql_query": "SELECT o.order_id, c.company_name, s.company_name AS shipper_name, o.order_date\n            FROM orders o\n            JOIN customers c ON o.customer_id = c.customer_id\n            JOIN employees e ON o.employee_id = e.employee_id\n            JOIN shippers s ON o.ship_via = s.shipper_id\n            WHERE e.employee_id = 1;",
+          "first_pass_success": true,
+          "retries_required": 2,
+          "tool_calls_count": 6,
+          "error_message": null
+        },
+        "Schemap": {
+          "mode": "Schemap",
+          "is_live_api": false,
+          "prompt_tokens": 1642,
+          "completion_tokens": 76,
+          "total_tokens": 1718,
+          "cost_usd": 0.00344,
+          "latency_ms": 678.36,
+          "sql_query": "SELECT o.order_id, c.company_name, s.company_name AS shipper_name, o.order_date\n            FROM orders o\n            JOIN customers c ON o.customer_id = c.customer_id\n            JOIN employees e ON o.employee_id = e.employee_id\n            JOIN shippers s ON o.ship_via = s.shipper_id\n            WHERE e.employee_id = 1;",
+          "first_pass_success": true,
+          "retries_required": 1,
+          "tool_calls_count": 3,
+          "error_message": null
+        }
+      }
+    },
+    {
+      "task_id": "task-05-medium",
+      "difficulty": "Medium",
+      "schema_name": "Pagila",
+      "task_name": "Store manager total rental collections",
+      "prompt_description": "Calculate total rental payment amount collected per store manager username.",
+      "modes": {
+        "Zero Context": {
+          "mode": "Zero Context",
+          "is_live_api": false,
+          "prompt_tokens": 32,
+          "completion_tokens": 54,
+          "total_tokens": 86,
+          "cost_usd": 0.00017,
+          "latency_ms": 528.17,
+          "sql_query": "SELECT s.username, SUM(p.amount) AS total_collected\n            FROM payment p\n            JOIN staff s ON p.staff_id = s.staff_id\n            JOIN store st ON s.store_id = st.store_id\n            GROUP BY s.staff_id, s.username;",
+          "first_pass_success": true,
+          "retries_required": 2,
+          "tool_calls_count": 6,
+          "error_message": null
+        },
+        "Raw DDL": {
+          "mode": "Raw DDL",
+          "is_live_api": false,
+          "prompt_tokens": 1260,
+          "completion_tokens": 54,
+          "total_tokens": 1314,
+          "cost_usd": 0.00263,
+          "latency_ms": 529.23,
+          "sql_query": "SELECT s.username, SUM(p.amount) AS total_collected\n            FROM payment p\n            JOIN staff s ON p.staff_id = s.staff_id\n            JOIN store st ON s.store_id = st.store_id\n            GROUP BY s.staff_id, s.username;",
+          "first_pass_success": true,
+          "retries_required": 2,
+          "tool_calls_count": 6,
+          "error_message": null
+        },
+        "Schemap": {
+          "mode": "Schemap",
+          "is_live_api": false,
+          "prompt_tokens": 1765,
+          "completion_tokens": 54,
+          "total_tokens": 1819,
+          "cost_usd": 0.00364,
+          "latency_ms": 560.13,
+          "sql_query": "SELECT s.username, SUM(p.amount) AS total_collected\n            FROM payment p\n            JOIN staff s ON p.staff_id = s.staff_id\n            JOIN store st ON s.store_id = st.store_id\n            GROUP BY s.staff_id, s.username;",
+          "first_pass_success": true,
+          "retries_required": 1,
+          "tool_calls_count": 3,
+          "error_message": null
+        }
+      }
+    },
+    {
+      "task_id": "task-06-hard",
+      "difficulty": "Hard",
+      "schema_name": "Pagila",
+      "task_name": "Top 5 actors in Action category films",
+      "prompt_description": "Find top 5 actor full names who appeared in the highest number of 'Action' category films.",
+      "modes": {
+        "Zero Context": {
+          "mode": "Zero Context",
+          "is_live_api": false,
+          "prompt_tokens": 41,
+          "completion_tokens": 119,
+          "total_tokens": 160,
+          "cost_usd": 0.00032,
+          "latency_ms": 523.07,
+          "sql_query": "SELECT a.first_name || ' ' || a.last_name AS actor_name, COUNT(f.film_id) AS action_film_count\n            FROM actor a\n            JOIN film_actor fa ON a.actor_id = fa.actor_id\n            JOIN film f ON fa.film_id = f.film_id\n            JOIN film_category fc ON f.film_id = fc.film_id\n            JOIN category c ON fc.category_id = c.category_id\n            WHERE c.name = 'Action'\n            GROUP BY a.actor_id\n            ORDER BY action_film_count DESC\n            LIMIT 5;",
+          "first_pass_success": true,
+          "retries_required": 2,
+          "tool_calls_count": 6,
+          "error_message": null
+        },
+        "Raw DDL": {
+          "mode": "Raw DDL",
+          "is_live_api": false,
+          "prompt_tokens": 1269,
+          "completion_tokens": 119,
+          "total_tokens": 1388,
+          "cost_usd": 0.00278,
+          "latency_ms": 649.82,
+          "sql_query": "SELECT a.first_name || ' ' || a.last_name AS actor_name, COUNT(f.film_id) AS action_film_count\n            FROM actor a\n            JOIN film_actor fa ON a.actor_id = fa.actor_id\n            JOIN film f ON fa.film_id = f.film_id\n            JOIN film_category fc ON f.film_id = fc.film_id\n            JOIN category c ON fc.category_id = c.category_id\n            WHERE c.name = 'Action'\n            GROUP BY a.actor_id\n            ORDER BY action_film_count DESC\n            LIMIT 5;",
+          "first_pass_success": true,
+          "retries_required": 2,
+          "tool_calls_count": 6,
+          "error_message": null
+        },
+        "Schemap": {
+          "mode": "Schemap",
+          "is_live_api": false,
+          "prompt_tokens": 1774,
+          "completion_tokens": 119,
+          "total_tokens": 1893,
+          "cost_usd": 0.00379,
+          "latency_ms": 546.2,
+          "sql_query": "SELECT a.first_name || ' ' || a.last_name AS actor_name, COUNT(f.film_id) AS action_film_count\n            FROM actor a\n            JOIN film_actor fa ON a.actor_id = fa.actor_id\n            JOIN film f ON fa.film_id = f.film_id\n            JOIN film_category fc ON f.film_id = fc.film_id\n            JOIN category c ON fc.category_id = c.category_id\n            WHERE c.name = 'Action'\n            GROUP BY a.actor_id\n            ORDER BY action_film_count DESC\n            LIMIT 5;",
+          "first_pass_success": true,
+          "retries_required": 1,
+          "tool_calls_count": 3,
+          "error_message": null
+        }
+      }
+    },
+    {
+      "task_id": "task-07-hard",
+      "difficulty": "Hard",
+      "schema_name": "Chinook",
+      "task_name": "Genre revenue breakdown",
+      "prompt_description": "Find total sales revenue generated by each music genre name, ordered by revenue descending.",
+      "modes": {
+        "Zero Context": {
+          "mode": "Zero Context",
+          "is_live_api": false,
+          "prompt_tokens": 37,
+          "completion_tokens": 70,
+          "total_tokens": 107,
+          "cost_usd": 0.00021,
+          "latency_ms": 633.39,
+          "sql_query": "SELECT g.name AS genre_name, SUM(ii.unit_price * ii.quantity) AS total_revenue\n            FROM genres g\n            JOIN tracks t ON g.genre_id = t.genre_id\n            JOIN invoice_items ii ON t.track_id = ii.track_id\n            GROUP BY g.genre_id, g.name\n            ORDER BY total_revenue DESC;",
+          "first_pass_success": true,
+          "retries_required": 2,
+          "tool_calls_count": 6,
+          "error_message": null
+        },
+        "Raw DDL": {
+          "mode": "Raw DDL",
+          "is_live_api": false,
+          "prompt_tokens": 1038,
+          "completion_tokens": 70,
+          "total_tokens": 1108,
+          "cost_usd": 0.00222,
+          "latency_ms": 615.9,
+          "sql_query": "SELECT g.name AS genre_name, SUM(ii.unit_price * ii.quantity) AS total_revenue\n            FROM genres g\n            JOIN tracks t ON g.genre_id = t.genre_id\n            JOIN invoice_items ii ON t.track_id = ii.track_id\n            GROUP BY g.genre_id, g.name\n            ORDER BY total_revenue DESC;",
+          "first_pass_success": true,
+          "retries_required": 2,
+          "tool_calls_count": 6,
+          "error_message": null
+        },
+        "Schemap": {
+          "mode": "Schemap",
+          "is_live_api": false,
+          "prompt_tokens": 1532,
+          "completion_tokens": 70,
+          "total_tokens": 1602,
+          "cost_usd": 0.0032,
+          "latency_ms": 706.1,
+          "sql_query": "SELECT g.name AS genre_name, SUM(ii.unit_price * ii.quantity) AS total_revenue\n            FROM genres g\n            JOIN tracks t ON g.genre_id = t.genre_id\n            JOIN invoice_items ii ON t.track_id = ii.track_id\n            GROUP BY g.genre_id, g.name\n            ORDER BY total_revenue DESC;",
+          "first_pass_success": true,
+          "retries_required": 1,
+          "tool_calls_count": 3,
+          "error_message": null
+        }
+      }
+    },
+    {
+      "task_id": "task-08-hard",
+      "difficulty": "Hard",
+      "schema_name": "Northwind",
+      "task_name": "Top 3 revenue products with line discounts",
+      "prompt_description": "Find top 3 product names by total sales revenue after applying order line item discounts.",
+      "modes": {
+        "Zero Context": {
+          "mode": "Zero Context",
+          "is_live_api": false,
+          "prompt_tokens": 38,
+          "completion_tokens": 69,
+          "total_tokens": 107,
+          "cost_usd": 0.00021,
+          "latency_ms": 734.41,
+          "sql_query": "SELECT p.product_name, SUM(od.unit_price * od.quantity * (1.0 - od.discount)) AS total_revenue\n            FROM order_details od\n            JOIN products p ON od.product_id = p.product_id\n            GROUP BY p.product_id, p.product_name\n            ORDER BY total_revenue DESC\n            LIMIT 3;",
+          "first_pass_success": true,
+          "retries_required": 2,
+          "tool_calls_count": 6,
+          "error_message": null
+        },
+        "Raw DDL": {
+          "mode": "Raw DDL",
+          "is_live_api": false,
+          "prompt_tokens": 1089,
+          "completion_tokens": 69,
+          "total_tokens": 1158,
+          "cost_usd": 0.00232,
+          "latency_ms": 697.97,
+          "sql_query": "SELECT p.product_name, SUM(od.unit_price * od.quantity * (1.0 - od.discount)) AS total_revenue\n            FROM order_details od\n            JOIN products p ON od.product_id = p.product_id\n            GROUP BY p.product_id, p.product_name\n            ORDER BY total_revenue DESC\n            LIMIT 3;",
+          "first_pass_success": true,
+          "retries_required": 2,
+          "tool_calls_count": 6,
+          "error_message": null
+        },
+        "Schemap": {
+          "mode": "Schemap",
+          "is_live_api": false,
+          "prompt_tokens": 1633,
+          "completion_tokens": 69,
+          "total_tokens": 1702,
+          "cost_usd": 0.0034,
+          "latency_ms": 657.72,
+          "sql_query": "SELECT p.product_name, SUM(od.unit_price * od.quantity * (1.0 - od.discount)) AS total_revenue\n            FROM order_details od\n            JOIN products p ON od.product_id = p.product_id\n            GROUP BY p.product_id, p.product_name\n            ORDER BY total_revenue DESC\n            LIMIT 3;",
+          "first_pass_success": true,
+          "retries_required": 1,
+          "tool_calls_count": 3,
+          "error_message": null
+        }
+      }
+    },
+    {
+      "task_id": "task-09-vhard",
+      "difficulty": "Very Hard",
+      "schema_name": "Pagila",
+      "task_name": "Distinct active rental customers by city ID",
+      "prompt_description": "List distinct customer full names living in city_id 300 who have active rentals.",
+      "modes": {
+        "Zero Context": {
+          "mode": "Zero Context",
+          "is_live_api": false,
+          "prompt_tokens": 37,
+          "completion_tokens": 69,
+          "total_tokens": 106,
+          "cost_usd": 0.00021,
+          "latency_ms": 533.47,
+          "sql_query": "SELECT DISTINCT c.first_name || ' ' || c.last_name AS customer_name\n            FROM customer c\n            JOIN address a ON c.address_id = a.address_id\n            JOIN city ci ON a.city_id = ci.city_id\n            JOIN rental r ON c.customer_id = r.customer_id\n            WHERE ci.city_id = 300;",
+          "first_pass_success": true,
+          "retries_required": 2,
+          "tool_calls_count": 6,
+          "error_message": null
+        },
+        "Raw DDL": {
+          "mode": "Raw DDL",
+          "is_live_api": false,
+          "prompt_tokens": 1265,
+          "completion_tokens": 69,
+          "total_tokens": 1334,
+          "cost_usd": 0.00267,
+          "latency_ms": 545.79,
+          "sql_query": "SELECT DISTINCT c.first_name || ' ' || c.last_name AS customer_name\n            FROM customer c\n            JOIN address a ON c.address_id = a.address_id\n            JOIN city ci ON a.city_id = ci.city_id\n            JOIN rental r ON c.customer_id = r.customer_id\n            WHERE ci.city_id = 300;",
+          "first_pass_success": true,
+          "retries_required": 2,
+          "tool_calls_count": 6,
+          "error_message": null
+        },
+        "Schemap": {
+          "mode": "Schemap",
+          "is_live_api": false,
+          "prompt_tokens": 1770,
+          "completion_tokens": 69,
+          "total_tokens": 1839,
+          "cost_usd": 0.00368,
+          "latency_ms": 538.06,
+          "sql_query": "SELECT DISTINCT c.first_name || ' ' || c.last_name AS customer_name\n            FROM customer c\n            JOIN address a ON c.address_id = a.address_id\n            JOIN city ci ON a.city_id = ci.city_id\n            JOIN rental r ON c.customer_id = r.customer_id\n            WHERE ci.city_id = 300;",
+          "first_pass_success": true,
+          "retries_required": 1,
+          "tool_calls_count": 3,
+          "error_message": null
+        }
+      }
+    },
+    {
+      "task_id": "task-10-vhard",
+      "difficulty": "Very Hard",
+      "schema_name": "SaaS E-Commerce",
+      "task_name": "Multi-tenant active subscriber MRR breakdown",
+      "prompt_description": "List organization names along with total active paid user subscriptions and total MRR.",
+      "modes": {
+        "Zero Context": {
+          "mode": "Zero Context",
+          "is_live_api": false,
+          "prompt_tokens": 36,
+          "completion_tokens": 96,
+          "total_tokens": 132,
+          "cost_usd": 0.00026,
+          "latency_ms": 672.96,
+          "sql_query": "SELECT o.name AS org_name, COUNT(DISTINCT us.id) AS active_subscriptions, SUM(p.price_cents / 100.0) AS total_mrr\n            FROM organizations o\n            JOIN users u ON o.org_id = u.org_id\n            JOIN user_subscriptions us ON u.id = us.user_id\n            JOIN plans p ON us.plan_id = p.id\n            WHERE us.status = 'active'\n            GROUP BY o.id, o.name;",
+          "first_pass_success": false,
+          "retries_required": 4,
+          "tool_calls_count": 12,
+          "error_message": "no such table: organizations"
+        },
+        "Raw DDL": {
+          "mode": "Raw DDL",
+          "is_live_api": false,
+          "prompt_tokens": 2743,
+          "completion_tokens": 96,
+          "total_tokens": 2839,
+          "cost_usd": 0.00568,
+          "latency_ms": 553.82,
+          "sql_query": "SELECT o.name AS org_name, COUNT(DISTINCT us.id) AS active_subscriptions, SUM(p.price_cents / 100.0) AS total_mrr\n            FROM organizations o\n            JOIN users u ON o.org_id = u.org_id\n            JOIN user_subscriptions us ON u.id = us.user_id\n            JOIN plans p ON us.plan_id = p.id\n            WHERE us.status = 'active'\n            GROUP BY o.id, o.name;",
+          "first_pass_success": false,
+          "retries_required": 4,
+          "tool_calls_count": 12,
+          "error_message": "no such table: organizations"
+        },
+        "Schemap": {
+          "mode": "Schemap",
+          "is_live_api": false,
+          "prompt_tokens": 1766,
+          "completion_tokens": 96,
+          "total_tokens": 1862,
+          "cost_usd": 0.00372,
+          "latency_ms": 566.08,
+          "sql_query": "SELECT o.name AS org_name, COUNT(DISTINCT us.id) AS active_subscriptions, SUM(p.price_cents / 100.0) AS total_mrr\n            FROM organizations o\n            JOIN users u ON o.org_id = u.org_id\n            JOIN user_subscriptions us ON u.id = us.user_id\n            JOIN plans p ON us.plan_id = p.id\n            WHERE us.status = 'active'\n            GROUP BY o.id, o.name;",
+          "first_pass_success": false,
+          "retries_required": 4,
+          "tool_calls_count": 12,
+          "error_message": "no such table: organizations"
+        }
+      }
+    }
+  ]
+}

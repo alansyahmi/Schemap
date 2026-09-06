@@ -986,30 +986,31 @@ CREATE INDEX idx_fk_staff_id_payment ON payment (staff_id);
 def get_saas_ecommerce_schema() -> tuple[DatabaseSchemaModel, str]:
     """30-table modern SaaS e-commerce platform schema."""
     schema = generate_synthetic_schema_models(30)
-    ddl_lines = []
+    ddl_tables = []
     for t in schema.tables:
-        ddl_lines.append(f"CREATE TABLE {t.name} (")
+        col_defs = []
         for col in t.columns:
             pk = " PRIMARY KEY" if col.primary_key else ""
             nullable = " NOT NULL" if not col.is_nullable else ""
-            ddl_lines.append(f"    {col.name} {col.data_type}{pk}{nullable},")
+            col_defs.append(f"    {col.name} {col.data_type}{pk}{nullable}")
         for fk in t.foreign_keys:
-            ddl_lines.append(f"    CONSTRAINT fk_{t.name}_{fk.column_name} FOREIGN KEY ({fk.column_name}) REFERENCES {fk.foreign_table_name} ({fk.foreign_column_name}),")
-        ddl_lines.append(");")
-    return schema, "\n".join(ddl_lines)
+            col_defs.append(f"    CONSTRAINT fk_{t.name}_{fk.column_name} FOREIGN KEY ({fk.column_name}) REFERENCES {fk.foreign_table_name} ({fk.foreign_column_name})")
+        ddl_tables.append(f"CREATE TABLE {t.name} (\n" + ",\n".join(col_defs) + "\n);")
+    return schema, "\n\n".join(ddl_tables)
 
 
 def get_enterprise_100_schema() -> tuple[DatabaseSchemaModel, str]:
     """100-table enterprise production schema."""
     schema = generate_synthetic_schema_models(100)
-    ddl_lines = []
+    ddl_tables = []
     for t in schema.tables:
-        ddl_lines.append(f"CREATE TABLE {t.name} (")
+        col_defs = []
         for col in t.columns:
             pk = " PRIMARY KEY" if col.primary_key else ""
             nullable = " NOT NULL" if not col.is_nullable else ""
-            ddl_lines.append(f"    {col.name} {col.data_type}{pk}{nullable},")
+            col_defs.append(f"    {col.name} {col.data_type}{pk}{nullable}")
         for fk in t.foreign_keys:
-            ddl_lines.append(f"    CONSTRAINT fk_{t.name}_{fk.column_name} FOREIGN KEY ({fk.column_name}) REFERENCES {fk.foreign_table_name} ({fk.foreign_column_name}),")
-        ddl_lines.append(");")
-    return schema, "\n".join(ddl_lines)
+            col_defs.append(f"    CONSTRAINT fk_{t.name}_{fk.column_name} FOREIGN KEY ({fk.column_name}) REFERENCES {fk.foreign_table_name} ({fk.foreign_column_name})")
+        ddl_tables.append(f"CREATE TABLE {t.name} (\n" + ",\n".join(col_defs) + "\n);")
+    return schema, "\n\n".join(ddl_tables)
+

@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-08-19 15:52:30 UTC",
+  "timestamp": "2026-09-06 22:12:51 UTC",
   "platform": "win32",
   "scales_evaluated": [
     10,
@@ -13,178 +13,178 @@
   "results": [
     {
       "tables_count": 10,
-      "columns_count": 105,
-      "foreign_keys_count": 8,
+      "columns_count": 122,
+      "foreign_keys_count": 6,
       "iterations_tested": 50,
       "latency_stats_ms": {
-        "mean": 0.521,
-        "p50": 0.518,
-        "p90": 0.544,
-        "p95": 0.549,
-        "p99": 0.557,
-        "min": 0.48,
-        "max": 0.559
+        "mean": 0.508,
+        "p50": 0.499,
+        "p90": 0.518,
+        "p95": 0.551,
+        "p99": 0.637,
+        "min": 0.494,
+        "max": 0.651
       },
       "component_breakdown_ms": {
-        "central_tables_ranking": 0.044,
-        "relationship_mapping": 0.057
+        "central_tables_ranking": 0.043,
+        "relationship_mapping": 0.047
       },
       "memory_profile": {
-        "peak_ram_kb": 17.72,
+        "peak_ram_kb": 17.85,
         "peak_ram_mb": 0.017
       },
-      "throughput_compilations_per_sec": 1920.1,
-      "output_context_characters": 1748
+      "throughput_compilations_per_sec": 1968.8,
+      "output_context_characters": 1621
     },
     {
       "tables_count": 25,
-      "columns_count": 333,
-      "foreign_keys_count": 14,
+      "columns_count": 341,
+      "foreign_keys_count": 13,
       "iterations_tested": 50,
       "latency_stats_ms": {
-        "mean": 1.075,
-        "p50": 1.083,
-        "p90": 1.112,
-        "p95": 1.12,
-        "p99": 1.296,
-        "min": 0.907,
-        "max": 1.444
+        "mean": 1.197,
+        "p50": 1.145,
+        "p90": 1.272,
+        "p95": 1.416,
+        "p99": 1.959,
+        "min": 1.128,
+        "max": 2.102
       },
       "component_breakdown_ms": {
-        "central_tables_ranking": 0.08,
-        "relationship_mapping": 0.09
+        "central_tables_ranking": 0.087,
+        "relationship_mapping": 0.103
       },
       "memory_profile": {
-        "peak_ram_kb": 29.29,
-        "peak_ram_mb": 0.029
+        "peak_ram_kb": 28.94,
+        "peak_ram_mb": 0.028
       },
-      "throughput_compilations_per_sec": 930.4,
-      "output_context_characters": 1986
+      "throughput_compilations_per_sec": 835.7,
+      "output_context_characters": 2031
     },
     {
       "tables_count": 50,
-      "columns_count": 648,
-      "foreign_keys_count": 28,
+      "columns_count": 553,
+      "foreign_keys_count": 27,
       "iterations_tested": 50,
       "latency_stats_ms": {
-        "mean": 2.105,
-        "p50": 2.078,
-        "p90": 2.161,
-        "p95": 2.195,
-        "p99": 2.383,
-        "min": 2.044,
-        "max": 2.539
+        "mean": 2.205,
+        "p50": 2.129,
+        "p90": 2.53,
+        "p95": 2.591,
+        "p99": 2.959,
+        "min": 2.086,
+        "max": 3.182
       },
       "component_breakdown_ms": {
-        "central_tables_ranking": 0.179,
-        "relationship_mapping": 0.211
+        "central_tables_ranking": 0.174,
+        "relationship_mapping": 0.215
       },
       "memory_profile": {
-        "peak_ram_kb": 47.58,
-        "peak_ram_mb": 0.046
+        "peak_ram_kb": 45.76,
+        "peak_ram_mb": 0.045
       },
-      "throughput_compilations_per_sec": 475.2,
-      "output_context_characters": 2518
+      "throughput_compilations_per_sec": 453.5,
+      "output_context_characters": 2510
     },
     {
       "tables_count": 100,
-      "columns_count": 1265,
-      "foreign_keys_count": 42,
+      "columns_count": 1222,
+      "foreign_keys_count": 51,
       "iterations_tested": 30,
       "latency_stats_ms": {
-        "mean": 3.61,
-        "p50": 3.601,
-        "p90": 3.683,
-        "p95": 3.708,
-        "p99": 3.725,
-        "min": 3.527,
-        "max": 3.727
+        "mean": 4.267,
+        "p50": 4.225,
+        "p90": 4.601,
+        "p95": 4.626,
+        "p99": 4.98,
+        "min": 3.973,
+        "max": 5.116
       },
       "component_breakdown_ms": {
-        "central_tables_ranking": 0.329,
-        "relationship_mapping": 0.317
+        "central_tables_ranking": 0.331,
+        "relationship_mapping": 0.377
       },
       "memory_profile": {
-        "peak_ram_kb": 76.42,
-        "peak_ram_mb": 0.075
+        "peak_ram_kb": 83.21,
+        "peak_ram_mb": 0.081
       },
-      "throughput_compilations_per_sec": 277.0,
-      "output_context_characters": 3234
+      "throughput_compilations_per_sec": 234.3,
+      "output_context_characters": 3501
     },
     {
       "tables_count": 250,
-      "columns_count": 3049,
-      "foreign_keys_count": 124,
+      "columns_count": 3146,
+      "foreign_keys_count": 114,
       "iterations_tested": 30,
       "latency_stats_ms": {
-        "mean": 9.574,
-        "p50": 9.534,
-        "p90": 9.78,
-        "p95": 9.879,
-        "p99": 10.068,
-        "min": 9.384,
-        "max": 10.118
+        "mean": 10.442,
+        "p50": 10.323,
+        "p90": 10.818,
+        "p95": 11.854,
+        "p99": 12.912,
+        "min": 9.819,
+        "max": 13.072
       },
       "component_breakdown_ms": {
-        "central_tables_ranking": 0.813,
-        "relationship_mapping": 0.953
+        "central_tables_ranking": 0.906,
+        "relationship_mapping": 1.626
       },
       "memory_profile": {
-        "peak_ram_kb": 197.37,
-        "peak_ram_mb": 0.193
+        "peak_ram_kb": 191.18,
+        "peak_ram_mb": 0.187
       },
-      "throughput_compilations_per_sec": 104.4,
-      "output_context_characters": 6564
+      "throughput_compilations_per_sec": 95.8,
+      "output_context_characters": 6260
     },
     {
       "tables_count": 500,
-      "columns_count": 6109,
-      "foreign_keys_count": 261,
+      "columns_count": 6342,
+      "foreign_keys_count": 280,
       "iterations_tested": 15,
       "latency_stats_ms": {
-        "mean": 19.066,
-        "p50": 19.513,
-        "p90": 20.364,
-        "p95": 20.621,
-        "p99": 20.631,
-        "min": 16.697,
-        "max": 20.634
+        "mean": 23.722,
+        "p50": 23.592,
+        "p90": 24.497,
+        "p95": 25.299,
+        "p99": 26.551,
+        "min": 22.28,
+        "max": 26.864
       },
       "component_breakdown_ms": {
-        "central_tables_ranking": 1.79,
-        "relationship_mapping": 1.902
+        "central_tables_ranking": 1.712,
+        "relationship_mapping": 2.347
       },
       "memory_profile": {
-        "peak_ram_kb": 391.56,
-        "peak_ram_mb": 0.382
+        "peak_ram_kb": 416.15,
+        "peak_ram_mb": 0.406
       },
-      "throughput_compilations_per_sec": 52.4,
-      "output_context_characters": 12501
+      "throughput_compilations_per_sec": 42.2,
+      "output_context_characters": 13235
     },
     {
       "tables_count": 1000,
-      "columns_count": 12358,
-      "foreign_keys_count": 509,
+      "columns_count": 12356,
+      "foreign_keys_count": 511,
       "iterations_tested": 15,
       "latency_stats_ms": {
-        "mean": 43.153,
-        "p50": 43.093,
-        "p90": 45.955,
-        "p95": 47.378,
-        "p99": 48.416,
-        "min": 40.034,
-        "max": 48.676
+        "mean": 49.084,
+        "p50": 47.439,
+        "p90": 52.181,
+        "p95": 56.782,
+        "p99": 64.442,
+        "min": 44.507,
+        "max": 66.358
       },
       "component_breakdown_ms": {
-        "central_tables_ranking": 3.505,
-        "relationship_mapping": 3.998
+        "central_tables_ranking": 3.431,
+        "relationship_mapping": 3.865
       },
       "memory_profile": {
-        "peak_ram_kb": 777.67,
+        "peak_ram_kb": 777.38,
         "peak_ram_mb": 0.759
       },
-      "throughput_compilations_per_sec": 23.2,
-      "output_context_characters": 23237
+      "throughput_compilations_per_sec": 20.4,
+      "output_context_characters": 23479
     }
   ]
 }

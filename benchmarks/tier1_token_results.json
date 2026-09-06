@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-08-20 06:45:39 UTC",
+  "timestamp": "2026-09-06 22:12:45 UTC",
   "frontier_models_count": 15,
   "frontier_models": {
     "Claude Fable 5 (Anthropic)": {
@@ -89,7 +89,7 @@
       "tables_count": 11,
       "columns_count": 64,
       "relationships_count": 11,
-      "latency_ms": 0.987,
+      "latency_ms": 1.079,
       "cl100k_tokens": {
         "raw_ddl": 995,
         "schemap_context": 536,
@@ -420,7 +420,7 @@
       "tables_count": 13,
       "columns_count": 86,
       "relationships_count": 13,
-      "latency_ms": 1.17,
+      "latency_ms": 1.094,
       "cl100k_tokens": {
         "raw_ddl": 1045,
         "schemap_context": 590,
@@ -751,7 +751,7 @@
       "tables_count": 15,
       "columns_count": 82,
       "relationships_count": 20,
-      "latency_ms": 1.458,
+      "latency_ms": 1.445,
       "cl100k_tokens": {
         "raw_ddl": 1222,
         "schemap_context": 673,
@@ -1080,179 +1080,179 @@
     {
       "schema_name": "SaaS E-Commerce Platform",
       "tables_count": 30,
-      "columns_count": 360,
-      "relationships_count": 11,
-      "latency_ms": 1.769,
+      "columns_count": 399,
+      "relationships_count": 16,
+      "latency_ms": 2.187,
       "cl100k_tokens": {
-        "raw_ddl": 2572,
-        "schemap_context": 532,
-        "claude_md": 918,
-        "agents_md": 2162,
-        "tokens_saved": 2040,
-        "reduction_percentage": "79.3%",
-        "agent_reduction_percentage": "15.9%"
+        "raw_ddl": 2913,
+        "schemap_context": 636,
+        "claude_md": 1065,
+        "agents_md": 2517,
+        "tokens_saved": 2277,
+        "reduction_percentage": "78.2%",
+        "agent_reduction_percentage": "13.6%"
       },
       "o200k_tokens": {
-        "raw_ddl": 2613,
-        "schemap_context": 540,
-        "reduction_percentage": "79.3%"
+        "raw_ddl": 2960,
+        "schemap_context": 644,
+        "reduction_percentage": "78.2%"
       },
       "multi_turn_agent_loop": {
         "turns_per_task": 20,
-        "raw_task_tokens": 51440,
-        "schemap_task_tokens": 10640,
-        "task_tokens_saved": 40800
+        "raw_task_tokens": 58260,
+        "schemap_task_tokens": 12720,
+        "task_tokens_saved": 45540
       },
       "frontier_models_roi": {
         "Claude Fable 5 (Anthropic)": {
           "rate_per_million": 10.0,
           "provider": "Anthropic",
           "tier": "High-End Frontier Intelligence",
-          "cost_saved_per_1k_prompts": 20.4,
-          "monthly_savings_per_dev": 17.95,
-          "annual_savings_team_5": 1077.12,
-          "agent_loop_task_tokens_saved": 40800,
-          "agent_loop_annual_team_savings": 1077.12
+          "cost_saved_per_1k_prompts": 22.77,
+          "monthly_savings_per_dev": 20.04,
+          "annual_savings_team_5": 1202.26,
+          "agent_loop_task_tokens_saved": 45540,
+          "agent_loop_annual_team_savings": 1202.26
         },
         "OpenAI o3 (OpenAI)": {
           "rate_per_million": 10.0,
           "provider": "OpenAI",
           "tier": "High-Compute Deep Reasoning",
-          "cost_saved_per_1k_prompts": 20.4,
-          "monthly_savings_per_dev": 17.95,
-          "annual_savings_team_5": 1077.12,
-          "agent_loop_task_tokens_saved": 40800,
-          "agent_loop_annual_team_savings": 1077.12
+          "cost_saved_per_1k_prompts": 22.77,
+          "monthly_savings_per_dev": 20.04,
+          "annual_savings_team_5": 1202.26,
+          "agent_loop_task_tokens_saved": 45540,
+          "agent_loop_annual_team_savings": 1202.26
         },
         "Claude Opus 5 (Anthropic)": {
           "rate_per_million": 5.0,
           "provider": "Anthropic",
           "tier": "Flagship Autonomous Reasoning",
-          "cost_saved_per_1k_prompts": 10.2,
-          "monthly_savings_per_dev": 8.98,
-          "annual_savings_team_5": 538.56,
-          "agent_loop_task_tokens_saved": 40800,
-          "agent_loop_annual_team_savings": 538.56
+          "cost_saved_per_1k_prompts": 11.38,
+          "monthly_savings_per_dev": 10.02,
+          "annual_savings_team_5": 601.13,
+          "agent_loop_task_tokens_saved": 45540,
+          "agent_loop_annual_team_savings": 601.13
         },
         "GPT-5.6 Sol (OpenAI)": {
           "rate_per_million": 5.0,
           "provider": "OpenAI",
           "tier": "Flagship Generalist",
-          "cost_saved_per_1k_prompts": 10.2,
-          "monthly_savings_per_dev": 8.98,
-          "annual_savings_team_5": 538.56,
-          "agent_loop_task_tokens_saved": 40800,
-          "agent_loop_annual_team_savings": 538.56
+          "cost_saved_per_1k_prompts": 11.38,
+          "monthly_savings_per_dev": 10.02,
+          "annual_savings_team_5": 601.13,
+          "agent_loop_task_tokens_saved": 45540,
+          "agent_loop_annual_team_savings": 601.13
         },
         "Gemini 3.7 Pro (Google)": {
           "rate_per_million": 3.5,
           "provider": "Google",
           "tier": "Deep Multimodal & Long Context",
-          "cost_saved_per_1k_prompts": 7.14,
-          "monthly_savings_per_dev": 6.28,
-          "annual_savings_team_5": 376.99,
-          "agent_loop_task_tokens_saved": 40800,
-          "agent_loop_annual_team_savings": 376.99
+          "cost_saved_per_1k_prompts": 7.97,
+          "monthly_savings_per_dev": 7.01,
+          "annual_savings_team_5": 420.79,
+          "agent_loop_task_tokens_saved": 45540,
+          "agent_loop_annual_team_savings": 420.79
         },
         "Claude Sonnet 5 (Anthropic)": {
           "rate_per_million": 2.0,
           "provider": "Anthropic",
           "tier": "Workhorse Coding Agent",
-          "cost_saved_per_1k_prompts": 4.08,
-          "monthly_savings_per_dev": 3.59,
-          "annual_savings_team_5": 215.42,
-          "agent_loop_task_tokens_saved": 40800,
-          "agent_loop_annual_team_savings": 215.42
+          "cost_saved_per_1k_prompts": 4.55,
+          "monthly_savings_per_dev": 4.01,
+          "annual_savings_team_5": 240.45,
+          "agent_loop_task_tokens_saved": 45540,
+          "agent_loop_annual_team_savings": 240.45
         },
         "GPT-5.6 Terra (OpenAI)": {
           "rate_per_million": 2.0,
           "provider": "OpenAI",
           "tier": "Standard Agentic Workhorse",
-          "cost_saved_per_1k_prompts": 4.08,
-          "monthly_savings_per_dev": 3.59,
-          "annual_savings_team_5": 215.42,
-          "agent_loop_task_tokens_saved": 40800,
-          "agent_loop_annual_team_savings": 215.42
+          "cost_saved_per_1k_prompts": 4.55,
+          "monthly_savings_per_dev": 4.01,
+          "annual_savings_team_5": 240.45,
+          "agent_loop_task_tokens_saved": 45540,
+          "agent_loop_annual_team_savings": 240.45
         },
         "Gemini 3.1 Pro (Google)": {
           "rate_per_million": 2.0,
           "provider": "Google",
           "tier": "Enterprise Multimodal",
-          "cost_saved_per_1k_prompts": 4.08,
-          "monthly_savings_per_dev": 3.59,
-          "annual_savings_team_5": 215.42,
-          "agent_loop_task_tokens_saved": 40800,
-          "agent_loop_annual_team_savings": 215.42
+          "cost_saved_per_1k_prompts": 4.55,
+          "monthly_savings_per_dev": 4.01,
+          "annual_savings_team_5": 240.45,
+          "agent_loop_task_tokens_saved": 45540,
+          "agent_loop_annual_team_savings": 240.45
         },
         "xAI Grok 4.6 (xAI)": {
           "rate_per_million": 2.0,
           "provider": "xAI",
           "tier": "Next-Gen Tool Use & Reasoning",
-          "cost_saved_per_1k_prompts": 4.08,
-          "monthly_savings_per_dev": 3.59,
-          "annual_savings_team_5": 215.42,
-          "agent_loop_task_tokens_saved": 40800,
-          "agent_loop_annual_team_savings": 215.42
+          "cost_saved_per_1k_prompts": 4.55,
+          "monthly_savings_per_dev": 4.01,
+          "annual_savings_team_5": 240.45,
+          "agent_loop_task_tokens_saved": 45540,
+          "agent_loop_annual_team_savings": 240.45
         },
         "DeepSeek V4-Pro (DeepSeek)": {
           "rate_per_million": 1.32,
           "provider": "DeepSeek",
           "tier": "Frontier Open-Weights Reasoning",
-          "cost_saved_per_1k_prompts": 2.69,
-          "monthly_savings_per_dev": 2.37,
-          "annual_savings_team_5": 142.18,
-          "agent_loop_task_tokens_saved": 40800,
-          "agent_loop_annual_team_savings": 142.18
+          "cost_saved_per_1k_prompts": 3.01,
+          "monthly_savings_per_dev": 2.64,
+          "annual_savings_team_5": 158.7,
+          "agent_loop_task_tokens_saved": 45540,
+          "agent_loop_annual_team_savings": 158.7
         },
         "OpenAI o3-mini (OpenAI)": {
           "rate_per_million": 1.1,
           "provider": "OpenAI",
           "tier": "Fast STEM & Code Reasoning",
-          "cost_saved_per_1k_prompts": 2.24,
-          "monthly_savings_per_dev": 1.97,
-          "annual_savings_team_5": 118.48,
-          "agent_loop_task_tokens_saved": 40800,
-          "agent_loop_annual_team_savings": 118.48
+          "cost_saved_per_1k_prompts": 2.5,
+          "monthly_savings_per_dev": 2.2,
+          "annual_savings_team_5": 132.25,
+          "agent_loop_task_tokens_saved": 45540,
+          "agent_loop_annual_team_savings": 132.25
         },
         "Claude Haiku 4.5 (Anthropic)": {
           "rate_per_million": 1.0,
           "provider": "Anthropic",
           "tier": "High-Speed Agent Loops",
-          "cost_saved_per_1k_prompts": 2.04,
-          "monthly_savings_per_dev": 1.8,
-          "annual_savings_team_5": 107.71,
-          "agent_loop_task_tokens_saved": 40800,
-          "agent_loop_annual_team_savings": 107.71
+          "cost_saved_per_1k_prompts": 2.28,
+          "monthly_savings_per_dev": 2.0,
+          "annual_savings_team_5": 120.23,
+          "agent_loop_task_tokens_saved": 45540,
+          "agent_loop_annual_team_savings": 120.23
         },
         "Gemini 3.7 Flash (Google)": {
           "rate_per_million": 0.75,
           "provider": "Google",
           "tier": "High-Efficiency Frontier",
-          "cost_saved_per_1k_prompts": 1.53,
-          "monthly_savings_per_dev": 1.35,
-          "annual_savings_team_5": 80.78,
-          "agent_loop_task_tokens_saved": 40800,
-          "agent_loop_annual_team_savings": 80.78
+          "cost_saved_per_1k_prompts": 1.71,
+          "monthly_savings_per_dev": 1.5,
+          "annual_savings_team_5": 90.17,
+          "agent_loop_task_tokens_saved": 45540,
+          "agent_loop_annual_team_savings": 90.17
         },
         "DeepSeek V4-Flash (DeepSeek)": {
           "rate_per_million": 0.44,
           "provider": "DeepSeek",
           "tier": "High-Throughput Inference",
-          "cost_saved_per_1k_prompts": 0.9,
-          "monthly_savings_per_dev": 0.79,
-          "annual_savings_team_5": 47.39,
-          "agent_loop_task_tokens_saved": 40800,
-          "agent_loop_annual_team_savings": 47.39
+          "cost_saved_per_1k_prompts": 1.0,
+          "monthly_savings_per_dev": 0.88,
+          "annual_savings_team_5": 52.9,
+          "agent_loop_task_tokens_saved": 45540,
+          "agent_loop_annual_team_savings": 52.9
         },
         "GPT-5.6 Luna (OpenAI)": {
           "rate_per_million": 0.2,
           "provider": "OpenAI",
           "tier": "Ultra-Fast Subagent Tier",
-          "cost_saved_per_1k_prompts": 0.41,
-          "monthly_savings_per_dev": 0.36,
-          "annual_savings_team_5": 21.54,
-          "agent_loop_task_tokens_saved": 40800,
-          "agent_loop_annual_team_savings": 21.54
+          "cost_saved_per_1k_prompts": 0.46,
+          "monthly_savings_per_dev": 0.4,
+          "annual_savings_team_5": 24.05,
+          "agent_loop_task_tokens_saved": 45540,
+          "agent_loop_annual_team_savings": 24.05
         }
       },
       "next_gen_models_roi": {
@@ -1260,330 +1260,330 @@
           "rate_per_million": 10.0,
           "provider": "Anthropic",
           "tier": "High-End Frontier Intelligence",
-          "cost_saved_per_1k_prompts": 20.4,
-          "monthly_savings_per_dev": 17.95,
-          "annual_savings_team_5": 1077.12,
-          "agent_loop_task_tokens_saved": 40800,
-          "agent_loop_annual_team_savings": 1077.12
+          "cost_saved_per_1k_prompts": 22.77,
+          "monthly_savings_per_dev": 20.04,
+          "annual_savings_team_5": 1202.26,
+          "agent_loop_task_tokens_saved": 45540,
+          "agent_loop_annual_team_savings": 1202.26
         },
         "OpenAI o3 (OpenAI)": {
           "rate_per_million": 10.0,
           "provider": "OpenAI",
           "tier": "High-Compute Deep Reasoning",
-          "cost_saved_per_1k_prompts": 20.4,
-          "monthly_savings_per_dev": 17.95,
-          "annual_savings_team_5": 1077.12,
-          "agent_loop_task_tokens_saved": 40800,
-          "agent_loop_annual_team_savings": 1077.12
+          "cost_saved_per_1k_prompts": 22.77,
+          "monthly_savings_per_dev": 20.04,
+          "annual_savings_team_5": 1202.26,
+          "agent_loop_task_tokens_saved": 45540,
+          "agent_loop_annual_team_savings": 1202.26
         },
         "Claude Opus 5 (Anthropic)": {
           "rate_per_million": 5.0,
           "provider": "Anthropic",
           "tier": "Flagship Autonomous Reasoning",
-          "cost_saved_per_1k_prompts": 10.2,
-          "monthly_savings_per_dev": 8.98,
-          "annual_savings_team_5": 538.56,
-          "agent_loop_task_tokens_saved": 40800,
-          "agent_loop_annual_team_savings": 538.56
+          "cost_saved_per_1k_prompts": 11.38,
+          "monthly_savings_per_dev": 10.02,
+          "annual_savings_team_5": 601.13,
+          "agent_loop_task_tokens_saved": 45540,
+          "agent_loop_annual_team_savings": 601.13
         },
         "GPT-5.6 Sol (OpenAI)": {
           "rate_per_million": 5.0,
           "provider": "OpenAI",
           "tier": "Flagship Generalist",
-          "cost_saved_per_1k_prompts": 10.2,
-          "monthly_savings_per_dev": 8.98,
-          "annual_savings_team_5": 538.56,
-          "agent_loop_task_tokens_saved": 40800,
-          "agent_loop_annual_team_savings": 538.56
+          "cost_saved_per_1k_prompts": 11.38,
+          "monthly_savings_per_dev": 10.02,
+          "annual_savings_team_5": 601.13,
+          "agent_loop_task_tokens_saved": 45540,
+          "agent_loop_annual_team_savings": 601.13
         },
         "Gemini 3.7 Pro (Google)": {
           "rate_per_million": 3.5,
           "provider": "Google",
           "tier": "Deep Multimodal & Long Context",
-          "cost_saved_per_1k_prompts": 7.14,
-          "monthly_savings_per_dev": 6.28,
-          "annual_savings_team_5": 376.99,
-          "agent_loop_task_tokens_saved": 40800,
-          "agent_loop_annual_team_savings": 376.99
+          "cost_saved_per_1k_prompts": 7.97,
+          "monthly_savings_per_dev": 7.01,
+          "annual_savings_team_5": 420.79,
+          "agent_loop_task_tokens_saved": 45540,
+          "agent_loop_annual_team_savings": 420.79
         },
         "Claude Sonnet 5 (Anthropic)": {
           "rate_per_million": 2.0,
           "provider": "Anthropic",
           "tier": "Workhorse Coding Agent",
-          "cost_saved_per_1k_prompts": 4.08,
-          "monthly_savings_per_dev": 3.59,
-          "annual_savings_team_5": 215.42,
-          "agent_loop_task_tokens_saved": 40800,
-          "agent_loop_annual_team_savings": 215.42
+          "cost_saved_per_1k_prompts": 4.55,
+          "monthly_savings_per_dev": 4.01,
+          "annual_savings_team_5": 240.45,
+          "agent_loop_task_tokens_saved": 45540,
+          "agent_loop_annual_team_savings": 240.45
         },
         "GPT-5.6 Terra (OpenAI)": {
           "rate_per_million": 2.0,
           "provider": "OpenAI",
           "tier": "Standard Agentic Workhorse",
-          "cost_saved_per_1k_prompts": 4.08,
-          "monthly_savings_per_dev": 3.59,
-          "annual_savings_team_5": 215.42,
-          "agent_loop_task_tokens_saved": 40800,
-          "agent_loop_annual_team_savings": 215.42
+          "cost_saved_per_1k_prompts": 4.55,
+          "monthly_savings_per_dev": 4.01,
+          "annual_savings_team_5": 240.45,
+          "agent_loop_task_tokens_saved": 45540,
+          "agent_loop_annual_team_savings": 240.45
         },
         "Gemini 3.1 Pro (Google)": {
           "rate_per_million": 2.0,
           "provider": "Google",
           "tier": "Enterprise Multimodal",
-          "cost_saved_per_1k_prompts": 4.08,
-          "monthly_savings_per_dev": 3.59,
-          "annual_savings_team_5": 215.42,
-          "agent_loop_task_tokens_saved": 40800,
-          "agent_loop_annual_team_savings": 215.42
+          "cost_saved_per_1k_prompts": 4.55,
+          "monthly_savings_per_dev": 4.01,
+          "annual_savings_team_5": 240.45,
+          "agent_loop_task_tokens_saved": 45540,
+          "agent_loop_annual_team_savings": 240.45
         },
         "xAI Grok 4.6 (xAI)": {
           "rate_per_million": 2.0,
           "provider": "xAI",
           "tier": "Next-Gen Tool Use & Reasoning",
-          "cost_saved_per_1k_prompts": 4.08,
-          "monthly_savings_per_dev": 3.59,
-          "annual_savings_team_5": 215.42,
-          "agent_loop_task_tokens_saved": 40800,
-          "agent_loop_annual_team_savings": 215.42
+          "cost_saved_per_1k_prompts": 4.55,
+          "monthly_savings_per_dev": 4.01,
+          "annual_savings_team_5": 240.45,
+          "agent_loop_task_tokens_saved": 45540,
+          "agent_loop_annual_team_savings": 240.45
         },
         "DeepSeek V4-Pro (DeepSeek)": {
           "rate_per_million": 1.32,
           "provider": "DeepSeek",
           "tier": "Frontier Open-Weights Reasoning",
-          "cost_saved_per_1k_prompts": 2.69,
-          "monthly_savings_per_dev": 2.37,
-          "annual_savings_team_5": 142.18,
-          "agent_loop_task_tokens_saved": 40800,
-          "agent_loop_annual_team_savings": 142.18
+          "cost_saved_per_1k_prompts": 3.01,
+          "monthly_savings_per_dev": 2.64,
+          "annual_savings_team_5": 158.7,
+          "agent_loop_task_tokens_saved": 45540,
+          "agent_loop_annual_team_savings": 158.7
         },
         "OpenAI o3-mini (OpenAI)": {
           "rate_per_million": 1.1,
           "provider": "OpenAI",
           "tier": "Fast STEM & Code Reasoning",
-          "cost_saved_per_1k_prompts": 2.24,
-          "monthly_savings_per_dev": 1.97,
-          "annual_savings_team_5": 118.48,
-          "agent_loop_task_tokens_saved": 40800,
-          "agent_loop_annual_team_savings": 118.48
+          "cost_saved_per_1k_prompts": 2.5,
+          "monthly_savings_per_dev": 2.2,
+          "annual_savings_team_5": 132.25,
+          "agent_loop_task_tokens_saved": 45540,
+          "agent_loop_annual_team_savings": 132.25
         },
         "Claude Haiku 4.5 (Anthropic)": {
           "rate_per_million": 1.0,
           "provider": "Anthropic",
           "tier": "High-Speed Agent Loops",
-          "cost_saved_per_1k_prompts": 2.04,
-          "monthly_savings_per_dev": 1.8,
-          "annual_savings_team_5": 107.71,
-          "agent_loop_task_tokens_saved": 40800,
-          "agent_loop_annual_team_savings": 107.71
+          "cost_saved_per_1k_prompts": 2.28,
+          "monthly_savings_per_dev": 2.0,
+          "annual_savings_team_5": 120.23,
+          "agent_loop_task_tokens_saved": 45540,
+          "agent_loop_annual_team_savings": 120.23
         },
         "Gemini 3.7 Flash (Google)": {
           "rate_per_million": 0.75,
           "provider": "Google",
           "tier": "High-Efficiency Frontier",
-          "cost_saved_per_1k_prompts": 1.53,
-          "monthly_savings_per_dev": 1.35,
-          "annual_savings_team_5": 80.78,
-          "agent_loop_task_tokens_saved": 40800,
-          "agent_loop_annual_team_savings": 80.78
+          "cost_saved_per_1k_prompts": 1.71,
+          "monthly_savings_per_dev": 1.5,
+          "annual_savings_team_5": 90.17,
+          "agent_loop_task_tokens_saved": 45540,
+          "agent_loop_annual_team_savings": 90.17
         },
         "DeepSeek V4-Flash (DeepSeek)": {
           "rate_per_million": 0.44,
           "provider": "DeepSeek",
           "tier": "High-Throughput Inference",
-          "cost_saved_per_1k_prompts": 0.9,
-          "monthly_savings_per_dev": 0.79,
-          "annual_savings_team_5": 47.39,
-          "agent_loop_task_tokens_saved": 40800,
-          "agent_loop_annual_team_savings": 47.39
+          "cost_saved_per_1k_prompts": 1.0,
+          "monthly_savings_per_dev": 0.88,
+          "annual_savings_team_5": 52.9,
+          "agent_loop_task_tokens_saved": 45540,
+          "agent_loop_annual_team_savings": 52.9
         },
         "GPT-5.6 Luna (OpenAI)": {
           "rate_per_million": 0.2,
           "provider": "OpenAI",
           "tier": "Ultra-Fast Subagent Tier",
-          "cost_saved_per_1k_prompts": 0.41,
-          "monthly_savings_per_dev": 0.36,
-          "annual_savings_team_5": 21.54,
-          "agent_loop_task_tokens_saved": 40800,
-          "agent_loop_annual_team_savings": 21.54
+          "cost_saved_per_1k_prompts": 0.46,
+          "monthly_savings_per_dev": 0.4,
+          "annual_savings_team_5": 24.05,
+          "agent_loop_task_tokens_saved": 45540,
+          "agent_loop_annual_team_savings": 24.05
         }
       }
     },
     {
       "schema_name": "Enterprise Production Scale",
       "tables_count": 100,
-      "columns_count": 1237,
-      "relationships_count": 40,
-      "latency_ms": 6.125,
+      "columns_count": 1265,
+      "relationships_count": 42,
+      "latency_ms": 6.332,
       "cl100k_tokens": {
-        "raw_ddl": 9027,
-        "schemap_context": 1103,
-        "claude_md": 1789,
-        "agents_md": 7442,
-        "tokens_saved": 7924,
+        "raw_ddl": 9237,
+        "schemap_context": 1127,
+        "claude_md": 1854,
+        "agents_md": 7647,
+        "tokens_saved": 8110,
         "reduction_percentage": "87.8%",
-        "agent_reduction_percentage": "17.6%"
+        "agent_reduction_percentage": "17.2%"
       },
       "o200k_tokens": {
-        "raw_ddl": 9168,
-        "schemap_context": 1111,
+        "raw_ddl": 9379,
+        "schemap_context": 1135,
         "reduction_percentage": "87.9%"
       },
       "multi_turn_agent_loop": {
         "turns_per_task": 20,
-        "raw_task_tokens": 180540,
-        "schemap_task_tokens": 22060,
-        "task_tokens_saved": 158480
+        "raw_task_tokens": 184740,
+        "schemap_task_tokens": 22540,
+        "task_tokens_saved": 162200
       },
       "frontier_models_roi": {
         "Claude Fable 5 (Anthropic)": {
           "rate_per_million": 10.0,
           "provider": "Anthropic",
           "tier": "High-End Frontier Intelligence",
-          "cost_saved_per_1k_prompts": 79.24,
-          "monthly_savings_per_dev": 69.73,
-          "annual_savings_team_5": 4183.87,
-          "agent_loop_task_tokens_saved": 158480,
-          "agent_loop_annual_team_savings": 4183.87
+          "cost_saved_per_1k_prompts": 81.1,
+          "monthly_savings_per_dev": 71.37,
+          "annual_savings_team_5": 4282.08,
+          "agent_loop_task_tokens_saved": 162200,
+          "agent_loop_annual_team_savings": 4282.08
         },
         "OpenAI o3 (OpenAI)": {
           "rate_per_million": 10.0,
           "provider": "OpenAI",
           "tier": "High-Compute Deep Reasoning",
-          "cost_saved_per_1k_prompts": 79.24,
-          "monthly_savings_per_dev": 69.73,
-          "annual_savings_team_5": 4183.87,
-          "agent_loop_task_tokens_saved": 158480,
-          "agent_loop_annual_team_savings": 4183.87
+          "cost_saved_per_1k_prompts": 81.1,
+          "monthly_savings_per_dev": 71.37,
+          "annual_savings_team_5": 4282.08,
+          "agent_loop_task_tokens_saved": 162200,
+          "agent_loop_annual_team_savings": 4282.08
         },
         "Claude Opus 5 (Anthropic)": {
           "rate_per_million": 5.0,
           "provider": "Anthropic",
           "tier": "Flagship Autonomous Reasoning",
-          "cost_saved_per_1k_prompts": 39.62,
-          "monthly_savings_per_dev": 34.87,
-          "annual_savings_team_5": 2091.94,
-          "agent_loop_task_tokens_saved": 158480,
-          "agent_loop_annual_team_savings": 2091.94
+          "cost_saved_per_1k_prompts": 40.55,
+          "monthly_savings_per_dev": 35.68,
+          "annual_savings_team_5": 2141.04,
+          "agent_loop_task_tokens_saved": 162200,
+          "agent_loop_annual_team_savings": 2141.04
         },
         "GPT-5.6 Sol (OpenAI)": {
           "rate_per_million": 5.0,
           "provider": "OpenAI",
           "tier": "Flagship Generalist",
-          "cost_saved_per_1k_prompts": 39.62,
-          "monthly_savings_per_dev": 34.87,
-          "annual_savings_team_5": 2091.94,
-          "agent_loop_task_tokens_saved": 158480,
-          "agent_loop_annual_team_savings": 2091.94
+          "cost_saved_per_1k_prompts": 40.55,
+          "monthly_savings_per_dev": 35.68,
+          "annual_savings_team_5": 2141.04,
+          "agent_loop_task_tokens_saved": 162200,
+          "agent_loop_annual_team_savings": 2141.04
         },
         "Gemini 3.7 Pro (Google)": {
           "rate_per_million": 3.5,
           "provider": "Google",
           "tier": "Deep Multimodal & Long Context",
-          "cost_saved_per_1k_prompts": 27.73,
-          "monthly_savings_per_dev": 24.41,
-          "annual_savings_team_5": 1464.36,
-          "agent_loop_task_tokens_saved": 158480,
-          "agent_loop_annual_team_savings": 1464.36
+          "cost_saved_per_1k_prompts": 28.38,
+          "monthly_savings_per_dev": 24.98,
+          "annual_savings_team_5": 1498.73,
+          "agent_loop_task_tokens_saved": 162200,
+          "agent_loop_annual_team_savings": 1498.73
         },
         "Claude Sonnet 5 (Anthropic)": {
           "rate_per_million": 2.0,
           "provider": "Anthropic",
           "tier": "Workhorse Coding Agent",
-          "cost_saved_per_1k_prompts": 15.85,
-          "monthly_savings_per_dev": 13.95,
-          "annual_savings_team_5": 836.77,
-          "agent_loop_task_tokens_saved": 158480,
-          "agent_loop_annual_team_savings": 836.77
+          "cost_saved_per_1k_prompts": 16.22,
+          "monthly_savings_per_dev": 14.27,
+          "annual_savings_team_5": 856.42,
+          "agent_loop_task_tokens_saved": 162200,
+          "agent_loop_annual_team_savings": 856.42
         },
         "GPT-5.6 Terra (OpenAI)": {
           "rate_per_million": 2.0,
           "provider": "OpenAI",
           "tier": "Standard Agentic Workhorse",
-          "cost_saved_per_1k_prompts": 15.85,
-          "monthly_savings_per_dev": 13.95,
-          "annual_savings_team_5": 836.77,
-          "agent_loop_task_tokens_saved": 158480,
-          "agent_loop_annual_team_savings": 836.77
+          "cost_saved_per_1k_prompts": 16.22,
+          "monthly_savings_per_dev": 14.27,
+          "annual_savings_team_5": 856.42,
+          "agent_loop_task_tokens_saved": 162200,
+          "agent_loop_annual_team_savings": 856.42
         },
         "Gemini 3.1 Pro (Google)": {
           "rate_per_million": 2.0,
           "provider": "Google",
           "tier": "Enterprise Multimodal",
-          "cost_saved_per_1k_prompts": 15.85,
-          "monthly_savings_per_dev": 13.95,
-          "annual_savings_team_5": 836.77,
-          "agent_loop_task_tokens_saved": 158480,
-          "agent_loop_annual_team_savings": 836.77
+          "cost_saved_per_1k_prompts": 16.22,
+          "monthly_savings_per_dev": 14.27,
+          "annual_savings_team_5": 856.42,
+          "agent_loop_task_tokens_saved": 162200,
+          "agent_loop_annual_team_savings": 856.42
         },
         "xAI Grok 4.6 (xAI)": {
           "rate_per_million": 2.0,
           "provider": "xAI",
           "tier": "Next-Gen Tool Use & Reasoning",
-          "cost_saved_per_1k_prompts": 15.85,
-          "monthly_savings_per_dev": 13.95,
-          "annual_savings_team_5": 836.77,
-          "agent_loop_task_tokens_saved": 158480,
-          "agent_loop_annual_team_savings": 836.77
+          "cost_saved_per_1k_prompts": 16.22,
+          "monthly_savings_per_dev": 14.27,
+          "annual_savings_team_5": 856.42,
+          "agent_loop_task_tokens_saved": 162200,
+          "agent_loop_annual_team_savings": 856.42
         },
         "DeepSeek V4-Pro (DeepSeek)": {
           "rate_per_million": 1.32,
           "provider": "DeepSeek",
           "tier": "Frontier Open-Weights Reasoning",
-          "cost_saved_per_1k_prompts": 10.46,
-          "monthly_savings_per_dev": 9.2,
-          "annual_savings_team_5": 552.27,
-          "agent_loop_task_tokens_saved": 158480,
-          "agent_loop_annual_team_savings": 552.27
+          "cost_saved_per_1k_prompts": 10.71,
+          "monthly_savings_per_dev": 9.42,
+          "annual_savings_team_5": 565.23,
+          "agent_loop_task_tokens_saved": 162200,
+          "agent_loop_annual_team_savings": 565.23
         },
         "OpenAI o3-mini (OpenAI)": {
           "rate_per_million": 1.1,
           "provider": "OpenAI",
           "tier": "Fast STEM & Code Reasoning",
-          "cost_saved_per_1k_prompts": 8.72,
-          "monthly_savings_per_dev": 7.67,
-          "annual_savings_team_5": 460.23,
-          "agent_loop_task_tokens_saved": 158480,
-          "agent_loop_annual_team_savings": 460.23
+          "cost_saved_per_1k_prompts": 8.92,
+          "monthly_savings_per_dev": 7.85,
+          "annual_savings_team_5": 471.03,
+          "agent_loop_task_tokens_saved": 162200,
+          "agent_loop_annual_team_savings": 471.03
         },
         "Claude Haiku 4.5 (Anthropic)": {
           "rate_per_million": 1.0,
           "provider": "Anthropic",
           "tier": "High-Speed Agent Loops",
-          "cost_saved_per_1k_prompts": 7.92,
-          "monthly_savings_per_dev": 6.97,
-          "annual_savings_team_5": 418.39,
-          "agent_loop_task_tokens_saved": 158480,
-          "agent_loop_annual_team_savings": 418.39
+          "cost_saved_per_1k_prompts": 8.11,
+          "monthly_savings_per_dev": 7.14,
+          "annual_savings_team_5": 428.21,
+          "agent_loop_task_tokens_saved": 162200,
+          "agent_loop_annual_team_savings": 428.21
         },
         "Gemini 3.7 Flash (Google)": {
           "rate_per_million": 0.75,
           "provider": "Google",
           "tier": "High-Efficiency Frontier",
-          "cost_saved_per_1k_prompts": 5.94,
-          "monthly_savings_per_dev": 5.23,
-          "annual_savings_team_5": 313.79,
-          "agent_loop_task_tokens_saved": 158480,
-          "agent_loop_annual_team_savings": 313.79
+          "cost_saved_per_1k_prompts": 6.08,
+          "monthly_savings_per_dev": 5.35,
+          "annual_savings_team_5": 321.16,
+          "agent_loop_task_tokens_saved": 162200,
+          "agent_loop_annual_team_savings": 321.16
         },
         "DeepSeek V4-Flash (DeepSeek)": {
           "rate_per_million": 0.44,
           "provider": "DeepSeek",
           "tier": "High-Throughput Inference",
-          "cost_saved_per_1k_prompts": 3.49,
-          "monthly_savings_per_dev": 3.07,
-          "annual_savings_team_5": 184.09,
-          "agent_loop_task_tokens_saved": 158480,
-          "agent_loop_annual_team_savings": 184.09
+          "cost_saved_per_1k_prompts": 3.57,
+          "monthly_savings_per_dev": 3.14,
+          "annual_savings_team_5": 188.41,
+          "agent_loop_task_tokens_saved": 162200,
+          "agent_loop_annual_team_savings": 188.41
         },
         "GPT-5.6 Luna (OpenAI)": {
           "rate_per_million": 0.2,
           "provider": "OpenAI",
           "tier": "Ultra-Fast Subagent Tier",
-          "cost_saved_per_1k_prompts": 1.58,
-          "monthly_savings_per_dev": 1.39,
-          "annual_savings_team_5": 83.68,
-          "agent_loop_task_tokens_saved": 158480,
-          "agent_loop_annual_team_savings": 83.68
+          "cost_saved_per_1k_prompts": 1.62,
+          "monthly_savings_per_dev": 1.43,
+          "annual_savings_team_5": 85.64,
+          "agent_loop_task_tokens_saved": 162200,
+          "agent_loop_annual_team_savings": 85.64
         }
       },
       "next_gen_models_roi": {
@@ -1591,151 +1591,151 @@
           "rate_per_million": 10.0,
           "provider": "Anthropic",
           "tier": "High-End Frontier Intelligence",
-          "cost_saved_per_1k_prompts": 79.24,
-          "monthly_savings_per_dev": 69.73,
-          "annual_savings_team_5": 4183.87,
-          "agent_loop_task_tokens_saved": 158480,
-          "agent_loop_annual_team_savings": 4183.87
+          "cost_saved_per_1k_prompts": 81.1,
+          "monthly_savings_per_dev": 71.37,
+          "annual_savings_team_5": 4282.08,
+          "agent_loop_task_tokens_saved": 162200,
+          "agent_loop_annual_team_savings": 4282.08
         },
         "OpenAI o3 (OpenAI)": {
           "rate_per_million": 10.0,
           "provider": "OpenAI",
           "tier": "High-Compute Deep Reasoning",
-          "cost_saved_per_1k_prompts": 79.24,
-          "monthly_savings_per_dev": 69.73,
-          "annual_savings_team_5": 4183.87,
-          "agent_loop_task_tokens_saved": 158480,
-          "agent_loop_annual_team_savings": 4183.87
+          "cost_saved_per_1k_prompts": 81.1,
+          "monthly_savings_per_dev": 71.37,
+          "annual_savings_team_5": 4282.08,
+          "agent_loop_task_tokens_saved": 162200,
+          "agent_loop_annual_team_savings": 4282.08
         },
         "Claude Opus 5 (Anthropic)": {
           "rate_per_million": 5.0,
           "provider": "Anthropic",
           "tier": "Flagship Autonomous Reasoning",
-          "cost_saved_per_1k_prompts": 39.62,
-          "monthly_savings_per_dev": 34.87,
-          "annual_savings_team_5": 2091.94,
-          "agent_loop_task_tokens_saved": 158480,
-          "agent_loop_annual_team_savings": 2091.94
+          "cost_saved_per_1k_prompts": 40.55,
+          "monthly_savings_per_dev": 35.68,
+          "annual_savings_team_5": 2141.04,
+          "agent_loop_task_tokens_saved": 162200,
+          "agent_loop_annual_team_savings": 2141.04
         },
         "GPT-5.6 Sol (OpenAI)": {
           "rate_per_million": 5.0,
           "provider": "OpenAI",
           "tier": "Flagship Generalist",
-          "cost_saved_per_1k_prompts": 39.62,
-          "monthly_savings_per_dev": 34.87,
-          "annual_savings_team_5": 2091.94,
-          "agent_loop_task_tokens_saved": 158480,
-          "agent_loop_annual_team_savings": 2091.94
+          "cost_saved_per_1k_prompts": 40.55,
+          "monthly_savings_per_dev": 35.68,
+          "annual_savings_team_5": 2141.04,
+          "agent_loop_task_tokens_saved": 162200,
+          "agent_loop_annual_team_savings": 2141.04
         },
         "Gemini 3.7 Pro (Google)": {
           "rate_per_million": 3.5,
           "provider": "Google",
           "tier": "Deep Multimodal & Long Context",
-          "cost_saved_per_1k_prompts": 27.73,
-          "monthly_savings_per_dev": 24.41,
-          "annual_savings_team_5": 1464.36,
-          "agent_loop_task_tokens_saved": 158480,
-          "agent_loop_annual_team_savings": 1464.36
+          "cost_saved_per_1k_prompts": 28.38,
+          "monthly_savings_per_dev": 24.98,
+          "annual_savings_team_5": 1498.73,
+          "agent_loop_task_tokens_saved": 162200,
+          "agent_loop_annual_team_savings": 1498.73
         },
         "Claude Sonnet 5 (Anthropic)": {
           "rate_per_million": 2.0,
           "provider": "Anthropic",
           "tier": "Workhorse Coding Agent",
-          "cost_saved_per_1k_prompts": 15.85,
-          "monthly_savings_per_dev": 13.95,
-          "annual_savings_team_5": 836.77,
-          "agent_loop_task_tokens_saved": 158480,
-          "agent_loop_annual_team_savings": 836.77
+          "cost_saved_per_1k_prompts": 16.22,
+          "monthly_savings_per_dev": 14.27,
+          "annual_savings_team_5": 856.42,
+          "agent_loop_task_tokens_saved": 162200,
+          "agent_loop_annual_team_savings": 856.42
         },
         "GPT-5.6 Terra (OpenAI)": {
           "rate_per_million": 2.0,
           "provider": "OpenAI",
           "tier": "Standard Agentic Workhorse",
-          "cost_saved_per_1k_prompts": 15.85,
-          "monthly_savings_per_dev": 13.95,
-          "annual_savings_team_5": 836.77,
-          "agent_loop_task_tokens_saved": 158480,
-          "agent_loop_annual_team_savings": 836.77
+          "cost_saved_per_1k_prompts": 16.22,
+          "monthly_savings_per_dev": 14.27,
+          "annual_savings_team_5": 856.42,
+          "agent_loop_task_tokens_saved": 162200,
+          "agent_loop_annual_team_savings": 856.42
         },
         "Gemini 3.1 Pro (Google)": {
           "rate_per_million": 2.0,
           "provider": "Google",
           "tier": "Enterprise Multimodal",
-          "cost_saved_per_1k_prompts": 15.85,
-          "monthly_savings_per_dev": 13.95,
-          "annual_savings_team_5": 836.77,
-          "agent_loop_task_tokens_saved": 158480,
-          "agent_loop_annual_team_savings": 836.77
+          "cost_saved_per_1k_prompts": 16.22,
+          "monthly_savings_per_dev": 14.27,
+          "annual_savings_team_5": 856.42,
+          "agent_loop_task_tokens_saved": 162200,
+          "agent_loop_annual_team_savings": 856.42
         },
         "xAI Grok 4.6 (xAI)": {
           "rate_per_million": 2.0,
           "provider": "xAI",
           "tier": "Next-Gen Tool Use & Reasoning",
-          "cost_saved_per_1k_prompts": 15.85,
-          "monthly_savings_per_dev": 13.95,
-          "annual_savings_team_5": 836.77,
-          "agent_loop_task_tokens_saved": 158480,
-          "agent_loop_annual_team_savings": 836.77
+          "cost_saved_per_1k_prompts": 16.22,
+          "monthly_savings_per_dev": 14.27,
+          "annual_savings_team_5": 856.42,
+          "agent_loop_task_tokens_saved": 162200,
+          "agent_loop_annual_team_savings": 856.42
         },
         "DeepSeek V4-Pro (DeepSeek)": {
           "rate_per_million": 1.32,
           "provider": "DeepSeek",
           "tier": "Frontier Open-Weights Reasoning",
-          "cost_saved_per_1k_prompts": 10.46,
-          "monthly_savings_per_dev": 9.2,
-          "annual_savings_team_5": 552.27,
-          "agent_loop_task_tokens_saved": 158480,
-          "agent_loop_annual_team_savings": 552.27
+          "cost_saved_per_1k_prompts": 10.71,
+          "monthly_savings_per_dev": 9.42,
+          "annual_savings_team_5": 565.23,
+          "agent_loop_task_tokens_saved": 162200,
+          "agent_loop_annual_team_savings": 565.23
         },
         "OpenAI o3-mini (OpenAI)": {
           "rate_per_million": 1.1,
           "provider": "OpenAI",
           "tier": "Fast STEM & Code Reasoning",
-          "cost_saved_per_1k_prompts": 8.72,
-          "monthly_savings_per_dev": 7.67,
-          "annual_savings_team_5": 460.23,
-          "agent_loop_task_tokens_saved": 158480,
-          "agent_loop_annual_team_savings": 460.23
+          "cost_saved_per_1k_prompts": 8.92,
+          "monthly_savings_per_dev": 7.85,
+          "annual_savings_team_5": 471.03,
+          "agent_loop_task_tokens_saved": 162200,
+          "agent_loop_annual_team_savings": 471.03
         },
         "Claude Haiku 4.5 (Anthropic)": {
           "rate_per_million": 1.0,
           "provider": "Anthropic",
           "tier": "High-Speed Agent Loops",
-          "cost_saved_per_1k_prompts": 7.92,
-          "monthly_savings_per_dev": 6.97,
-          "annual_savings_team_5": 418.39,
-          "agent_loop_task_tokens_saved": 158480,
-          "agent_loop_annual_team_savings": 418.39
+          "cost_saved_per_1k_prompts": 8.11,
+          "monthly_savings_per_dev": 7.14,
+          "annual_savings_team_5": 428.21,
+          "agent_loop_task_tokens_saved": 162200,
+          "agent_loop_annual_team_savings": 428.21
         },
         "Gemini 3.7 Flash (Google)": {
           "rate_per_million": 0.75,
           "provider": "Google",
           "tier": "High-Efficiency Frontier",
-          "cost_saved_per_1k_prompts": 5.94,
-          "monthly_savings_per_dev": 5.23,
-          "annual_savings_team_5": 313.79,
-          "agent_loop_task_tokens_saved": 158480,
-          "agent_loop_annual_team_savings": 313.79
+          "cost_saved_per_1k_prompts": 6.08,
+          "monthly_savings_per_dev": 5.35,
+          "annual_savings_team_5": 321.16,
+          "agent_loop_task_tokens_saved": 162200,
+          "agent_loop_annual_team_savings": 321.16
         },
         "DeepSeek V4-Flash (DeepSeek)": {
           "rate_per_million": 0.44,
           "provider": "DeepSeek",
           "tier": "High-Throughput Inference",
-          "cost_saved_per_1k_prompts": 3.49,
-          "monthly_savings_per_dev": 3.07,
-          "annual_savings_team_5": 184.09,
-          "agent_loop_task_tokens_saved": 158480,
-          "agent_loop_annual_team_savings": 184.09
+          "cost_saved_per_1k_prompts": 3.57,
+          "monthly_savings_per_dev": 3.14,
+          "annual_savings_team_5": 188.41,
+          "agent_loop_task_tokens_saved": 162200,
+          "agent_loop_annual_team_savings": 188.41
         },
         "GPT-5.6 Luna (OpenAI)": {
           "rate_per_million": 0.2,
           "provider": "OpenAI",
           "tier": "Ultra-Fast Subagent Tier",
-          "cost_saved_per_1k_prompts": 1.58,
-          "monthly_savings_per_dev": 1.39,
-          "annual_savings_team_5": 83.68,
-          "agent_loop_task_tokens_saved": 158480,
-          "agent_loop_annual_team_savings": 83.68
+          "cost_saved_per_1k_prompts": 1.62,
+          "monthly_savings_per_dev": 1.43,
+          "annual_savings_team_5": 85.64,
+          "agent_loop_task_tokens_saved": 162200,
+          "agent_loop_annual_team_savings": 85.64
         }
       }
     }
