@@ -33,6 +33,10 @@ schemap quickstart
 
 # Compile AI context map
 schemap context --scope analytics
+
+# Self-update or cleanly uninstall
+schemap update
+schemap uninstall --purge
 ```
 
 ## Competitor Comparisons & Technical Guides

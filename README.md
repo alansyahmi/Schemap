@@ -95,9 +95,10 @@ pipx install schemap-tool
 > * `uv tool install schemap-tool`
 > * `pip install schemap-tool`
 > 
-> *To update Schemap anytime:*
+> *To update or cleanly remove Schemap anytime:*
 > ```bash
 > schemap update
+> schemap uninstall --purge
 > ```
 
 ---

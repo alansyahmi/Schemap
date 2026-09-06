@@ -3,7 +3,15 @@ from unittest.mock import patch, MagicMock
 from click.testing import CliRunner
 
 from schemap.cli import cli
-from schemap.updater import check_for_updates, _parse_version, detect_installer, run_upgrade
+from schemap.updater import (
+    check_for_updates,
+    _parse_version,
+    detect_installer,
+    run_upgrade,
+    detect_uninstaller,
+    run_uninstall,
+    purge_local_config
+)
 
 
 def test_parse_version():
@@ -102,3 +110,41 @@ def test_cli_update_perform_success():
         assert result.exit_code == 0
         assert "Successfully updated Schemap to v3.2.0" in result.output
         mock_upgrade.assert_called_once_with(target_version="3.2.0")
+
+
+def test_detect_uninstaller():
+    name, cmd = detect_uninstaller()
+    assert name in ["pip", "uv", "pipx"]
+    assert "uninstall" in cmd
+
+
+def test_cli_uninstall_aborted():
+    runner = CliRunner()
+    result = runner.invoke(cli, ["uninstall"], input="n\n")
+    assert result.exit_code == 0
+    assert "Uninstallation cancelled" in result.output
+
+
+def test_cli_uninstall_confirmed_success():
+    runner = CliRunner()
+    with patch("schemap.cli.run_uninstall") as mock_uninst:
+        mock_uninst.return_value = (True, "Successfully uninstalled schemap-tool")
+        result = runner.invoke(cli, ["uninstall", "--yes"])
+        assert result.exit_code == 0
+        assert "Schemap CLI has been uninstalled" in result.output
+        mock_uninst.assert_called_once()
+
+
+def test_cli_uninstall_with_purge(tmp_path):
+    runner = CliRunner()
+    with patch("schemap.cli.run_uninstall") as mock_uninst, \
+         patch("schemap.cli.purge_local_config") as mock_purge:
+        mock_uninst.return_value = (True, "Successfully uninstalled")
+        mock_purge.return_value = ["credentials.json", "license.cache"]
+
+        result = runner.invoke(cli, ["uninstall", "--yes", "--purge"])
+        assert result.exit_code == 0
+        assert "Purging local configuration" in result.output
+        assert "removed 2 items" in result.output
+        mock_purge.assert_called_once()
+        mock_uninst.assert_called_once()

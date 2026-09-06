@@ -48,7 +48,14 @@ from .quickstart import run_quickstart
 from .fix import run_fix
 from .skills import install_agent_skills
 from .state import get_trial_status, start_trial, record_successful_run, mark_review_prompted
-from .updater import check_for_updates, run_upgrade, detect_installer
+from .updater import (
+    check_for_updates,
+    run_upgrade,
+    detect_installer,
+    run_uninstall,
+    detect_uninstaller,
+    purge_local_config
+)
 import webbrowser
 import urllib.parse
 
@@ -1638,6 +1645,52 @@ def update(check, force):
         click.secho(f"\n[ERROR] Update failed:\n{output}", fg="red")
         click.secho(f"\nManual upgrade command: pip install --upgrade schemap-tool", fg="yellow")
         sys.exit(1)
+
+
+@cli.command()
+@click.option('--yes', '-y', is_flag=True, help="Confirm uninstallation without prompting.")
+@click.option('--purge', is_flag=True, help="Also remove all stored credentials, license cache, and local device configuration.")
+def uninstall(yes, purge):
+    """Uninstall Schemap CLI and optionally purge stored credentials and cache."""
+    installer_name, cmd = detect_uninstaller()
+
+    click.secho("\n=======================================================", fg="yellow", bold=True)
+    click.secho("  Schemap CLI Uninstallation", fg="yellow", bold=True)
+    click.secho("=======================================================", fg="yellow", bold=True)
+    click.echo(f"  Detected Environment: {installer_name.upper()}")
+    click.echo(f"  Uninstall Command:    {' '.join(cmd)}")
+    if purge:
+        click.secho("  Configuration Action: PURGE all local credentials & cache", fg="red")
+    else:
+        click.echo("  Configuration Action: Keep credentials & configuration intact")
+    click.secho("=======================================================\n", fg="yellow", bold=True)
+
+    if not yes:
+        confirm = click.confirm("Are you sure you want to uninstall Schemap?", default=False)
+        if not confirm:
+            click.echo("Uninstallation cancelled.")
+            return
+
+    # 1. Purge local configuration if requested
+    if purge:
+        click.echo("-> Purging local configuration and credentials... ", nl=False)
+        removed_items = purge_local_config()
+        if removed_items:
+            click.secho(f"OK (removed {len(removed_items)} items)", fg="green")
+        else:
+            click.secho("OK (already clean)", fg="green")
+
+    # 2. Run uninstaller
+    click.echo(f"-> Running {' '.join(cmd)}... ")
+    success, output = run_uninstall()
+
+    if success:
+        click.secho("\n[SUCCESS] Schemap CLI has been uninstalled.", fg="green", bold=True)
+        if not purge:
+            click.echo("Note: Your local credentials and configuration were preserved. Run with --purge to remove them.")
+    else:
+        click.secho(f"\n[WARNING] Uninstaller finished with code:\n{output}", fg="yellow")
+        click.echo(f"Manual uninstall command: {' '.join(cmd)}")
 
 
 if __name__ == "__main__":

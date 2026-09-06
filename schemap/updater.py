@@ -117,3 +117,83 @@ def run_upgrade(target_version: Optional[str] = None) -> Tuple[bool, str]:
             return False, f"Command '{' '.join(cmd)}' failed with exit code {proc.returncode}:\n{output}"
     except Exception as e:
         return False, f"Failed to execute update command '{' '.join(cmd)}': {str(e)}"
+
+
+def detect_uninstaller() -> Tuple[str, list[str]]:
+    """
+    Detects the best command to uninstall schemap-tool based on the running environment:
+    - 'uv' (if uv tool is detected)
+    - 'pipx' (if pipx is detected)
+    - 'pip' (standard pip / venv)
+    Returns (installer_name, command_args).
+    """
+    exe_path = sys.executable.lower()
+
+    if "pipx" in exe_path:
+        pipx_bin = shutil.which("pipx")
+        if pipx_bin:
+            return "pipx", [pipx_bin, "uninstall", "schemap-tool"]
+
+    if "uv" in exe_path or os.environ.get("UV_TOOL"):
+        uv_bin = shutil.which("uv")
+        if uv_bin:
+            return "uv", [uv_bin, "tool", "uninstall", "schemap-tool"]
+
+    # Default python -m pip uninstall -y
+    python_bin = sys.executable
+    return "pip", [python_bin, "-m", "pip", "uninstall", "-y", "schemap-tool"]
+
+
+def run_uninstall() -> Tuple[bool, str]:
+    """
+    Executes the self-uninstall command using the detected package manager.
+    Returns (success: bool, message: str).
+    """
+    installer_name, cmd = detect_uninstaller()
+    try:
+        proc = subprocess.run(
+            cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+            check=False
+        )
+        output = proc.stdout.strip() if proc.stdout else ""
+        if proc.returncode == 0:
+            return True, output
+        else:
+            return False, f"Command '{' '.join(cmd)}' failed with exit code {proc.returncode}:\n{output}"
+    except Exception as e:
+        return False, f"Failed to execute uninstall command '{' '.join(cmd)}': {str(e)}"
+
+
+def purge_local_config() -> list[str]:
+    """
+    Removes local configuration, credentials, state, and license cache.
+    Returns a list of removed paths/descriptions.
+    """
+    from .license import get_app_dir
+    removed = []
+    app_dir = get_app_dir()
+
+    if app_dir.exists():
+        try:
+            for item in app_dir.iterdir():
+                try:
+                    if item.is_file():
+                        item.unlink()
+                        removed.append(str(item.name))
+                    elif item.is_dir():
+                        shutil.rmtree(item)
+                        removed.append(f"{item.name}/")
+                except Exception:
+                    pass
+            try:
+                app_dir.rmdir()
+                removed.append(f"{app_dir.name} (directory)")
+            except Exception:
+                pass
+        except Exception:
+            pass
+
+    return removed

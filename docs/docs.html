@@ -144,6 +144,12 @@
                 </div>
 
                 <div class="docs-nav-group">
+                    <div class="docs-nav-title">Maintenance & Updates</div>
+                    <a href="#update" class="docs-nav-link">schemap update <span class="doc-tag new">v3.1</span></a>
+                    <a href="#uninstall" class="docs-nav-link">schemap uninstall <span class="doc-tag new">v3.1</span></a>
+                </div>
+
+                <div class="docs-nav-group">
                     <div class="docs-nav-title">Configuration</div>
                     <a href="#config-schema" class="docs-nav-link">schemap.yaml Schema</a>
                 </div>
@@ -165,8 +171,13 @@ pipx install schemap-tool
 # Or using uv
 uv tool install schemap-tool
 
-# Upgrade to latest version anytime
-pipx upgrade schemap-tool</code></pre>
+# Self-update to latest PyPI version anytime
+schemap update
+schemap update --check   # Check without installing
+
+# Clean uninstallation with optional config purge
+schemap uninstall
+schemap uninstall --purge   # Completely remove credentials & cache</code></pre>
                     </div>
                 </section>
 
@@ -392,6 +403,62 @@ schemap --no-color score</code></pre>
 #   .codex/skills/schemap/SKILL.md
 #   .claude/skills/schemap/SKILL.md
 #   .cursor/rules/schemap.mdc</code></pre>
+                    </div>
+                </section>
+
+                <!-- Maintenance & Updates -->
+                <section id="update" class="doc-section">
+                    <h2>Maintenance & Self-Updates</h2>
+                    <div class="doc-card">
+                        <div class="doc-card-header">
+                            <span class="doc-cmd">schemap update</span>
+                            <span class="doc-tag new">v3.1 New</span>
+                        </div>
+                        <p>Queries PyPI for the latest published version of <code>schemap-tool</code>, detects your active package manager (<code>uv</code>, <code>pipx</code>, or <code>pip</code>), and performs an automated in-place upgrade.</p>
+                        <pre><code># Self-upgrade to latest version
+schemap update
+
+# Check if a newer version is available without installing
+schemap update --check
+
+# Force re-install current version
+schemap update --force</code></pre>
+                        <table class="param-table">
+                            <thead>
+                                <tr><th>Option</th><th>Description</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td><code>--check</code></td><td>Inspect PyPI and report update availability without performing installation.</td></tr>
+                                <tr><td><code>--force</code></td><td>Force package re-installation even if already on the latest version.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section id="uninstall" class="doc-section">
+                    <div class="doc-card">
+                        <div class="doc-card-header">
+                            <span class="doc-cmd">schemap uninstall</span>
+                            <span class="doc-tag new">v3.1 New</span>
+                        </div>
+                        <p>Cleanly uninstalls the Schemap CLI package using your detected package manager. Optionally purges stored global credentials, local device identifiers, and license caches.</p>
+                        <pre><code># Interactive uninstallation (prompts for confirmation)
+schemap uninstall
+
+# Non-interactive uninstallation
+schemap uninstall --yes
+
+# Complete uninstallation and purge all local credentials/caches
+schemap uninstall --yes --purge</code></pre>
+                        <table class="param-table">
+                            <thead>
+                                <tr><th>Option</th><th>Description</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td><code>--yes / -y</code></td><td>Confirm uninstallation without prompting interactively.</td></tr>
+                                <tr><td><code>--purge</code></td><td>Delete all stored credentials, license caches, and device identifiers from local app directory.</td></tr>
+                            </tbody>
+                        </table>
                     </div>
                 </section>
 
