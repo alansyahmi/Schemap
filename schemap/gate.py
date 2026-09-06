@@ -351,7 +351,7 @@ def generate_gate_markdown_report(result: GateResult, project_name: str | None =
 
     lines.extend([
         "---",
-        "<sub>🤖 Powered by <a href='https://schemap.dev'>Schemap</a> — The AI Database Context & Governance Control Plane</sub>",
+        "<sub>Powered by <a href='https://schemap-tool.pages.dev'>Schemap</a> — The AI Database Context & Governance Control Plane</sub>",
         ""
     ])
 

@@ -206,28 +206,28 @@ alwaysApply: false
                         <tbody>
                             <tr>
                                 <td><strong>Context Window Overhead</strong></td>
-                                <td>⚠️ 15,000–30,000 tokens / prompt</td>
-                                <td><strong>⚡ 800–2,500 tokens (89% compression)</strong></td>
+                                <td><span class="icon-warn"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span> 15,000–30,000 tokens / prompt</td>
+                                <td><strong><svg class="inline-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> 800–2,500 tokens (89% compression)</strong></td>
                             </tr>
                             <tr>
                                 <td><strong>Scoped Activation</strong></td>
-                                <td>❌ Injected globally on every file</td>
-                                <td><strong>✅ Activated only on SQL/backend globs</strong></td>
+                                <td><span class="icon-cross"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span> Injected globally on every file</td>
+                                <td><strong><span class="icon-check"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span> Activated only on SQL/backend globs</strong></td>
                             </tr>
                             <tr>
                                 <td><strong>Anti-Hallucination Rules</strong></td>
-                                <td>❌ None (AI guesses join keys)</td>
-                                <td><strong>✅ Explicit <code>[SAFETY]</code> negative constraints</strong></td>
+                                <td><span class="icon-cross"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span> None (AI guesses join keys)</td>
+                                <td><strong><span class="icon-check"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span> Explicit <code>[SAFETY]</code> negative constraints</strong></td>
                             </tr>
                             <tr>
                                 <td><strong>Join Topology Graph</strong></td>
-                                <td>❌ Flat alphabetical tables</td>
-                                <td><strong>✅ Topological graph with central table ranking</strong></td>
+                                <td><span class="icon-cross"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span> Flat alphabetical tables</td>
+                                <td><strong><span class="icon-check"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span> Topological graph with central table ranking</strong></td>
                             </tr>
                             <tr>
                                 <td><strong>Automated Migration Sync</strong></td>
-                                <td>❌ Manual copy-pasting</td>
-                                <td><strong>✅ Automated Git pre-commit hook</strong></td>
+                                <td><span class="icon-cross"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span> Manual copy-pasting</td>
+                                <td><strong><span class="icon-check"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span> Automated Git pre-commit hook</strong></td>
                             </tr>
                         </tbody>
                     </table>

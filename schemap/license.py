@@ -311,7 +311,7 @@ def fetch_seats_status(license_key: str, endpoint: str | None = None) -> Dict[st
         return {"error": str(e)}
 
 
-def create_customer_portal_session(license_key: str, endpoint: str | None = None, return_url: str = "https://schemap.dev") -> Dict[str, Any]:
+def create_customer_portal_session(license_key: str, endpoint: str | None = None, return_url: str = "https://schemap-tool.pages.dev") -> Dict[str, Any]:
     """
     Requests a Stripe Customer Billing Portal session URL from the license API.
     """
@@ -374,10 +374,10 @@ def verify_tier(
     if not license_key:
         if min_required_level > 0:
             if required_feature == "ci" or is_ci:
-                raise LicenseError("Schemap Team License required for CI/CD pipeline automation. Upgrade at https://schemap.dev/#pricing")
+                raise LicenseError("Schemap Team License required for CI/CD pipeline automation. Upgrade at https://schemap-tool.pages.dev/#pricing")
             if required_feature:
-                raise LicenseError(f"Feature '{required_feature}' requires Schemap Team tier. Upgrade at https://schemap.dev/#pricing")
-            raise LicenseError(f"Free tier limited to {FREE_TABLE_LIMIT} tables. Found {tables_count} tables. Upgrade to Pro or Team at https://schemap.dev/#pricing.")
+                raise LicenseError(f"Feature '{required_feature}' requires Schemap Team tier. Upgrade at https://schemap-tool.pages.dev/#pricing")
+            raise LicenseError(f"Free tier limited to {FREE_TABLE_LIMIT} tables. Found {tables_count} tables. Upgrade to Pro or Team at https://schemap-tool.pages.dev/#pricing.")
         return "free"
 
     # 2. Check Local Cache Optimization (bypassed in CI)
@@ -390,7 +390,7 @@ def verify_tier(
                 if tier_level < min_required_level:
                     raise LicenseError(
                         f"Feature '{required_feature}' requires Schemap {min_required_tier.title()} tier (current license: {cached_tier.title()}). "
-                        f"Upgrade at https://schemap.dev/#pricing"
+                        f"Upgrade at https://schemap-tool.pages.dev/#pricing"
                     )
                 return cached_tier
 
@@ -408,7 +408,7 @@ def verify_tier(
         if tier_level < min_required_level:
             raise LicenseError(
                 f"Feature '{required_feature}' requires Schemap {min_required_tier.title()} tier (current license: {active_tier.title()}). "
-                f"Upgrade at https://schemap.dev/#pricing"
+                f"Upgrade at https://schemap-tool.pages.dev/#pricing"
             )
         return active_tier
     else:

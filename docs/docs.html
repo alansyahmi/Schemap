@@ -26,7 +26,7 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400&family=Red+Hat+Display:wght@400;500;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
         rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=10">
+    <link rel="stylesheet" href="style.css?v=12">
     <script async src="https://startupbar.co/widget/loader.js" data-startup-id="6a520807-b62b-4145-8c05-b2c862af8e05"></script>
     <script type="application/ld+json">
     {
@@ -78,7 +78,12 @@
             <a class="logo" href="index.html" aria-label="Schemap home">
                 <img src="assets/Text_Logo__Dark_-removebg-preview2.png" alt="Schemap">
             </a>
-            <div class="nav-links">
+            <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+                <span class="hamburger-bar"></span>
+                <span class="hamburger-bar"></span>
+                <span class="hamburger-bar"></span>
+            </button>
+            <div class="nav-links" id="nav-menu">
                 <a href="index.html#how-it-works">How it works</a>
                 <a href="index.html#features">Features</a>
                 <a href="blog.html">Blog</a>
@@ -101,8 +106,24 @@
             </div>
         </header>
 
+        <!-- Mobile Section Jump Bar -->
+        <div class="docs-mobile-nav-bar">
+            <button class="docs-nav-toggle-btn" id="docs-sidebar-toggle" aria-expanded="false" aria-controls="docs-sidebar">
+                <span class="docs-nav-toggle-title">
+                    <svg class="inline-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                    <span id="docs-active-section-label">Jump to Section</span>
+                </span>
+                <span class="docs-nav-arrow" id="docs-nav-arrow">▾</span>
+            </button>
+        </div>
+        <div class="docs-sidebar-backdrop" id="docs-sidebar-backdrop"></div>
+
         <div class="docs-grid">
-            <aside class="docs-sidebar">
+            <aside class="docs-sidebar" id="docs-sidebar">
+                <div class="docs-sidebar-header-mobile">
+                    <span style="display:flex;align-items:center;gap:6px;"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg> Table of Contents</span>
+                    <button class="docs-sidebar-close-btn" id="docs-sidebar-close" aria-label="Close navigation"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+                </div>
                 <div class="docs-nav-group">
                     <div class="docs-nav-title">Getting Started</div>
                     <a href="#install" class="docs-nav-link">Installation</a>
@@ -526,7 +547,7 @@ profiles:
             <p>Developed by <a href="https://swarty.pages.dev/" target="_blank" rel="noopener" class="logo-font">Swarty.</a></p>
         </div>
     </footer>
-    <script src="app.js?v=10"></script>
+    <script src="app.js?v=11"></script>
 </body>
 
 </html>

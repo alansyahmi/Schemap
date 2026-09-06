@@ -108,7 +108,7 @@
                 <div class="doc-card" style="margin-bottom: 1.5rem;">
                     <h3>1. The Ambiguous Foreign Key Trap</h3>
                     <p>When an AI agent is asked to fetch user purchases, it inspects table names and often constructs this broken SQL query:</p>
-                    <pre style="background: var(--surface); padding: 12px; border-radius: 6px; color: #ff6b6b;"><code>-- ❌ HALLUCINATED QUERY (Broken Join)
+                    <pre style="background: var(--surface); padding: 12px; border-radius: 6px; color: #ff6b6b;"><code>-- [FAIL] HALLUCINATED QUERY (Broken Join)
 SELECT * FROM orders 
 JOIN users ON orders.id = users.id; -- WRONG: Joins order ID to user ID!</code></pre>
                     <p>The correct query requires joining <code>orders.user_id → users.id</code>. Without explicit relationship mapping, the LLM generates syntactically valid SQL that returns empty or corrupted datasets.</p>
@@ -117,7 +117,7 @@ JOIN users ON orders.id = users.id; -- WRONG: Joins order ID to user ID!</code><
                 <div class="doc-card" style="margin-bottom: 1.5rem;">
                     <h3>2. Sensitive Credential Exposure</h3>
                     <p>When asked to "generate a user profile query", an AI agent will blindly select all columns, including sensitive fields:</p>
-                    <pre style="background: var(--surface); padding: 12px; border-radius: 6px; color: #ff6b6b;"><code>-- ❌ DANGEROUS QUERY (Exposes Credentials)
+                    <pre style="background: var(--surface); padding: 12px; border-radius: 6px; color: #ff6b6b;"><code>-- [DANGER] SENSITIVE QUERY (Exposes Credentials)
 SELECT id, email, password_hash, auth_token, ssn FROM users;</code></pre>
                 </div>
 
@@ -154,7 +154,7 @@ SELECT id, email, password_hash, auth_token, ssn FROM users;</code></pre>
                     <p>To ensure database context and safety rules stay synchronized as your team writes SQL migrations, Schemap includes a one-click Git pre-commit hook installer:</p>
                     <pre style="background: var(--surface); padding: 14px; border-radius: 6px; color: var(--text);"><code>$ schemap hook install
 
-✔ Installed Git pre-commit hook at .git/hooks/pre-commit</code></pre>
+[OK] Installed Git pre-commit hook at .git/hooks/pre-commit</code></pre>
                     <p>Now, whenever a developer commits an SQL migration file, Schemap automatically updates `schemap_database_context.md` and agent rule files before the commit is completed.</p>
                 </div>
             </section>

@@ -336,7 +336,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Team Plans (Monthly vs Annual)
     const teamPlans = {
-        monthly: ["$19", "/seat/mo", "$29/seat/mo", "Flexible Team Monthly", "For fast-moving engineering teams. Flexible per-seat monthly billing.", "https://buy.stripe.com/6oU8wP9lH3kpgsE275dIA04"],
+        monthly: ["$19", "/seat/mo", "$29/seat/mo", "Flexible Team Monthly", "For fast-moving engineering teams. Flexible per-seat monthly billing.", "https://buy.stripe.com/cNi14n55rf370tGeTRdIA06"],
         annual: ["$15", "/seat/mo", "$19/seat/mo", "Billed annually ($180/seat/yr)", "Save 20% with annual team billing. Includes CI/CD gates & PR bot.", "https://buy.stripe.com/5kQ14n1Tf4ot90c8vtdIA05"]
     };
     document.querySelectorAll("[data-team-interval]").forEach((btn) => {
@@ -502,7 +502,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (claimedEl && remainingEl && progressBarEl) {
         const TOTAL_CAP = 200;
-        
+
         async function fetchFounderSeats() {
             try {
                 const res = await fetch("https://schemap-license-api.alansyahmi2004.workers.dev/v1/stats/founders");
@@ -521,7 +521,7 @@ document.addEventListener("DOMContentLoaded", () => {
         function updateFounderUI(claimedCount) {
             const remaining = Math.max(0, TOTAL_CAP - claimedCount);
             const percentage = Math.min(100, Math.max(5, (claimedCount / TOTAL_CAP) * 100));
-            
+
             claimedEl.textContent = claimedCount;
             remainingEl.textContent = remaining;
             progressBarEl.style.width = `${percentage}%`;
@@ -529,4 +529,166 @@ document.addEventListener("DOMContentLoaded", () => {
 
         fetchFounderSeats();
     }
+
+    // ============================================================
+    // MOBILE NAVIGATION DRAWER
+    // ============================================================
+    let navToggle = document.getElementById("nav-toggle");
+    const navMenu = document.querySelector(".nav-links");
+    const navContainer = document.querySelector(".nav-container");
+
+    if (!navToggle && navContainer && navMenu) {
+        navToggle = document.createElement("button");
+        navToggle.id = "nav-toggle";
+        navToggle.className = "nav-toggle";
+        navToggle.setAttribute("aria-label", "Toggle navigation");
+        navToggle.setAttribute("aria-expanded", "false");
+        navToggle.innerHTML = '<span class="hamburger-bar"></span><span class="hamburger-bar"></span><span class="hamburger-bar"></span>';
+        navContainer.insertBefore(navToggle, navMenu);
+    }
+
+    if (navToggle && navMenu) {
+        navToggle.addEventListener("click", (e) => {
+            e.stopPropagation();
+            const isOpen = navMenu.classList.toggle("is-open");
+            navToggle.classList.toggle("is-open", isOpen);
+            navToggle.setAttribute("aria-expanded", String(isOpen));
+            document.body.classList.toggle("nav-menu-open", isOpen);
+        });
+
+        // Close on clicking any link inside navMenu
+        navMenu.querySelectorAll("a").forEach((link) => {
+            link.addEventListener("click", () => {
+                navMenu.classList.remove("is-open");
+                navToggle.classList.remove("is-open");
+                navToggle.setAttribute("aria-expanded", "false");
+                document.body.classList.remove("nav-menu-open");
+            });
+        });
+
+        // Close on clicking outside
+        document.addEventListener("click", (e) => {
+            if (navMenu.classList.contains("is-open") && !navMenu.contains(e.target) && !navToggle.contains(e.target)) {
+                navMenu.classList.remove("is-open");
+                navToggle.classList.remove("is-open");
+                navToggle.setAttribute("aria-expanded", "false");
+                document.body.classList.remove("nav-menu-open");
+            }
+        });
+    }
+
+    // ============================================================
+    // DOCS MOBILE SECTION NAVIGATOR & DRAWER
+    // ============================================================
+    const docsSidebarToggle = document.getElementById("docs-sidebar-toggle");
+    const docsSidebar = document.getElementById("docs-sidebar");
+    const docsBackdrop = document.getElementById("docs-sidebar-backdrop");
+    const docsSidebarClose = document.getElementById("docs-sidebar-close");
+    const docsActiveLabel = document.getElementById("docs-active-section-label");
+
+    if (docsSidebarToggle && docsSidebar) {
+        function openDocsDrawer() {
+            docsSidebar.classList.add("is-open");
+            if (docsBackdrop) docsBackdrop.classList.add("is-open");
+            docsSidebarToggle.setAttribute("aria-expanded", "true");
+        }
+
+        function closeDocsDrawer() {
+            docsSidebar.classList.remove("is-open");
+            if (docsBackdrop) docsBackdrop.classList.remove("is-open");
+            docsSidebarToggle.setAttribute("aria-expanded", "false");
+        }
+
+        docsSidebarToggle.addEventListener("click", (e) => {
+            e.stopPropagation();
+            if (docsSidebar.classList.contains("is-open")) {
+                closeDocsDrawer();
+            } else {
+                openDocsDrawer();
+            }
+        });
+
+        if (docsSidebarClose) {
+            docsSidebarClose.addEventListener("click", closeDocsDrawer);
+        }
+
+        if (docsBackdrop) {
+            docsBackdrop.addEventListener("click", closeDocsDrawer);
+        }
+
+        // Close on link click & update active label
+        docsSidebar.querySelectorAll(".docs-nav-link").forEach((link) => {
+            link.addEventListener("click", () => {
+                const linkText = link.textContent.trim().replace(/\s*v\d+(\.\d+)?\s*$/i, '');
+                if (docsActiveLabel) {
+                    docsActiveLabel.textContent = `Section: ${linkText}`;
+                }
+                closeDocsDrawer();
+            });
+        });
+
+        // Scroll spy to highlight active section and update mobile toggle label
+        const sections = document.querySelectorAll(".doc-section");
+        if (sections.length > 0 && "IntersectionObserver" in window) {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        const id = entry.target.getAttribute("id");
+                        const activeLink = docsSidebar.querySelector(`a[href="#${id}"]`);
+                        if (activeLink) {
+                            docsSidebar.querySelectorAll(".docs-nav-link").forEach((l) => l.classList.remove("is-active"));
+                            activeLink.classList.add("is-active");
+                            const linkText = activeLink.textContent.trim().replace(/\s*v\d+(\.\d+)?\s*$/i, '');
+                            if (docsActiveLabel && window.innerWidth <= 900) {
+                                docsActiveLabel.textContent = `Section: ${linkText}`;
+                            }
+                        }
+                    }
+                });
+            }, { rootMargin: "-80px 0px -60% 0px", threshold: 0 });
+
+            sections.forEach((sec) => observer.observe(sec));
+        }
+    }
+
+    // ============================================================
+    // DOCS LIVE SEARCH FILTER
+    // ============================================================
+    const docSearchInput = document.getElementById("doc-search");
+    if (docSearchInput) {
+        const cards = document.querySelectorAll(".doc-card");
+        const sections = document.querySelectorAll(".doc-section");
+
+        docSearchInput.addEventListener("input", (e) => {
+            const query = e.target.value.toLowerCase().trim();
+
+            if (!query) {
+                cards.forEach((c) => c.style.display = "");
+                sections.forEach((s) => s.style.display = "");
+                return;
+            }
+
+            sections.forEach((section) => {
+                const sectionCards = section.querySelectorAll(".doc-card");
+                let anyCardVisible = false;
+
+                sectionCards.forEach((card) => {
+                    const text = card.textContent.toLowerCase();
+                    const matches = text.includes(query);
+                    card.style.display = matches ? "" : "none";
+                    if (matches) anyCardVisible = true;
+                });
+
+                // Check section heading as well
+                const headingText = section.querySelector("h2")?.textContent.toLowerCase() || "";
+                if (headingText.includes(query)) {
+                    anyCardVisible = true;
+                    sectionCards.forEach((card) => card.style.display = "");
+                }
+
+                section.style.display = anyCardVisible ? "" : "none";
+            });
+        });
+    }
 });
+

@@ -196,7 +196,7 @@ def _process_schema(cfg, enrich: bool, quiet: bool = False, required_feature: st
     if enrich:
         if not active_key:
             click.secho("\n[ERROR] The --enrich LLM layer requires an active Schemap Pro license key.", fg="red")
-            click.secho("Run `schemap activate <LICENSE_KEY>` or upgrade at https://schemap.dev/#pricing", fg="yellow")
+            click.secho("Run `schemap activate <LICENSE_KEY>` or upgrade at https://schemap-tool.pages.dev/#pricing", fg="yellow")
             sys.exit(1)
 
         if cfg.llm.api_key:
@@ -286,7 +286,7 @@ def _maybe_prompt_feedback(cmd_name: str = "run", tokens_saved: int = 0):
             webbrowser.open("https://github.com/alansyahmi/schemap")
         elif choice == "2":
             tweet_text = f"Just shaved {tokens_saved:,} tokens from my database schema with @schemap_ai! Check it out:" if tokens_saved > 0 else "Loving @schemap_ai for AI database context generation! Check it out:"
-            intent_url = f"https://twitter.com/intent/tweet?text={urllib.parse.quote(tweet_text)}&url={urllib.parse.quote('https://schemap.dev')}"
+            intent_url = f"https://twitter.com/intent/tweet?text={urllib.parse.quote(tweet_text)}&url={urllib.parse.quote('https://schemap-tool.pages.dev')}"
             click.secho("-> Opening X/Twitter... Thank you for the shoutout!", fg="green")
             webbrowser.open(intent_url)
         elif choice == "3" and not has_key:

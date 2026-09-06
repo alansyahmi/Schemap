@@ -111,7 +111,7 @@
 
     <main class="docs-container">
         <header class="docs-hero">
-            <a href="docs.html" class="v3-banner"><span class="v3-badge">🛡️ Trust &amp; Privacy</span> 100% Local-First Architecture ↗</a>
+            <a href="docs.html" class="v3-banner"><span class="v3-badge"><svg class="inline-icon" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>Trust &amp; Privacy</span> 100% Local-First Architecture ↗</a>
             <h1>Where Does Your Schema Go?</h1>
             <p class="section-lead">A transparent breakdown of Schemap's security model, local-first execution pipeline, zero-telemetry design, and credential protection for enterprise teams.</p>
         </header>
@@ -145,8 +145,8 @@ FROM information_schema.columns
 WHERE table_schema = 'public';
 
 -- What Schemap NEVER queries:
-SELECT * FROM users;          -- ❌ NEVER EXECUTED
-SELECT email, ssn FROM customers; -- ❌ NEVER EXECUTED</code></pre>
+SELECT * FROM users;          -- [BLOCKED] NEVER EXECUTED
+SELECT email, ssn FROM customers; -- [BLOCKED] NEVER EXECUTED</code></pre>
                 </div>
 
                 <div class="doc-card" style="margin-bottom: 1.5rem;">
@@ -191,33 +191,33 @@ SELECT email, ssn FROM customers; -- ❌ NEVER EXECUTED</code></pre>
                         <tbody>
                             <tr>
                                 <td><strong>Database Credentials in Agent Process</strong></td>
-                                <td>⚠️ Active DB connection held by daemon</td>
-                                <td>⚠️ Stored in cloud database backend</td>
-                                <td><strong>✅ Zero credentials stored in context files</strong></td>
+                                <td><span class="icon-warn"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span> Active DB connection held by daemon</td>
+                                <td><span class="icon-warn"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span> Stored in cloud database backend</td>
+                                <td><strong><span class="icon-check"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span> Zero credentials stored in context files</strong></td>
                             </tr>
                             <tr>
                                 <td><strong>Database Row Data Transmission</strong></td>
-                                <td>⚠️ Queries table rows on demand</td>
-                                <td>⚠️ Streams query results to SaaS</td>
-                                <td><strong>✅ 0 row data accessed or transmitted</strong></td>
+                                <td><span class="icon-warn"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span> Queries table rows on demand</td>
+                                <td><span class="icon-warn"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span> Streams query results to SaaS</td>
+                                <td><strong><span class="icon-check"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span> 0 row data accessed or transmitted</strong></td>
                             </tr>
                             <tr>
                                 <td><strong>Air-Gapped Offline Execution</strong></td>
-                                <td>❌ Requires active local server RPC</td>
-                                <td>❌ Requires external cloud connection</td>
-                                <td><strong>✅ 100% offline &amp; air-gapped compatible</strong></td>
+                                <td><span class="icon-cross"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span> Requires active local server RPC</td>
+                                <td><span class="icon-cross"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span> Requires external cloud connection</td>
+                                <td><strong><span class="icon-check"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span> 100% offline &amp; air-gapped compatible</strong></td>
                             </tr>
                             <tr>
                                 <td><strong>Telemetry &amp; Usage Logging</strong></td>
                                 <td>Varies by daemon</td>
-                                <td>⚠️ Cloud behavioral telemetry</td>
-                                <td><strong>✅ Zero telemetry, zero tracking</strong></td>
+                                <td><span class="icon-warn"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span> Cloud behavioral telemetry</td>
+                                <td><strong><span class="icon-check"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span> Zero telemetry, zero tracking</strong></td>
                             </tr>
                             <tr>
                                 <td><strong>SOC2 / HIPAA Compliance Risk</strong></td>
                                 <td>High (Live query execution)</td>
                                 <td>High (Third-party data processor)</td>
-                                <td><strong>✅ Zero risk (Static repo files only)</strong></td>
+                                <td><strong><span class="icon-check"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span> Zero risk (Static repo files only)</strong></td>
                             </tr>
                         </tbody>
                     </table>

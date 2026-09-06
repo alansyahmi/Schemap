@@ -319,10 +319,7 @@
 .param-table th{color:var(--muted);font-weight:600;background:var(--surface2)}
 .param-table code{color:var(--blue);font-size:.8rem}
 
-@media(max-width:900px){
-    .docs-grid{grid-template-columns:1fr}
-    .docs-sidebar{position:static;max-height:none;margin-bottom:30px;border-bottom:1px solid var(--line);padding-bottom:20px}
-}
+/* Note: Responsive rules for .docs-grid and .docs-sidebar are consolidated in the mobile responsive section below */
 
 /* ============================================================
    DUAL-ENGINE B2C / B2B PRICING & ROI CALCULATOR STYLES
@@ -516,4 +513,472 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* ============================================================
+   MOBILE NAVIGATION & INTERACTIVE DRAWERS
+   ============================================================ */
+.nav-toggle {
+  display: none;
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 8px 10px;
+  cursor: pointer;
+  flex-direction: column;
+  gap: 5px;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  transition: border-color 0.2s, background-color 0.2s;
+  z-index: 101;
+}
+.nav-toggle:hover {
+  border-color: var(--blue);
+  background: var(--surface2);
+}
+.nav-toggle .hamburger-bar {
+  display: block;
+  width: 20px;
+  height: 2px;
+  background: var(--text);
+  border-radius: 2px;
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease;
+  transform-origin: center;
+}
+.nav-toggle.is-open .hamburger-bar:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+.nav-toggle.is-open .hamburger-bar:nth-child(2) {
+  opacity: 0;
+}
+.nav-toggle.is-open .hamburger-bar:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+/* Docs Mobile Navigation Bar & Drawer */
+.docs-mobile-nav-bar {
+  display: none;
+}
+.docs-sidebar-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  z-index: 89;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+.docs-sidebar-backdrop.is-open {
+  display: block;
+  opacity: 1;
+}
+.docs-sidebar-header-mobile {
+  display: none;
+}
+
+@keyframes mobileNavFadeIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes modalPopIn {
+  from { opacity: 0; transform: scale(0.96) translateY(-10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* ============================================================
+   RESPONSIVE BREAKPOINTS: TABLET & DESKTOP (< 900px)
+   ============================================================ */
+@media (max-width: 900px) {
+  /* Navbar */
+  .nav-toggle {
+    display: flex;
+  }
+  .nav-links {
+    display: none;
+    position: fixed;
+    top: 68px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(8, 9, 11, 0.98);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    flex-direction: column;
+    padding: 24px 28px 48px;
+    gap: 12px;
+    align-items: stretch;
+    border-top: 1px solid var(--line);
+    z-index: 100;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .nav-links.is-open {
+    display: flex;
+    animation: mobileNavFadeIn 0.25s ease-out;
+  }
+  .nav-links a {
+    font-size: 1.05rem;
+    padding: 12px 6px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .nav-links a:hover {
+    color: var(--blue);
+  }
+  .nav-links .nav-btn {
+    text-align: center;
+    background: var(--surface2);
+    border-color: var(--strong);
+    padding: 14px;
+    margin-top: 10px;
+    justify-content: center;
+  }
+  body.nav-menu-open {
+    overflow: hidden;
+  }
+
+  /* Docs Layout & Mobile Sidebar Drawer */
+  .docs-grid {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+  .docs-mobile-nav-bar {
+    display: block;
+    position: sticky;
+    top: 68px;
+    z-index: 15;
+    background: var(--bg);
+    padding: 12px 0;
+    margin-bottom: 24px;
+    border-bottom: 1px solid var(--line);
+  }
+  .docs-nav-toggle-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--surface);
+    border: 1px solid var(--strong);
+    padding: 12px 16px;
+    border-radius: var(--radius);
+    color: var(--text);
+    font: 600 0.88rem "JetBrains Mono", monospace;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    transition: all 0.2s ease;
+  }
+  .docs-nav-toggle-btn:hover,
+  .docs-nav-toggle-btn[aria-expanded="true"] {
+    border-color: var(--blue);
+    background: var(--surface2);
+  }
+  .docs-nav-toggle-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .docs-nav-arrow {
+    color: var(--blue);
+    font-size: 0.95rem;
+    transition: transform 0.2s;
+  }
+  .docs-nav-toggle-btn[aria-expanded="true"] .docs-nav-arrow {
+    transform: rotate(180deg);
+  }
+
+  .docs-sidebar {
+    display: none;
+    position: fixed;
+    top: 135px;
+    left: 16px;
+    right: 16px;
+    max-height: calc(100vh - 165px);
+    background: #0d1015;
+    border: 1px solid var(--blue);
+    border-radius: 6px;
+    padding: 20px 18px 28px;
+    box-shadow: 0 20px 70px rgba(0, 0, 0, 0.9);
+    z-index: 90;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .docs-sidebar.is-open {
+    display: block;
+    animation: modalPopIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .docs-sidebar-header-mobile {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 12px;
+    margin-bottom: 16px;
+    border-bottom: 1px solid var(--line);
+    font: 700 0.82rem "JetBrains Mono", monospace;
+    color: var(--blue);
+  }
+  .docs-sidebar-close-btn {
+    background: transparent;
+    border: 0;
+    color: var(--muted);
+    font-size: 1.1rem;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: var(--radius);
+  }
+  .docs-sidebar-close-btn:hover {
+    color: var(--text);
+    background: var(--surface2);
+  }
+
+  /* Grid adaptations */
+  .pain-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  .feature-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+  .split {
+    grid-template-columns: 1fr;
+    gap: 36px;
+  }
+  .pricing-grid,
+  #pricing-pane-team .pricing-grid {
+    grid-template-columns: 1fr !important;
+    max-width: 460px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+  .flow-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    max-width: 340px;
+    margin: 36px auto 20px;
+  }
+  .flow-grid > b {
+    transform: rotate(90deg);
+    display: block;
+    margin: 4px auto;
+    font-size: 1.3rem;
+  }
+}
+
+/* ============================================================
+   RESPONSIVE BREAKPOINTS: MOBILE SCREENS (< 640px & < 480px)
+   ============================================================ */
+@media (max-width: 640px) {
+  .section-container {
+    padding: 56px 18px;
+  }
+  .docs-container {
+    padding: 24px 16px 80px;
+  }
+  .hero {
+    padding: 32px 16px 56px;
+  }
+  .hero h1 {
+    font-size: clamp(2rem, 7.5vw, 3.2rem);
+    line-height: 1.12;
+    margin-bottom: 16px;
+  }
+  .hero-subtitle {
+    font-size: 0.98rem;
+    margin-bottom: 24px;
+  }
+  .hero-actions {
+    flex-direction: column;
+    align-items: stretch;
+    max-width: 320px;
+    margin: 0 auto;
+  }
+  .hero-actions .btn {
+    width: 100%;
+  }
+  .trust-line {
+    gap: 8px 14px;
+    font-size: 0.68rem;
+  }
+
+  /* Hero Terminal on Mobile */
+  .hero-terminal {
+    margin-top: 36px;
+  }
+  .terminal-bar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 12px;
+  }
+  .hero-cmd-tabs {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    white-space: nowrap;
+    padding-bottom: 4px;
+  }
+  .terminal-body {
+    padding: 14px;
+    font-size: 0.76rem;
+    min-height: auto;
+    overflow-x: auto;
+  }
+
+  /* Proof Switcher Tabs */
+  .proof-tabs {
+    flex-direction: column;
+  }
+  .proof-panel {
+    padding: 20px 16px;
+  }
+  .proof-panel pre {
+    font-size: 0.8rem;
+    padding: 12px;
+    overflow-x: auto;
+  }
+
+  /* Benchmark Suite Mobile */
+  .bench-tabs {
+    flex-direction: column;
+    align-items: stretch;
+    max-width: 360px;
+    margin: 0 auto 24px;
+  }
+  .bench-tab-btn {
+    width: 100%;
+    text-align: center;
+  }
+  .schema-pills {
+    gap: 6px;
+  }
+  .schema-pill-btn {
+    font-size: 0.74rem;
+    padding: 5px 10px;
+  }
+  .scaling-table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin: 0 -8px;
+  }
+  .scaling-table {
+    min-width: 560px;
+  }
+
+  /* Features */
+  .feature-grid {
+    grid-template-columns: 1fr;
+  }
+  .feature-grid article {
+    min-height: auto;
+    padding: 22px 18px;
+  }
+
+  /* Pricing Tabs & Controls */
+  .pricing-tabs {
+    flex-direction: column;
+    width: 100%;
+    max-width: 360px;
+  }
+  .pricing-tab-btn {
+    width: 100%;
+    text-align: center;
+  }
+  .billing-toggle-container {
+    flex-direction: column;
+    gap: 8px;
+    margin: 16px auto 24px;
+  }
+  .billing-toggle-pill {
+    max-width: 100%;
+  }
+
+  /* ROI Calculator */
+  .roi-calculator-box {
+    padding: 20px 16px;
+  }
+  .roi-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  /* Docs Cards & Tables */
+  .doc-card {
+    padding: 18px 14px;
+  }
+  .doc-card pre {
+    padding: 12px 10px;
+    font-size: 0.78rem;
+  }
+  .param-table {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    width: 100%;
+  }
+  .param-table th, .param-table td {
+    white-space: nowrap;
+    padding: 8px 10px;
+  }
+  .param-table td:last-child {
+    white-space: normal;
+    min-width: 160px;
+  }
+
+  /* Footer */
+  .footer-content {
+    flex-direction: column;
+    text-align: center;
+    gap: 14px;
+  }
+}
+
+/* ============================================================
+   DEVELOPER SVG ICONS & BADGES (NO EMOJIS)
+   ============================================================ */
+.inline-icon {
+  display: inline-block;
+  vertical-align: -0.16em;
+  margin-right: 0.35em;
+  flex-shrink: 0;
+}
+.feature-svg {
+  display: inline-block;
+  vertical-align: middle;
+}
+.icon-check {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--green);
+  margin-right: 4px;
+  vertical-align: -0.15em;
+}
+.icon-cross {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--red);
+  margin-right: 4px;
+  vertical-align: -0.15em;
+}
+.icon-warn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--yellow);
+  margin-right: 4px;
+  vertical-align: -0.15em;
+}
+
+
 

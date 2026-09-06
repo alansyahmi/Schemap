@@ -94,7 +94,7 @@
 
     <main class="docs-container">
         <header class="docs-hero">
-            <a href="index.html#benchmarks" class="v3-banner"><span class="v3-badge">⚡ Benchmark Validated</span> 89% Token Reduction ↗</a>
+            <a href="index.html#benchmarks" class="v3-banner"><span class="v3-badge"><svg class="inline-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Benchmark Validated</span> 89% Token Reduction ↗</a>
             <h1>Schemap vs. dbctx</h1>
             <p class="section-lead">Comparing native repository context engineering against proprietary binary database slices. Why standard Markdown rules (<code>CLAUDE.md</code>, <code>AGENTS.md</code>) deliver superior reliability for AI coding agents.</p>
         </header>
@@ -126,38 +126,38 @@
                             </tr>
                             <tr>
                                 <td><strong>Anti-Hallucination Guardrails</strong></td>
-                                <td>❌ None (Relies on raw table slices)</td>
-                                <td><strong>✅ Automatic <code>[SAFETY]</code> rule generation &amp; negative constraints</strong></td>
+                                <td><span class="icon-cross"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span> None (Relies on raw table slices)</td>
+                                <td><strong><span class="icon-check"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span> Automatic <code>[SAFETY]</code> rule generation &amp; negative constraints</strong></td>
                             </tr>
                             <tr>
                                 <td><strong>Native Agent IDE Integration</strong></td>
-                                <td>❌ Requires custom tool / runtime caller</td>
-                                <td><strong>✅ Zero-dependency: Auto-read by Claude Code, Cursor, Codex, Copilot</strong></td>
+                                <td><span class="icon-cross"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span> Requires custom tool / runtime caller</td>
+                                <td><strong><span class="icon-check"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span> Zero-dependency: Auto-read by Claude Code, Cursor, Codex, Copilot</strong></td>
                             </tr>
                             <tr>
                                 <td><strong>AI Health &amp; Readiness Score</strong></td>
-                                <td>❌ No</td>
-                                <td><strong>✅ <code>schemap doctor</code> (0-100 score + auto-fix)</strong></td>
+                                <td><span class="icon-cross"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span> No</td>
+                                <td><strong><span class="icon-check"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span> <code>schemap doctor</code> (0-100 score + auto-fix)</strong></td>
                             </tr>
                             <tr>
                                 <td><strong>Shortest JOIN Path Solver</strong></td>
-                                <td>❌ No</td>
-                                <td><strong>✅ <code>schemap join tableA tableB</code> (multi-hop SQL)</strong></td>
+                                <td><span class="icon-cross"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span> No</td>
+                                <td><strong><span class="icon-check"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span> <code>schemap join tableA tableB</code> (multi-hop SQL)</strong></td>
                             </tr>
                             <tr>
                                 <td><strong>Token Economics Inspector</strong></td>
-                                <td>❌ No</td>
-                                <td><strong>✅ <code>schemap benchmark --cost</code> ($ saved / dev)</strong></td>
+                                <td><span class="icon-cross"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span> No</td>
+                                <td><strong><span class="icon-check"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span> <code>schemap benchmark --cost</code> ($ saved / dev)</strong></td>
                             </tr>
                             <tr>
                                 <td><strong>CI/CD Breaking Change Risk Gate</strong></td>
-                                <td>❌ No</td>
-                                <td><strong>✅ <code>schemap diff --risk --fail-on-breaking</code></strong></td>
+                                <td><span class="icon-cross"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span> No</td>
+                                <td><strong><span class="icon-check"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span> <code>schemap diff --risk --fail-on-breaking</code></strong></td>
                             </tr>
                             <tr>
                                 <td><strong>Compilation Latency</strong></td>
                                 <td>~100ms - 2,000ms (database indexing)</td>
-                                <td><strong>⚡ Sub-3ms local CLI compiler</strong></td>
+                                <td><strong><svg class="inline-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Sub-3ms local CLI compiler</strong></td>
                             </tr>
                         </tbody>
                     </table>
