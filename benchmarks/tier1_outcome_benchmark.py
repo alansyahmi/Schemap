@@ -1,6 +1,6 @@
-"""Tier 1: Agent Task Outcome Benchmark Engine.
+"""Tier 1: Database Reasoning Outcome Benchmark Engine.
 
-Hero Question: Does Schemap make AI coding agents faster, cheaper, and less error-prone when working with real databases?
+Hero Question: Does Schemap actually reduce the AI Database Amnesia Tax?
 
 Evaluates 10 realistic developer feature tasks across 3 context modes:
 1. Mode A: Zero Context (Blind guess)
@@ -8,9 +8,10 @@ Evaluates 10 realistic developer feature tasks across 3 context modes:
 3. Mode C: Schemap Compiled Context (`schemap_database_context.md` + agent rules)
 
 Empirical Principles:
+- Dual-Gate First-Pass Success: Syntax & execution pass AND semantic result correctness against seeded databases.
 - No silent fallback: Outputs BENCHMARK NOT RUN if no API key is present.
 - No invented retries/tool calls: Single-pass metric tracking.
-- Separate observed metrics (tokens, latency, PASS/FAIL) vs projected cost ($).
+- Separate observed metrics (tokens, latency, syntax_valid, semantic_correct) vs projected cost ($).
 - 100% dynamic report generation calculated directly from dataset.
 - Multi-run evaluations (e.g. 5 runs per task = 150 total runs).
 - Difficulty tier breakdown: Easy, Medium, Hard, Very Hard.
@@ -208,8 +209,136 @@ DEVELOPER_TASKS = [
 ]
 
 
+def seed_chinook(cursor: sqlite3.Cursor):
+    """Seed sample rows for Chinook media store."""
+    cursor.executemany("INSERT INTO artists (artist_id, name) VALUES (?, ?);", [
+        (1, 'AC/DC'),
+        (2, 'Accept'),
+    ])
+    cursor.executemany("INSERT INTO albums (album_id, title, artist_id) VALUES (?, ?, ?);", [
+        (1, 'For Those About To Rock We Salute You', 1),
+        (2, 'Let There Be Rock', 1),
+        (3, 'Restless and Wild', 2),
+    ])
+    cursor.executemany("INSERT INTO media_types (media_type_id, name) VALUES (?, ?);", [
+        (1, 'MPEG audio file'),
+    ])
+    cursor.executemany("INSERT INTO genres (genre_id, name) VALUES (?, ?);", [
+        (1, 'Rock'),
+        (2, 'Metal'),
+    ])
+    cursor.executemany("INSERT INTO tracks (track_id, name, album_id, media_type_id, genre_id, composer, milliseconds, bytes, unit_price) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);", [
+        (1, 'For Those About To Rock (We Salute You)', 1, 1, 1, 'Angus Young', 343719, 11170334, 0.99),
+        (2, 'Fast As a Shark', 3, 1, 2, 'F. Baltes', 230619, 7532364, 0.99),
+    ])
+    cursor.executemany("INSERT INTO employees (employee_id, last_name, first_name, title, reports_to, birth_date, hire_date, address, city, state, country, postal_code, phone, fax, email) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", [
+        (1, 'Adams', 'Andrew', 'General Manager', None, '1962-02-18', '2002-08-14', '11120 Jasper Ave NW', 'Edmonton', 'AB', 'Canada', 'T5K 2N1', '+1 (780) 428-9482', None, 'andrew@chinookcorp.com'),
+        (3, 'Peacock', 'Jane', 'Sales Support Agent', 1, '1973-08-29', '2002-04-01', '1111 6 Ave SW', 'Calgary', 'AB', 'Canada', 'T2P 5M5', '+1 (403) 262-3443', None, 'jane@chinookcorp.com'),
+    ])
+    cursor.executemany("INSERT INTO customers (customer_id, first_name, last_name, company, address, city, state, country, postal_code, phone, fax, email, support_rep_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", [
+        (1, 'Luís', 'Gonçalves', 'Embraer', 'Av. Faria Lima', 'São José', 'SP', 'Brazil', '12227', '+55', None, 'luis@embraer.com', 3),
+        (2, 'Leonie', 'Köhler', None, 'Theodor-Heuss-Str 34', 'Stuttgart', None, 'Germany', '70174', '+49', None, 'leonie@yahoo.de', 3),
+    ])
+    cursor.executemany("INSERT INTO invoices (invoice_id, customer_id, invoice_date, billing_address, billing_city, billing_state, billing_country, billing_postal_code, total) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);", [
+        (1, 1, '2024-01-01', 'Av. Faria Lima', 'São José', 'SP', 'Brazil', '12227', 3.96),
+        (2, 2, '2024-01-02', 'Theodor-Heuss-Str 34', 'Stuttgart', None, 'Germany', '70174', 1.98),
+    ])
+    cursor.executemany("INSERT INTO invoice_items (invoice_line_id, invoice_id, track_id, unit_price, quantity) VALUES (?, ?, ?, ?, ?);", [
+        (1, 1, 1, 0.99, 2),
+        (2, 2, 2, 0.99, 2),
+    ])
+
+
+def seed_northwind(cursor: sqlite3.Cursor):
+    """Seed sample rows for Northwind ERP schema."""
+    cursor.executemany("INSERT INTO categories (category_id, category_name, description, picture) VALUES (?, ?, ?, ?);", [
+        (1, 'Beverages', 'Soft drinks, coffees, teas, beers', None),
+        (2, 'Condiments', 'Sweet and savory sauces, relishes', None),
+    ])
+    cursor.executemany("INSERT INTO suppliers (supplier_id, company_name, contact_name, contact_title, address, city, region, postal_code, country, phone, fax, homepage) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", [
+        (1, 'Exotic Liquids', 'Charlotte Cooper', 'Purchasing Mgr', '49 Gilbert St.', 'London', None, 'EC1 4SD', 'UK', '171-555-2222', None, None),
+    ])
+    cursor.executemany("INSERT INTO products (product_id, product_name, supplier_id, category_id, quantity_per_unit, unit_price, units_in_stock, units_on_order, reorder_level, discontinued) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", [
+        (1, 'Chai', 1, 1, '10 boxes x 20 bags', 18.0, 39, 0, 10, 0),
+        (2, 'Chang', 1, 1, '24 - 12 oz bottles', 19.0, 17, 40, 25, 0),
+        (3, 'Aniseed Syrup', 1, 2, '12 - 550 ml bottles', 10.0, 13, 70, 25, 0),
+    ])
+    cursor.executemany("INSERT INTO employees (employee_id, last_name, first_name, title, title_of_courtesy, birth_date, hire_date, address, city, region, postal_code, country, home_phone, extension, notes, reports_to) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", [
+        (1, 'Davolio', 'Nancy', 'Sales Rep', 'Ms.', '1948-12-08', '1992-05-01', '507 20th Ave', 'Seattle', 'WA', '98122', 'USA', '206-555-9857', '5467', 'Notes', None),
+    ])
+    cursor.executemany("INSERT INTO shippers (shipper_id, company_name, phone) VALUES (?, ?, ?);", [
+        (1, 'Speedy Express', '(503) 555-9831'),
+    ])
+    cursor.executemany("INSERT INTO customers (customer_id, company_name, contact_name, contact_title, address, city, region, postal_code, country, phone, fax) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", [
+        ('ALFKI', 'Alfreds Futterkiste', 'Maria Anders', 'Sales Rep', 'Obere Str. 57', 'Berlin', None, '12209', 'Germany', '030-0074321', '030-0076545'),
+    ])
+    cursor.executemany("INSERT INTO orders (order_id, customer_id, employee_id, order_date, required_date, shipped_date, ship_via, freight, ship_name, ship_address, ship_city, ship_region, ship_postal_code, ship_country) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", [
+        (10248, 'ALFKI', 1, '1996-07-04', '1996-08-01', '1996-07-16', 1, 32.38, 'Alfreds Futterkiste', 'Obere Str. 57', 'Berlin', None, '12209', 'Germany'),
+    ])
+    cursor.executemany("INSERT INTO order_details (order_id, product_id, unit_price, quantity, discount) VALUES (?, ?, ?, ?, ?);", [
+        (10248, 1, 14.0, 12, 0.0),
+        (10248, 2, 9.8, 10, 0.05),
+        (10248, 3, 34.8, 5, 0.0),
+    ])
+
+
+def seed_pagila(cursor: sqlite3.Cursor):
+    """Seed sample rows for Pagila DVD rental schema."""
+    cursor.executemany("INSERT INTO actor (actor_id, first_name, last_name, last_update) VALUES (?, ?, ?, ?);", [
+        (1, 'PENELOPE', 'GUINESS', '2006-02-15'),
+        (2, 'NICK', 'WAHLBERG', '2006-02-15'),
+    ])
+    cursor.executemany("INSERT INTO category (category_id, name, last_update) VALUES (?, ?, ?);", [
+        (1, 'Action', '2006-02-15'),
+        (2, 'Animation', '2006-02-15'),
+    ])
+    cursor.executemany("INSERT INTO language (language_id, name, last_update) VALUES (?, ?, ?);", [
+        (1, 'English', '2006-02-15'),
+    ])
+    cursor.executemany("INSERT INTO film (film_id, title, description, release_year, language_id, rental_duration, rental_rate, length, replacement_cost, rating, last_update) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", [
+        (1, 'ACADEMY DINOSAUR', 'Epic Drama', 2006, 1, 6, 0.99, 86, 20.99, 'PG', '2006-02-15'),
+        (2, 'ACE GOLDFINGER', 'Astounding Epistle', 2006, 1, 3, 4.99, 48, 12.99, 'G', '2006-02-15'),
+    ])
+    cursor.executemany("INSERT INTO film_actor (actor_id, film_id, last_update) VALUES (?, ?, ?);", [
+        (1, 1, '2006-02-15'),
+        (2, 1, '2006-02-15'),
+    ])
+    cursor.executemany("INSERT INTO film_category (film_id, category_id, last_update) VALUES (?, ?, ?);", [
+        (1, 1, '2006-02-15'),
+        (2, 2, '2006-02-15'),
+    ])
+    cursor.executemany("INSERT INTO country (country_id, country, last_update) VALUES (?, ?, ?);", [
+        (1, 'United States', '2006-02-15'),
+    ])
+    cursor.executemany("INSERT INTO city (city_id, city, country_id, last_update) VALUES (?, ?, ?, ?);", [
+        (300, 'Kingston', 1, '2006-02-15'),
+    ])
+    cursor.executemany("INSERT INTO address (address_id, address, address2, district, city_id, postal_code, phone, last_update) VALUES (?, ?, ?, ?, ?, ?, ?, ?);", [
+        (1, '47 MySakila Drive', None, 'Alberta', 300, '35200', '14033335568', '2006-02-15'),
+    ])
+    cursor.executemany("INSERT INTO store (store_id, manager_staff_id, address_id, last_update) VALUES (?, ?, ?, ?);", [
+        (1, 1, 1, '2006-02-15'),
+    ])
+    cursor.executemany("INSERT INTO staff (staff_id, first_name, last_name, address_id, email, store_id, active, username, password, last_update) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", [
+        (1, 'Mike', 'Hillyer', 1, 'Mike@sakilastaff.com', 1, 1, 'Mike', 'password', '2006-02-15'),
+    ])
+    cursor.executemany("INSERT INTO customer (customer_id, store_id, first_name, last_name, email, address_id, activebool, create_date, last_update) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);", [
+        (1, 1, 'MARY', 'SMITH', 'MARY.SMITH@sakilacustomer.org', 1, 1, '2006-02-14', '2006-02-15'),
+    ])
+    cursor.executemany("INSERT INTO inventory (inventory_id, film_id, store_id, last_update) VALUES (?, ?, ?, ?);", [
+        (1, 1, 1, '2006-02-15'),
+        (2, 2, 1, '2006-02-15'),
+    ])
+    cursor.executemany("INSERT INTO rental (rental_id, rental_date, inventory_id, customer_id, return_date, staff_id, last_update) VALUES (?, ?, ?, ?, ?, ?, ?);", [
+        (1, '2005-05-24 22:53:30', 1, 1, '2005-05-26 22:04:30', 1, '2006-02-15'),
+    ])
+    cursor.executemany("INSERT INTO payment (payment_id, customer_id, staff_id, rental_id, amount, payment_date) VALUES (?, ?, ?, ?, ?, ?);", [
+        (1, 1, 1, 1, 2.99, '2005-05-25 11:30:37'),
+    ])
+
+
 def init_in_memory_db(schema_name: str) -> sqlite3.Connection:
-    """Create in-memory SQLite database populated with schema tables."""
+    """Create in-memory SQLite database populated with schema tables and sample seed data."""
     conn = sqlite3.connect(":memory:")
     cursor = conn.cursor()
 
@@ -236,8 +365,45 @@ def init_in_memory_db(schema_name: str) -> sqlite3.Connection:
             except Exception:
                 pass
 
+    # Seed realistic rows
+    if schema_name == "Chinook":
+        seed_chinook(cursor)
+    elif schema_name == "Northwind":
+        seed_northwind(cursor)
+    elif schema_name == "Pagila":
+        seed_pagila(cursor)
+
     conn.commit()
     return conn
+
+
+def normalize_cell(val: Any) -> Any:
+    """Normalize cell value for robust semantic comparison."""
+    if val is None:
+        return ""
+    if isinstance(val, float):
+        return round(val, 2)
+    if isinstance(val, int):
+        return val
+    return str(val).strip().lower()
+
+
+def normalize_row(row: Tuple[Any, ...]) -> Tuple[Any, ...]:
+    """Normalize a database result row."""
+    return tuple(normalize_cell(c) for c in row)
+
+
+def verify_result_correctness(generated_results: List[Tuple], ground_truth_results: List[Tuple]) -> bool:
+    """Verify semantic correctness by comparing normalized result row datasets."""
+    if not ground_truth_results:
+        return False
+    if len(generated_results) != len(ground_truth_results):
+        return False
+
+    gen_norm = sorted([normalize_row(r) for r in generated_results], key=lambda x: str(x))
+    gt_norm = sorted([normalize_row(r) for r in ground_truth_results], key=lambda x: str(x))
+
+    return gen_norm == gt_norm
 
 
 def extract_sql_from_response(text: str) -> str:
@@ -251,8 +417,8 @@ def extract_sql_from_response(text: str) -> str:
     return text.strip()
 
 
-def call_live_llm_api(prompt: str) -> str:
-    """Call live LLM endpoint if configured. Returns empty string if no credentials exist."""
+def call_live_llm_api(prompt: str) -> Tuple[str, str]:
+    """Call live LLM endpoint if configured. Returns (response_text, error_message)."""
     base_url = os.environ.get("ANTHROPIC_BASE_URL", "https://api.anthropic.com")
     auth_token = os.environ.get("ANTHROPIC_AUTH_TOKEN") or os.environ.get("ANTHROPIC_API_KEY")
     model = os.environ.get("ANTHROPIC_MODEL", "claude-3-7-sonnet-20250219")
@@ -275,9 +441,12 @@ def call_live_llm_api(prompt: str) -> str:
                 res = json.loads(resp.read().decode("utf-8"))
                 for c in res.get("content", []):
                     if c.get("type") == "text":
-                        return c.get("text", "")
-        except Exception:
-            pass
+                        return c.get("text", ""), ""
+        except urllib.error.HTTPError as e:
+            err_body = e.read().decode("utf-8", errors="replace")[:200]
+            return "", f"Anthropic HTTP {e.code}: {err_body}"
+        except Exception as e:
+            return "", str(e)
 
     openai_key = os.environ.get("OPENAI_API_KEY")
     if openai_key:
@@ -297,11 +466,15 @@ def call_live_llm_api(prompt: str) -> str:
                 res = json.loads(resp.read().decode("utf-8"))
                 choices = res.get("choices", [])
                 if choices:
-                    return choices[0].get("message", {}).get("content", "")
-        except Exception:
-            pass
+                    return choices[0].get("message", {}).get("content", ""), ""
+        except urllib.error.HTTPError as e:
+            err_body = e.read().decode("utf-8", errors="replace")[:200]
+            return "", f"OpenAI HTTP {e.code}: {err_body}"
+        except Exception as e:
+            return "", str(e)
 
-    return ""
+    return "", "No API credentials configured (set ANTHROPIC_API_KEY or OPENAI_API_KEY)"
+
 
 
 def evaluate_task_mode(task: Dict[str, Any], mode: str, schema_model, raw_ddl: str, run_index: int = 1) -> Dict[str, Any]:
@@ -322,7 +495,7 @@ def evaluate_task_mode(task: Dict[str, Any], mode: str, schema_model, raw_ddl: s
     prompt_tokens = len(enc.encode(prompt))
 
     t0 = time.perf_counter()
-    llm_response = call_live_llm_api(prompt)
+    llm_response, api_err = call_live_llm_api(prompt)
     latency_ms = round((time.perf_counter() - t0) * 1000.0, 2)
 
     if not llm_response:
@@ -330,30 +503,41 @@ def evaluate_task_mode(task: Dict[str, Any], mode: str, schema_model, raw_ddl: s
             "mode": mode,
             "run_index": run_index,
             "status": "BENCHMARK NOT RUN",
-            "reason": "Missing LLM API credentials (ANTHROPIC_API_KEY or OPENAI_API_KEY)"
+            "reason": api_err or "Missing or invalid LLM API credentials"
         }
 
     extracted_sql = extract_sql_from_response(llm_response)
     completion_tokens = len(enc.encode(extracted_sql))
     total_tokens = prompt_tokens + completion_tokens
 
-    # Execute generated SQL empirically against SQLite
+    # Execute generated SQL and ground truth SQL empirically against seeded SQLite instance
     conn = init_in_memory_db(task["schema_name"])
     cursor = conn.cursor()
 
-    is_success = False
+    syntax_valid = False
+    semantic_correct = False
     error_msg = None
 
     try:
+        # Ground truth results
+        cursor.execute(task["ground_truth_sql"].strip())
+        gt_rows = cursor.fetchall()
+
+        # Generated SQL results
         cursor.execute(extracted_sql)
-        is_success = True
+        gen_rows = cursor.fetchall()
+        syntax_valid = True
+
+        # Semantic result verification
+        semantic_correct = verify_result_correctness(gen_rows, gt_rows)
     except Exception as e:
-        is_success = False
+        syntax_valid = False
+        semantic_correct = False
         error_msg = str(e)
     finally:
         conn.close()
 
-    # Observed metrics vs Projected pricing calculation ($2.00 / 1M input tokens baseline)
+    first_pass_success = syntax_valid and semantic_correct
     projected_cost_usd = round((total_tokens / 1_000_000.0) * 2.00, 6)
 
     return {
@@ -366,7 +550,9 @@ def evaluate_task_mode(task: Dict[str, Any], mode: str, schema_model, raw_ddl: s
             "total_tokens": total_tokens,
             "latency_ms": latency_ms,
             "sql_query": extracted_sql,
-            "first_pass_success": is_success,
+            "syntax_valid": syntax_valid,
+            "semantic_correct": semantic_correct,
+            "first_pass_success": first_pass_success,
             "error_message": error_msg,
         },
         "projected_metrics": {
@@ -376,26 +562,27 @@ def evaluate_task_mode(task: Dict[str, Any], mode: str, schema_model, raw_ddl: s
 
 
 def run_tier1_outcome_benchmark(runs_per_task: int = 5) -> Dict[str, Any]:
-    """Execute Tier 1 Agent Task Outcome Benchmark across all 10 realistic tasks across N runs."""
+    """Execute Tier 1 Database Reasoning Outcome Benchmark across all 10 tasks across N runs."""
     schemas = {
         "Chinook": get_chinook_schema(),
         "Northwind": get_northwind_schema(),
         "Pagila": get_pagila_schema(),
     }
 
-    # Check for credentials first
-    has_api_key = bool(os.environ.get("ANTHROPIC_AUTH_TOKEN") or os.environ.get("ANTHROPIC_API_KEY") or os.environ.get("OPENAI_API_KEY"))
-
-    if not has_api_key:
+    # Pre-flight probe
+    probe_resp, probe_err = call_live_llm_api("Return only the word OK")
+    if not probe_resp:
         return {
             "timestamp": time.strftime("%Y-%m-%d %H:%M:%S UTC", time.gmtime()),
+            "benchmark_title": "Database Reasoning Outcome Benchmark",
             "status": "BENCHMARK NOT RUN",
-            "reason": "No live LLM API credentials found. Set ANTHROPIC_API_KEY or OPENAI_API_KEY to run empirical evaluations.",
+            "reason": f"Pre-flight API check failed: {probe_err}",
             "total_evaluations_planned": len(DEVELOPER_TASKS) * runs_per_task * 3,
             "summary_by_mode": {},
             "difficulty_breakdown": {},
             "task_details": []
         }
+
 
     task_results = []
     all_evals = []
@@ -438,8 +625,14 @@ def run_tier1_outcome_benchmark(runs_per_task: int = 5) -> Dict[str, Any]:
             continue
 
         completed_eval_count += total_evals
-        successes = sum(1 for m in mode_evals if m["first_pass_success"])
-        success_rate_pct = round((successes / total_evals) * 100.0, 1)
+        syntax_passes = sum(1 for m in mode_evals if m["syntax_valid"])
+        semantic_passes = sum(1 for m in mode_evals if m["semantic_correct"])
+        first_pass_successes = sum(1 for m in mode_evals if m["first_pass_success"])
+
+        first_pass_pct = round((first_pass_successes / total_evals) * 100.0, 1)
+        syntax_pass_pct = round((syntax_passes / total_evals) * 100.0, 1)
+        semantic_pass_pct = round((semantic_passes / total_evals) * 100.0, 1)
+
         avg_input_tokens = round(sum(m["prompt_tokens"] for m in mode_evals) / total_evals, 1)
         avg_total_tokens = round(sum(m["total_tokens"] for m in mode_evals) / total_evals, 1)
         avg_cost_usd = round(sum(p["cost_usd_baseline"] for p in mode_proj) / total_evals, 5)
@@ -447,8 +640,12 @@ def run_tier1_outcome_benchmark(runs_per_task: int = 5) -> Dict[str, Any]:
 
         summary_by_mode[mode] = {
             "total_runs": total_evals,
-            "successes": successes,
-            "first_pass_success_rate_pct": success_rate_pct,
+            "syntax_passes": syntax_passes,
+            "syntax_pass_rate_pct": syntax_pass_pct,
+            "semantic_passes": semantic_passes,
+            "semantic_pass_rate_pct": semantic_pass_pct,
+            "first_pass_successes": first_pass_successes,
+            "first_pass_success_rate_pct": first_pass_pct,
             "avg_input_tokens": avg_input_tokens,
             "avg_total_tokens": avg_total_tokens,
             "avg_cost_usd": avg_cost_usd,
@@ -458,6 +655,7 @@ def run_tier1_outcome_benchmark(runs_per_task: int = 5) -> Dict[str, Any]:
     if completed_eval_count == 0:
         return {
             "timestamp": time.strftime("%Y-%m-%d %H:%M:%S UTC", time.gmtime()),
+            "benchmark_title": "Database Reasoning Outcome Benchmark",
             "status": "BENCHMARK NOT RUN",
             "reason": "No live LLM completions produced. Check API credentials (ANTHROPIC_API_KEY / OPENAI_API_KEY).",
             "total_evaluations_planned": len(DEVELOPER_TASKS) * runs_per_task * 3,
@@ -465,7 +663,6 @@ def run_tier1_outcome_benchmark(runs_per_task: int = 5) -> Dict[str, Any]:
             "difficulty_breakdown": {},
             "task_details": []
         }
-
 
     # DYNAMIC CALCULATION: Difficulty Breakdown
     difficulty_breakdown = {}
@@ -498,6 +695,7 @@ def run_tier1_outcome_benchmark(runs_per_task: int = 5) -> Dict[str, Any]:
 
     return {
         "timestamp": time.strftime("%Y-%m-%d %H:%M:%S UTC", time.gmtime()),
+        "benchmark_title": "Database Reasoning Outcome Benchmark",
         "status": "COMPLETED",
         "runs_per_task": runs_per_task,
         "total_evaluations": len(all_evals),
@@ -540,22 +738,23 @@ def generate_markdown_report(data: Dict[str, Any]) -> str:
     s_time = summary.get("Schemap", {}).get("avg_latency_s", 0.0)
 
     lines = [
-        "# 🏆 Schemap Tier 1 Benchmark: Empirical Agent Outcome",
+        "# 🏆 Schemap Tier 1 Benchmark: Database Reasoning Outcome",
         "",
         f"**Generated:** `{data['timestamp']}`  ",
         f"**Scope:** `{total_evals} evaluations · 3 context conditions · 10 realistic engineering tasks · {runs_per_task} runs each`  ",
+        f"**Validation Standard:** `Dual-Gate (Syntax & Execution Pass + Semantic Dataset Result Match)`  ",
         "",
         "---",
         "",
         "## ⚡ Does Schemap actually reduce the AI Database Amnesia Tax?",
         "",
-        "| Metric | Blind (Zero Context) | Raw DDL (`pg_dump`) | Schemap Compiled Context |",
+        "| Outcome | Blind (Zero Context) | Raw DDL (`pg_dump`) | Schemap Compiled Context |",
         "| :--- | :---: | :---: | :---: |",
-        f"| **First-Pass Success** | {z_succ:.1f}% | {r_succ:.1f}% | **{s_succ:.1f}%** |",
-        f"| **Avg. Input Tokens** | {z_in:,} | {r_in:,} | **{s_in:,}** |",
-        f"| **Avg. Total Tokens** | {z_tot:,} | {r_tot:,} | **{s_tot:,}** |",
-        f"| **Avg. Cost / Task (Projected)** | ${z_cost:.4f} | ${r_cost:.4f} | **${s_cost:.4f}** |",
-        f"| **Avg. Latency (s)** | {z_time:.2f}s | {r_time:.2f}s | **{s_time:.2f}s** |",
+        f"| **First-Pass Success (Dual-Gate)** | {z_succ:.1f}% | {r_succ:.1f}% | **{s_succ:.1f}%** |",
+        f"| **Avg. Input Tokens [Observed]** | {z_in:,} | {r_in:,} | **{s_in:,}** |",
+        f"| **Avg. Total Tokens [Observed]** | {z_tot:,} | {r_tot:,} | **{s_tot:,}** |",
+        f"| **Avg. Cost / Task [Calculated]** | ${z_cost:.4f} | ${r_cost:.4f} | **${s_cost:.4f}** |",
+        f"| **Avg. Latency (s) [Observed]** | {z_time:.2f}s | {r_time:.2f}s | **{s_time:.2f}s** |",
         "",
         f"> 🎯 **{data.get('killer_headline', '')}**",
         "",
@@ -563,8 +762,8 @@ def generate_markdown_report(data: Dict[str, Any]) -> str:
         "",
         "## 📊 First-Pass Success Rate by Task Difficulty Tier",
         "",
-        "| Difficulty Tier | Raw DDL (`pg_dump`) | Schemap Context | Impact |",
-        "| :--- | :---: | :---: | :---: |",
+        "| Difficulty Tier | Raw DDL (`pg_dump`) | Schemap Context | Impact | Strategic Insight |",
+        "| :--- | :---: | :---: | :---: | :--- |",
     ]
 
     for d_name in ["Easy", "Medium", "Hard", "Very Hard"]:
@@ -581,9 +780,10 @@ def generate_markdown_report(data: Dict[str, Any]) -> str:
         "",
         "## 🔬 Scientific Methodology Notes",
         "",
-        "1. **Zero Artificial Fallbacks:** No simulated or hardcoded ground truth SQL substitutions. Evaluations execute live against LLM completions.",
-        "2. **Observed vs. Projected Separation:** Input/total tokens and latency are empirically observed; costs are projected using standard $2.00/1M baseline rate.",
-        "3. **Strategic Impact Discovery:** Benchmark reveals where Schemap delivers maximum value: *Schemap matters when your database stops being simple.*",
+        "1. **Dual-Gate Verification:** An evaluation only succeeds if it executes cleanly without syntax errors AND returns row values identical to the ground truth dataset.",
+        "2. **Zero Artificial Fallbacks:** No simulated or hardcoded ground truth SQL substitutions. Evaluations execute live against LLM completions.",
+        "3. **Observed vs. Calculated Separation:** Tokens, execution status, and latency are empirically observed; costs are projected using standard $2.00/1M baseline rate.",
+        "4. **Strategic Impact Discovery:** Benchmark reveals where Schemap delivers maximum value: *Schemap matters when your database stops being simple.*",
         "",
         "---",
         "*Reproduce this benchmark anytime by running: `uv run python benchmarks/tier1_outcome_benchmark.py --runs 5`*"
@@ -593,11 +793,11 @@ def generate_markdown_report(data: Dict[str, Any]) -> str:
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Tier 1 Empirical Agent Outcome Benchmark")
+    parser = argparse.ArgumentParser(description="Tier 1 Database Reasoning Outcome Benchmark")
     parser.add_argument("--runs", type=int, default=5, help="Number of runs per task (default: 5)")
     args = parser.parse_args()
 
-    print(f"Running Tier 1 Empirical Agent Outcome Benchmark ({args.runs} runs/task)...")
+    print(f"Running Tier 1 Database Reasoning Outcome Benchmark ({args.runs} runs/task)...")
     data = run_tier1_outcome_benchmark(runs_per_task=args.runs)
 
     benchmarks_dir = Path(__file__).parent
@@ -615,7 +815,7 @@ def main():
         with open(report_path, "w", encoding="utf-8") as f:
             f.write(md_content)
 
-        print(f"\n[SUCCESS] Tier 1 Empirical Outcome Benchmark complete ({data['total_evaluations']} evaluations)!")
+        print(f"\n[SUCCESS] Tier 1 Database Reasoning Outcome Benchmark complete ({data['total_evaluations']} evaluations)!")
         print(f"- Headline: {data.get('killer_headline')}")
         print(f"- JSON results written to: {json_path}")
         print(f"- Markdown report written to: {report_path}")

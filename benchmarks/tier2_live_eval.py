@@ -350,6 +350,18 @@ def run_tier2_benchmark() -> Dict[str, Any]:
         "Pagila": get_pagila_schema(),
     }
 
+    # Pre-flight probe
+    probe_resp = query_llm_live("Return only the word OK")
+    if not probe_resp:
+        return {
+            "timestamp": time.strftime("%Y-%m-%d %H:%M:%S UTC", time.gmtime()),
+            "status": "BENCHMARK NOT RUN",
+            "reason": "Live LLM API credentials missing or invalid.",
+            "total_tasks_evaluated": 0,
+            "summary_by_mode": {},
+            "task_details": []
+        }
+
     results = []
 
     for task in BENCHMARK_TASKS:
@@ -384,10 +396,12 @@ def run_tier2_benchmark() -> Dict[str, Any]:
 
     return {
         "timestamp": time.strftime("%Y-%m-%d %H:%M:%S UTC", time.gmtime()),
+        "status": "COMPLETED",
         "total_tasks_evaluated": len(results),
         "summary_by_mode": summary_by_mode,
         "task_details": results
     }
+
 
 
 def generate_markdown_report(data: Dict[str, Any]) -> str:
