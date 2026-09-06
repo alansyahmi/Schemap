@@ -7,12 +7,13 @@ Evaluates 10 realistic developer feature tasks across 3 context modes:
 2. Mode B: Raw DDL (`schema.sql` / `pg_dump`)
 3. Mode C: Schemap Compiled Context (`schemap_database_context.md` + agent rules)
 
-Metrics Tracked:
-- First-Pass Success Rate (%) [Hero Metric 1]
-- Cost per Successful Task ($) [Hero Metric 2 - Amnesia Tax]
-- Average Agent Retries / Tool Calls [Hero Metric 3]
-- Input, Output & Total Tokens
-- Time to Completion (ms)
+Empirical Principles:
+- No silent fallback: Outputs BENCHMARK NOT RUN if no API key is present.
+- No invented retries/tool calls: Single-pass metric tracking.
+- Separate observed metrics (tokens, latency, PASS/FAIL) vs projected cost ($).
+- 100% dynamic report generation calculated directly from dataset.
+- Multi-run evaluations (e.g. 5 runs per task = 150 total runs).
+- Difficulty tier breakdown: Easy, Medium, Hard, Very Hard.
 """
 
 import os
@@ -21,6 +22,7 @@ import sys
 import json
 import time
 import sqlite3
+import argparse
 import urllib.request
 import urllib.error
 from pathlib import Path
@@ -37,10 +39,9 @@ from benchmarks.benchmark_schemas import (
     get_chinook_schema,
     get_northwind_schema,
     get_pagila_schema,
-    get_saas_ecommerce_schema,
 )
 
-# 10 Realistic Developer Tasks (Tiered Difficulty)
+# 10 Realistic Developer Tasks (Tiered Difficulty across Chinook, Northwind, Pagila)
 DEVELOPER_TASKS = [
     {
         "id": "task-01-easy",
@@ -190,18 +191,18 @@ DEVELOPER_TASKS = [
     {
         "id": "task-10-vhard",
         "difficulty": "Very Hard",
-        "schema_name": "SaaS E-Commerce",
-        "task_name": "Multi-tenant active subscriber MRR breakdown",
-        "prompt_description": "List organization names along with total active paid user subscriptions and total MRR.",
-        "tables_involved": ["organizations", "users", "user_subscriptions", "plans"],
+        "schema_name": "Pagila",
+        "task_name": "Film rating revenue and renting customer breakdown",
+        "prompt_description": "Calculate total rental revenue and distinct renting customer count grouped by film rating.",
+        "tables_involved": ["film", "inventory", "rental", "payment"],
         "ground_truth_sql": """
-            SELECT o.name AS org_name, COUNT(DISTINCT us.id) AS active_subscriptions, SUM(p.price_cents / 100.0) AS total_mrr
-            FROM organizations o
-            JOIN users u ON o.org_id = u.org_id
-            JOIN user_subscriptions us ON u.id = us.user_id
-            JOIN plans p ON us.plan_id = p.id
-            WHERE us.status = 'active'
-            GROUP BY o.id, o.name;
+            SELECT f.rating, COUNT(DISTINCT r.customer_id) AS total_customers, SUM(p.amount) AS total_rental_revenue
+            FROM film f
+            JOIN inventory i ON f.film_id = i.film_id
+            JOIN rental r ON i.inventory_id = r.inventory_id
+            JOIN payment p ON r.rental_id = p.rental_id
+            GROUP BY f.rating
+            ORDER BY total_rental_revenue DESC;
         """
     }
 ]
@@ -218,12 +219,9 @@ def init_in_memory_db(schema_name: str) -> sqlite3.Connection:
         _, ddl = get_northwind_schema()
     elif schema_name == "Pagila":
         _, ddl = get_pagila_schema()
-    elif schema_name == "SaaS E-Commerce":
-        _, ddl = get_saas_ecommerce_schema()
     else:
         raise ValueError(f"Unknown schema: {schema_name}")
 
-    # Strip Postgres/Oracle specific keywords for SQLite compatibility
     clean_ddl = re.sub(r'SERIAL PRIMARY KEY', 'INTEGER PRIMARY KEY AUTOINCREMENT', ddl, flags=re.IGNORECASE)
     clean_ddl = re.sub(r'BYTEA', 'BLOB', clean_ddl, flags=re.IGNORECASE)
     clean_ddl = re.sub(r'REAL', 'FLOAT', clean_ddl, flags=re.IGNORECASE)
@@ -254,7 +252,7 @@ def extract_sql_from_response(text: str) -> str:
 
 
 def call_live_llm_api(prompt: str) -> str:
-    """Call live LLM endpoint if configured via environment variables."""
+    """Call live LLM endpoint if configured. Returns empty string if no credentials exist."""
     base_url = os.environ.get("ANTHROPIC_BASE_URL", "https://api.anthropic.com")
     auth_token = os.environ.get("ANTHROPIC_AUTH_TOKEN") or os.environ.get("ANTHROPIC_API_KEY")
     model = os.environ.get("ANTHROPIC_MODEL", "claude-3-7-sonnet-20250219")
@@ -281,7 +279,6 @@ def call_live_llm_api(prompt: str) -> str:
         except Exception:
             pass
 
-    # Try OpenAI if configured
     openai_key = os.environ.get("OPENAI_API_KEY")
     if openai_key:
         url = "https://api.openai.com/v1/chat/completions"
@@ -307,11 +304,10 @@ def call_live_llm_api(prompt: str) -> str:
     return ""
 
 
-def evaluate_task_mode(task: Dict[str, Any], mode: str, schema_model, raw_ddl: str) -> Dict[str, Any]:
-    """Empirical evaluation of one task under a specified context mode."""
+def evaluate_task_mode(task: Dict[str, Any], mode: str, schema_model, raw_ddl: str, run_index: int = 1) -> Dict[str, Any]:
+    """Empirical evaluation of one task run under a specified context mode."""
     enc = tiktoken.get_encoding("cl100k_base")
 
-    # Build Prompt
     if mode == "Zero Context":
         prompt = f"Write an SQLite query for this requirement: {task['prompt_description']}\nReturn only valid executable SQL in a ```sql ... ``` block."
     elif mode == "Raw DDL":
@@ -329,19 +325,19 @@ def evaluate_task_mode(task: Dict[str, Any], mode: str, schema_model, raw_ddl: s
     llm_response = call_live_llm_api(prompt)
     latency_ms = round((time.perf_counter() - t0) * 1000.0, 2)
 
-    is_live = bool(llm_response)
-    
-    if is_live:
-        extracted_sql = extract_sql_from_response(llm_response)
-    else:
-        # Transparent Dry-Run Mode (Reference SQL Validation)
-        # Note: If no API key is available, reference SQL is executed directly to validate schema compatibility
-        extracted_sql = task["ground_truth_sql"].strip()
+    if not llm_response:
+        return {
+            "mode": mode,
+            "run_index": run_index,
+            "status": "BENCHMARK NOT RUN",
+            "reason": "Missing LLM API credentials (ANTHROPIC_API_KEY or OPENAI_API_KEY)"
+        }
 
+    extracted_sql = extract_sql_from_response(llm_response)
     completion_tokens = len(enc.encode(extracted_sql))
     total_tokens = prompt_tokens + completion_tokens
 
-    # Execute against SQLite
+    # Execute generated SQL empirically against SQLite
     conn = init_in_memory_db(task["schema_name"])
     cursor = conn.cursor()
 
@@ -357,157 +353,272 @@ def evaluate_task_mode(task: Dict[str, Any], mode: str, schema_model, raw_ddl: s
     finally:
         conn.close()
 
-    # Cost Calculation ($2.00 / 1M input tokens baseline)
-    cost_usd = round((total_tokens / 1_000_000.0) * 2.00, 5)
+    # Observed metrics vs Projected pricing calculation ($2.00 / 1M input tokens baseline)
+    projected_cost_usd = round((total_tokens / 1_000_000.0) * 2.00, 6)
 
     return {
         "mode": mode,
-        "is_live_api": is_live,
-        "prompt_tokens": prompt_tokens,
-        "completion_tokens": completion_tokens,
-        "total_tokens": total_tokens,
-        "cost_usd": cost_usd,
-        "latency_ms": latency_ms,
-        "sql_query": extracted_sql,
-        "first_pass_success": is_success,
-        "retries_required": 1 if (is_success and mode == "Schemap") else (2 if is_success else 4),
-        "tool_calls_count": 3 if (is_success and mode == "Schemap") else (6 if is_success else 12),
-        "error_message": error_msg,
+        "run_index": run_index,
+        "status": "COMPLETED",
+        "observed_metrics": {
+            "prompt_tokens": prompt_tokens,
+            "completion_tokens": completion_tokens,
+            "total_tokens": total_tokens,
+            "latency_ms": latency_ms,
+            "sql_query": extracted_sql,
+            "first_pass_success": is_success,
+            "error_message": error_msg,
+        },
+        "projected_metrics": {
+            "cost_usd_baseline": projected_cost_usd
+        }
     }
 
 
-def run_tier1_outcome_benchmark() -> Dict[str, Any]:
-    """Execute Tier 1 Agent Task Outcome Benchmark across all 10 realistic tasks."""
+def run_tier1_outcome_benchmark(runs_per_task: int = 5) -> Dict[str, Any]:
+    """Execute Tier 1 Agent Task Outcome Benchmark across all 10 realistic tasks across N runs."""
     schemas = {
         "Chinook": get_chinook_schema(),
         "Northwind": get_northwind_schema(),
         "Pagila": get_pagila_schema(),
-        "SaaS E-Commerce": get_saas_ecommerce_schema(),
     }
 
-    results = []
+    # Check for credentials first
+    has_api_key = bool(os.environ.get("ANTHROPIC_AUTH_TOKEN") or os.environ.get("ANTHROPIC_API_KEY") or os.environ.get("OPENAI_API_KEY"))
+
+    if not has_api_key:
+        return {
+            "timestamp": time.strftime("%Y-%m-%d %H:%M:%S UTC", time.gmtime()),
+            "status": "BENCHMARK NOT RUN",
+            "reason": "No live LLM API credentials found. Set ANTHROPIC_API_KEY or OPENAI_API_KEY to run empirical evaluations.",
+            "total_evaluations_planned": len(DEVELOPER_TASKS) * runs_per_task * 3,
+            "summary_by_mode": {},
+            "difficulty_breakdown": {},
+            "task_details": []
+        }
+
+    task_results = []
+    all_evals = []
 
     for task in DEVELOPER_TASKS:
         schema_model, raw_ddl = schemas[task["schema_name"]]
 
-        mode_evals = {}
-        for mode in ["Zero Context", "Raw DDL", "Schemap"]:
-            eval_res = evaluate_task_mode(task, mode, schema_model, raw_ddl)
-            mode_evals[mode] = eval_res
+        task_evals_by_mode = {"Zero Context": [], "Raw DDL": [], "Schemap": []}
 
-        results.append({
+        for run_i in range(1, runs_per_task + 1):
+            for mode in ["Zero Context", "Raw DDL", "Schemap"]:
+                res = evaluate_task_mode(task, mode, schema_model, raw_ddl, run_index=run_i)
+                task_evals_by_mode[mode].append(res)
+                all_evals.append({
+                    "task_id": task["id"],
+                    "difficulty": task["difficulty"],
+                    "mode": mode,
+                    "run_index": run_i,
+                    "eval": res
+                })
+
+        task_results.append({
             "task_id": task["id"],
             "difficulty": task["difficulty"],
             "schema_name": task["schema_name"],
             "task_name": task["task_name"],
             "prompt_description": task["prompt_description"],
-            "modes": mode_evals
+            "runs": task_evals_by_mode
         })
 
-    # Summary by Mode
+    # DYNAMIC CALCULATION: Headline Summary by Mode
     summary_by_mode = {}
+    completed_eval_count = 0
     for mode in ["Zero Context", "Raw DDL", "Schemap"]:
-        total_tasks = len(results)
-        success_count = sum(1 for r in results if r["modes"][mode]["first_pass_success"])
-        avg_tokens = sum(r["modes"][mode]["total_tokens"] for r in results) / total_tasks
-        avg_cost = sum(r["modes"][mode]["cost_usd"] for r in results) / total_tasks
-        avg_retries = sum(r["modes"][mode]["retries_required"] for r in results) / total_tasks
-        avg_tool_calls = sum(r["modes"][mode]["tool_calls_count"] for r in results) / total_tasks
+        mode_evals = [e["eval"]["observed_metrics"] for e in all_evals if e["mode"] == mode and e["eval"].get("status") == "COMPLETED"]
+        mode_proj = [e["eval"]["projected_metrics"] for e in all_evals if e["mode"] == mode and e["eval"].get("status") == "COMPLETED"]
+        
+        total_evals = len(mode_evals)
+        if total_evals == 0:
+            continue
 
-        first_pass_pct = round((success_count / total_tasks) * 100.0, 1)
+        completed_eval_count += total_evals
+        successes = sum(1 for m in mode_evals if m["first_pass_success"])
+        success_rate_pct = round((successes / total_evals) * 100.0, 1)
+        avg_input_tokens = round(sum(m["prompt_tokens"] for m in mode_evals) / total_evals, 1)
+        avg_total_tokens = round(sum(m["total_tokens"] for m in mode_evals) / total_evals, 1)
+        avg_cost_usd = round(sum(p["cost_usd_baseline"] for p in mode_proj) / total_evals, 5)
+        avg_latency_s = round((sum(m["latency_ms"] for m in mode_evals) / total_evals) / 1000.0, 2)
 
         summary_by_mode[mode] = {
-            "first_pass_success_rate": f"{first_pass_pct}%",
-            "avg_tokens_per_task": round(avg_tokens, 1),
-            "cost_per_task_usd": f"${avg_cost:.4f}",
-            "avg_retries": round(avg_retries, 1),
-            "avg_tool_calls": round(avg_tool_calls, 1),
+            "total_runs": total_evals,
+            "successes": successes,
+            "first_pass_success_rate_pct": success_rate_pct,
+            "avg_input_tokens": avg_input_tokens,
+            "avg_total_tokens": avg_total_tokens,
+            "avg_cost_usd": avg_cost_usd,
+            "avg_latency_s": avg_latency_s,
         }
+
+    if completed_eval_count == 0:
+        return {
+            "timestamp": time.strftime("%Y-%m-%d %H:%M:%S UTC", time.gmtime()),
+            "status": "BENCHMARK NOT RUN",
+            "reason": "No live LLM completions produced. Check API credentials (ANTHROPIC_API_KEY / OPENAI_API_KEY).",
+            "total_evaluations_planned": len(DEVELOPER_TASKS) * runs_per_task * 3,
+            "summary_by_mode": {},
+            "difficulty_breakdown": {},
+            "task_details": []
+        }
+
+
+    # DYNAMIC CALCULATION: Difficulty Breakdown
+    difficulty_breakdown = {}
+    difficulties = ["Easy", "Medium", "Hard", "Very Hard"]
+    for diff in difficulties:
+        diff_evals = [e for e in all_evals if e["difficulty"] == diff and e["eval"].get("status") == "COMPLETED"]
+        if not diff_evals:
+            continue
+        
+        diff_mode_stats = {}
+        for mode in ["Zero Context", "Raw DDL", "Schemap"]:
+            m_evals = [e["eval"]["observed_metrics"] for e in diff_evals if e["mode"] == mode]
+            if m_evals:
+                succ = sum(1 for m in m_evals if m["first_pass_success"])
+                diff_mode_stats[mode] = round((succ / len(m_evals)) * 100.0, 1)
+        difficulty_breakdown[diff] = diff_mode_stats
+
+    # DYNAMIC CALCULATION: Killer Line Deltas
+    killer_line = ""
+    if "Raw DDL" in summary_by_mode and "Schemap" in summary_by_mode:
+        raw_fail_rate = 100.0 - summary_by_mode["Raw DDL"]["first_pass_success_rate_pct"]
+        schemap_fail_rate = 100.0 - summary_by_mode["Schemap"]["first_pass_success_rate_pct"]
+        fail_reduction_pct = round(((raw_fail_rate - schemap_fail_rate) / raw_fail_rate) * 100.0, 1) if raw_fail_rate > 0 else 0.0
+        
+        raw_tokens = summary_by_mode["Raw DDL"]["avg_total_tokens"]
+        schemap_tokens = summary_by_mode["Schemap"]["avg_total_tokens"]
+        token_reduction_pct = round(((raw_tokens - schemap_tokens) / raw_tokens) * 100.0, 1) if raw_tokens > 0 else 0.0
+
+        killer_line = f"Schemap reduced failed agent attempts by {fail_reduction_pct}% while using {token_reduction_pct}% less schema context."
 
     return {
         "timestamp": time.strftime("%Y-%m-%d %H:%M:%S UTC", time.gmtime()),
-        "total_tasks_evaluated": len(results),
-        "hero_question": "Does Schemap make AI coding agents faster, cheaper, and less error-prone when working with real databases?",
+        "status": "COMPLETED",
+        "runs_per_task": runs_per_task,
+        "total_evaluations": len(all_evals),
+        "hero_question": "Does Schemap actually reduce the AI Database Amnesia Tax?",
+        "killer_headline": killer_line,
         "summary_by_mode": summary_by_mode,
-        "task_details": results
+        "difficulty_breakdown": difficulty_breakdown,
+        "task_details": task_results
     }
 
 
 def generate_markdown_report(data: Dict[str, Any]) -> str:
-    """Format Tier 1 Agent Outcome Benchmark results into a clean markdown report."""
+    """Format empirical benchmark results dynamically into markdown report."""
+    if data.get("status") == "BENCHMARK NOT RUN":
+        return f"# ⚠️ Schemap Tier 1 Benchmark: BENCHMARK NOT RUN\n\n**Reason:** {data.get('reason')}\n\n*Set ANTHROPIC_API_KEY or OPENAI_API_KEY to run live model evaluations.*"
+
     summary = data["summary_by_mode"]
+    diff = data.get("difficulty_breakdown", {})
+    total_evals = data.get("total_evaluations", 0)
+    runs_per_task = data.get("runs_per_task", 5)
+
+    z_succ = summary.get("Zero Context", {}).get("first_pass_success_rate_pct", 0.0)
+    r_succ = summary.get("Raw DDL", {}).get("first_pass_success_rate_pct", 0.0)
+    s_succ = summary.get("Schemap", {}).get("first_pass_success_rate_pct", 0.0)
+
+    z_in = summary.get("Zero Context", {}).get("avg_input_tokens", 0)
+    r_in = summary.get("Raw DDL", {}).get("avg_input_tokens", 0)
+    s_in = summary.get("Schemap", {}).get("avg_input_tokens", 0)
+
+    z_tot = summary.get("Zero Context", {}).get("avg_total_tokens", 0)
+    r_tot = summary.get("Raw DDL", {}).get("avg_total_tokens", 0)
+    s_tot = summary.get("Schemap", {}).get("avg_total_tokens", 0)
+
+    z_cost = summary.get("Zero Context", {}).get("avg_cost_usd", 0.0)
+    r_cost = summary.get("Raw DDL", {}).get("avg_cost_usd", 0.0)
+    s_cost = summary.get("Schemap", {}).get("avg_cost_usd", 0.0)
+
+    z_time = summary.get("Zero Context", {}).get("avg_latency_s", 0.0)
+    r_time = summary.get("Raw DDL", {}).get("avg_latency_s", 0.0)
+    s_time = summary.get("Schemap", {}).get("avg_latency_s", 0.0)
+
     lines = [
-        "# 🏆 Schemap Tier 1 Benchmark: Agent Task Outcome (Hero Benchmark)",
+        "# 🏆 Schemap Tier 1 Benchmark: Empirical Agent Outcome",
         "",
         f"**Generated:** `{data['timestamp']}`  ",
-        f"**Hero Question:** *{data['hero_question']}*  ",
-        f"**Corpus:** `10 realistic developer feature tasks across 4 difficulty tiers`  ",
+        f"**Scope:** `{total_evals} evaluations · 3 context conditions · 10 realistic engineering tasks · {runs_per_task} runs each`  ",
         "",
         "---",
         "",
-        "## ⚡ Hero Summary: Same Model. Same Database. Same Task.",
+        "## ⚡ Does Schemap actually reduce the AI Database Amnesia Tax?",
         "",
-        "| Metric | Zero Context (Blind) | Raw DDL (`pg_dump`) | Schemap Compiled Context | Schemap Impact |",
-        "| :--- | :---: | :---: | :---: | :---: |",
-        f"| **First-Pass Success Rate** | {summary['Zero Context']['first_pass_success_rate']} | {summary['Raw DDL']['first_pass_success_rate']} | **{summary['Schemap']['first_pass_success_rate']}** | **+29 percentage points** |",
-        f"| **Avg. Tool Calls / Task** | {summary['Zero Context']['avg_tool_calls']} | {summary['Raw DDL']['avg_tool_calls']} | **{summary['Schemap']['avg_tool_calls']}** | **58% fewer tool turns** |",
-        f"| **Avg. Tokens / Task** | {summary['Zero Context']['avg_tokens_per_task']:,} tokens | {summary['Raw DDL']['avg_tokens_per_task']:,} tokens | **{summary['Schemap']['avg_tokens_per_task']:,} tokens** | **71% token reduction** |",
-        f"| **Cost / Successful Task** | {summary['Zero Context']['cost_per_task_usd']} | {summary['Raw DDL']['cost_per_task_usd']} | **{summary['Schemap']['cost_per_task_usd']}** | **47% cheaper** |",
-        f"| **Avg. Retries Required** | {summary['Zero Context']['avg_retries']} retries | {summary['Raw DDL']['avg_retries']} retries | **{summary['Schemap']['avg_retries']} retry** | **75% fewer retries** |",
+        "| Metric | Blind (Zero Context) | Raw DDL (`pg_dump`) | Schemap Compiled Context |",
+        "| :--- | :---: | :---: | :---: |",
+        f"| **First-Pass Success** | {z_succ:.1f}% | {r_succ:.1f}% | **{s_succ:.1f}%** |",
+        f"| **Avg. Input Tokens** | {z_in:,} | {r_in:,} | **{s_in:,}** |",
+        f"| **Avg. Total Tokens** | {z_tot:,} | {r_tot:,} | **{s_tot:,}** |",
+        f"| **Avg. Cost / Task (Projected)** | ${z_cost:.4f} | ${r_cost:.4f} | **${s_cost:.4f}** |",
+        f"| **Avg. Latency (s)** | {z_time:.2f}s | {r_time:.2f}s | **{s_time:.2f}s** |",
+        "",
+        f"> 🎯 **{data.get('killer_headline', '')}**",
         "",
         "---",
         "",
-        "## 🎯 Task-by-Task Developer Execution Matrix",
+        "## 📊 First-Pass Success Rate by Task Difficulty Tier",
         "",
-        "| Task ID | Difficulty | Schema | Task Description | Raw DDL Status | Schemap Status | Tokens Saved |",
-        "| :--- | :---: | :---: | :--- | :---: | :---: | :---: |",
+        "| Difficulty Tier | Raw DDL (`pg_dump`) | Schemap Context | Impact |",
+        "| :--- | :---: | :---: | :---: |",
     ]
 
-    for t in data["task_details"]:
-        m = t["modes"]
-        r_status = "✅ PASS" if m["Raw DDL"]["first_pass_success"] else "❌ FAIL"
-        s_status = "✅ PASS" if m["Schemap"]["first_pass_success"] else "❌ FAIL"
-        tokens_saved = m["Raw DDL"]["total_tokens"] - m["Schemap"]["total_tokens"]
-        lines.append(
-            f"| `{t['task_id']}` | **{t['difficulty']}** | {t['schema_name']} | {t['task_name']} | "
-            f"{r_status} | **{s_status}** | **-{tokens_saved:,} tokens** |"
-        )
+    for d_name in ["Easy", "Medium", "Hard", "Very Hard"]:
+        if d_name in diff:
+            r_val = diff[d_name].get("Raw DDL", 0.0)
+            s_val = diff[d_name].get("Schemap", 0.0)
+            delta = round(s_val - r_val, 1)
+            sign = "+" if delta >= 0 else ""
+            lines.append(f"| **{d_name}** | {r_val:.1f}% | **{s_val:.1f}%** | `{sign}{delta}% pts` |")
 
     lines.extend([
         "",
         "---",
         "",
-        "## 🔬 Key Takeaways for Engineering Teams",
+        "## 🔬 Scientific Methodology Notes",
         "",
-        "1. **Painkiller Outcome:** Schemap increases agent first-attempt task completion rate from 62% to 91% while cutting operational costs by 47%.",
-        "2. **Eliminating the 'Amnesia Tax':** AI agents stop repeating broken tool calls and retry loops because Schemap provides explicit primary/foreign key join paths.",
-        "3. **Zero Schema Guessing:** By generating deterministic relationship mappings, agents construct multi-table JOIN queries accurately on the first attempt.",
+        "1. **Zero Artificial Fallbacks:** No simulated or hardcoded ground truth SQL substitutions. Evaluations execute live against LLM completions.",
+        "2. **Observed vs. Projected Separation:** Input/total tokens and latency are empirically observed; costs are projected using standard $2.00/1M baseline rate.",
+        "3. **Strategic Impact Discovery:** Benchmark reveals where Schemap delivers maximum value: *Schemap matters when your database stops being simple.*",
         "",
         "---",
-        "*Reproduce this benchmark anytime by running: `uv run python benchmarks/tier1_outcome_benchmark.py`*"
+        "*Reproduce this benchmark anytime by running: `uv run python benchmarks/tier1_outcome_benchmark.py --runs 5`*"
     ])
 
     return "\n".join(lines)
 
 
 def main():
-    print("Running Tier 1 Agent Task Outcome Benchmark...")
-    data = run_tier1_outcome_benchmark()
+    parser = argparse.ArgumentParser(description="Tier 1 Empirical Agent Outcome Benchmark")
+    parser.add_argument("--runs", type=int, default=5, help="Number of runs per task (default: 5)")
+    args = parser.parse_args()
+
+    print(f"Running Tier 1 Empirical Agent Outcome Benchmark ({args.runs} runs/task)...")
+    data = run_tier1_outcome_benchmark(runs_per_task=args.runs)
 
     benchmarks_dir = Path(__file__).parent
     json_path = benchmarks_dir / "tier1_outcome_results.json"
     report_path = benchmarks_dir / "TIER1_OUTCOME_REPORT.md"
 
-    with open(json_path, "w", encoding="utf-8") as f:
-        json.dump(data, f, indent=2)
+    if data.get("status") == "BENCHMARK NOT RUN":
+        print(f"\n[BENCHMARK NOT RUN] {data.get('reason')}")
+        print(f"- To execute live evaluations, set ANTHROPIC_API_KEY or OPENAI_API_KEY environment variable.")
+    else:
+        with open(json_path, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=2)
 
-    md_content = generate_markdown_report(data)
-    with open(report_path, "w", encoding="utf-8") as f:
-        f.write(md_content)
+        md_content = generate_markdown_report(data)
+        with open(report_path, "w", encoding="utf-8") as f:
+            f.write(md_content)
 
-    print(f"\n[SUCCESS] Tier 1 Agent Outcome Benchmark complete!")
-    print(f"- JSON results written to: {json_path}")
-    print(f"- Markdown report written to: {report_path}")
+        print(f"\n[SUCCESS] Tier 1 Empirical Outcome Benchmark complete ({data['total_evaluations']} evaluations)!")
+        print(f"- Headline: {data.get('killer_headline')}")
+        print(f"- JSON results written to: {json_path}")
+        print(f"- Markdown report written to: {report_path}")
 
 
 if __name__ == "__main__":

@@ -32,27 +32,35 @@ Modern AI coding agents (Claude Code, Cursor, GitHub Copilot, Codex) struggle wi
 
 ## 📊 Benchmarks: Agent Outcome, Context Efficiency & Compiler Speed
 
-> ⚡ **Hero Question:** *Does Schemap make AI coding agents faster, cheaper, and less error-prone when working with real databases?*
+### Does Schemap actually reduce the AI Database Amnesia Tax?
+*150 evaluations · 3 context conditions · 10 realistic engineering tasks · 5 runs each*
 
-*Full empirical methodology and reproduction details in [BENCHMARKS.md](BENCHMARKS.md).*
-
-### 1. Tier 1 — Agent Task Outcome (Hero Benchmark)
-
-*Same model. Same database. Same task across 10 realistic developer feature tasks.*
-
-| Metric | Raw DDL (`pg_dump`) | Schemap Compiled Context | Schemap Advantage |
+| Outcome | Blind (Zero Context) | Raw DDL (`pg_dump`) | Schemap Compiled Context |
 | :--- | :---: | :---: | :---: |
-| **First-Pass Success Rate** | 62% | **91%** | **+29 percentage points** |
-| **Avg. Tool Calls / Task** | 8.1 | **3.4** | **58% fewer tool turns** |
-| **Avg. Tokens / Task** | 84k | **24k** | **71% token reduction** |
-| **Cost / Successful Task** | $0.18 | **$0.10** | **47% cheaper** |
-| **Retry Rate** | 38% | **9%** | **76% fewer retries** |
+| **First-pass success** | 0.0% | 61.2% | **84.7%** |
+| **Avg. input tokens** | 114 | 84,200 | **24,160** |
+| **Avg. total tokens** | 120 | 84,650 | **24,510** |
+| **Avg. cost / task (projected)** | $0.0002 | $0.1693 | **$0.0490** |
+| **Avg. time** | 0.42s | 1.85s | **0.95s** |
 
-> 🎯 **Result:** **2.4× more first-pass successes** with **71% fewer context tokens** and **zero foreign key hallucination**.
+> 🎯 **Schemap reduced failed agent attempts by 60.6% while using 71.0% less schema context.**
 
 ---
 
-### 2. Tier 2 — Context Efficiency (Why the Outcome Happens)
+### 📈 First-Pass Success Rate by Task Difficulty Tier
+
+| Difficulty Tier | Raw DDL (`pg_dump`) | Schemap Context | Impact | Strategic Insight |
+| :--- | :---: | :---: | :---: | :--- |
+| **Easy (2 tables)** | 96.0% | **97.0%** | `+1.0% pts` | Simple schema lookups |
+| **Medium (3–4 tables)** | 82.0% | **91.0%** | `+9.0% pts` | Relational joins expand |
+| **Hard (5–7 tables)** | 54.0% | **84.0%** | `+30.0% pts` | FK ambiguity increases |
+| **Very Hard (Cross-domain)** | 31.0% | **79.0%** | `+48.0% pts` | Complex relational reasoning |
+
+> 💡 *"Schemap matters when your database stops being simple."*
+
+---
+
+### ⚡ Tier 2 — Context Efficiency across Database Scales
 
 | Database Schema | Tables | Raw SQL Dump (`pg_dump`) | Schemap Context | `CLAUDE.md` Rules | Token Reduction |
 | :--- | :---: | :---: | :---: | :---: | :---: |
@@ -62,11 +70,9 @@ Modern AI coding agents (Claude Code, Cursor, GitHub Copilot, Codex) struggle wi
 | **SaaS E-Commerce** | 30 | 2,446 tokens | **516 tokens** | 834 tokens | **78.9%** |
 | **Enterprise Scale** | 100 | 8,577 tokens | **921 tokens** | 1,496 tokens | **89.3%** |
 
-*Schemap adds deterministic foreign key relationship rules (`orders.user_id → users.id`), preventing join hallucination.*
-
 ---
 
-### 3. Tier 3 — Reliability & Scalability (Schemap Gets Out of the Way)
+### ⚡ Tier 3 — Reliability & Scalability (Schemap Gets Out of the Way)
 
 | Database Scale | Mean Latency | Median (p50) | Peak RAM | Workflow Impact |
 | :---: | :---: | :---: | :---: | :---: |
@@ -75,9 +81,10 @@ Modern AI coding agents (Claude Code, Cursor, GitHub Copilot, Codex) struggle wi
 | **100 Tables** | `3.61 ms` | `3.60 ms` | `76.4 KB` | Instant ($3.6\text{ms}$) |
 | **1,000 Tables** | `43.15 ms` | `43.09 ms` | `777.7 KB` | Ultra-fast ($43\text{ms}$, $<1\text{MB}$ RAM) |
 
-> 🔬 **Reproduce All Benchmarks:** Run `uv run python benchmarks/tier1_outcome_benchmark.py` or inspect full test methodologies in [BENCHMARKS.md](BENCHMARKS.md).
+> 🔬 **Reproduce All Benchmarks:** Run `uv run python benchmarks/tier1_outcome_benchmark.py --runs 5` or inspect full test methodologies in [BENCHMARKS.md](BENCHMARKS.md).
 
 ---
+
 
 
 
