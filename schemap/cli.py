@@ -62,15 +62,17 @@ import urllib.parse
 @click.group()
 @click.version_option("3.1.2", package_name="schemap-tool", message="Schemap %(version)s")
 @click.option('--profile', default=None, help="Named profile to load from schemap.yaml.")
+@click.option('--db', default=None, help="Database connection URL (e.g. sqlite:///app.db, postgresql://...).")
 @click.option('--quiet', '-q', is_flag=True, help="Suppress informational messages.")
 @click.option('--no-color', is_flag=True, help="Disable color output.")
 @click.option('--output', 'output_fmt', default=None, help="Global default output format.")
 @click.option('--output-file', default=None, help="Redirect output to a file.")
 @click.pass_context
-def cli(ctx, profile, quiet, no_color, output_fmt, output_file):
+def cli(ctx, profile, db, quiet, no_color, output_fmt, output_file):
     """Schemap: AI Database Context Compiler - The fastest way to make your database AI-ready."""
     ctx.ensure_object(dict)
     ctx.obj['profile'] = profile
+    ctx.obj['db'] = db
     ctx.obj['quiet'] = quiet
     ctx.obj['no_color'] = no_color
     ctx.obj['output_fmt'] = output_fmt
@@ -298,12 +300,16 @@ def _maybe_prompt_feedback(cmd_name: str = "run", tokens_saved: int = 0):
 
 @cli.command()
 @click.option('--config', default="schemap.yaml", help="Path to configuration file.")
+@click.option('--db', default=None, help="Database connection URL (e.g. sqlite:///app.db, postgresql://...).")
 @click.option('--json', 'json_output', is_flag=True, help="Output health report in machine-readable JSON.")
 @click.option('--verbose', is_flag=True, help="Enable verbose output.")
-def doctor(config, json_output, verbose):
+@click.pass_context
+def doctor(ctx, config, db, json_output, verbose):
     """Run Schemap AI Database Health Check & Onboarding Diagnostic."""
     try:
-        cfg = load_config(config)
+        prof = ctx.obj.get('profile') if ctx.obj else None
+        db_url = db or (ctx.obj.get('db') if ctx.obj else None)
+        cfg = load_config(config, profile=prof, db_url=db_url)
         schema_model, raw_tables, unresolved = _process_schema(cfg, enrich=False)
 
         report = get_doctor_report(schema_model, raw_tables, unresolved)
@@ -339,13 +345,17 @@ def doctor(config, json_output, verbose):
 
 @cli.command()
 @click.option('--config', default="schemap.yaml", help="Path to configuration file.")
+@click.option('--db', default=None, help="Database connection URL (e.g. sqlite:///app.db, postgresql://...).")
 @click.option('--json', 'json_output', is_flag=True, help="Output benchmark data in JSON format.")
 @click.option('--cost', is_flag=True, help="Display monetary LLM cost savings estimates.")
 @click.option('--verbose', is_flag=True, help="Enable verbose output.")
-def benchmark(config, json_output, cost, verbose):
+@click.pass_context
+def benchmark(ctx, config, db, json_output, cost, verbose):
     """Run Database Context Benchmark (tables, raw vs schemap tokens, compression, monetary savings, AI score, latency)."""
     try:
-        cfg = load_config(config)
+        prof = ctx.obj.get('profile') if ctx.obj else None
+        db_url = db or (ctx.obj.get('db') if ctx.obj else None)
+        cfg = load_config(config, profile=prof, db_url=db_url)
         schema_model, raw_tables, unresolved = _process_schema(cfg, enrich=False)
         
         bench_data = calculate_benchmark(schema_model, raw_tables, unresolved)
@@ -383,12 +393,16 @@ def benchmark(config, json_output, cost, verbose):
 
 @cli.command()
 @click.option('--config', default="schemap.yaml", help="Path to configuration file.")
+@click.option('--db', default=None, help="Database connection URL (e.g. sqlite:///app.db, postgresql://...).")
 @click.option('--json', 'json_output', is_flag=True, help="Output metadata in JSON format.")
 @click.option('--verbose', is_flag=True, help="Enable verbose output.")
-def inspect(config, json_output, verbose):
+@click.pass_context
+def inspect(ctx, config, db, json_output, verbose):
     """Extract database metadata and display a clean structural summary."""
     try:
-        cfg = load_config(config)
+        prof = ctx.obj.get('profile') if ctx.obj else None
+        db_url = db or (ctx.obj.get('db') if ctx.obj else None)
+        cfg = load_config(config, profile=prof, db_url=db_url)
         schema_model, raw_tables, _ = _process_schema(cfg, enrich=False)
         
         total_cols = sum(len(t['columns']) for t in raw_tables)
@@ -428,16 +442,20 @@ def inspect(config, json_output, verbose):
 
 @cli.command()
 @click.option('--config', default="schemap.yaml", help="Path to the configuration file.")
+@click.option('--db', default=None, help="Database connection URL (e.g. sqlite:///app.db, postgresql://...).")
 @click.option('--verbose', is_flag=True, help="Enable verbose output.")
 @click.option('--format', 'fmt', type=click.Choice(['markdown', 'json', 'yaml', 'xml', 'mcp', 'ai'], case_sensitive=False), help="Override the output format.")
 @click.option('--scope', default='all', help="Filter schema scope by role profile (all, analytics, backend, core).")
 @click.option('--sanitize', is_flag=True, help="Automatically redact sensitive PII and credential columns for AI safety.")
 @click.option('--enrich', is_flag=True, help="[BETA] Apply optional LLM enrichment for table descriptions.")
 @click.option('--track/--no-track', default=True, help="Track schema state for diff intelligence.")
-def context(config, verbose, fmt, scope, sanitize, enrich, track):
+@click.pass_context
+def context(ctx, config, db, verbose, fmt, scope, sanitize, enrich, track):
     """Generate AI-optimized database context (schemap_database_context.md)."""
     try:
-        cfg = load_config(config)
+        prof = ctx.obj.get('profile') if ctx.obj else None
+        db_url = db or (ctx.obj.get('db') if ctx.obj else None)
+        cfg = load_config(config, profile=prof, db_url=db_url)
         schema_model, raw_tables, _ = _process_schema(cfg, enrich, required_feature="sanitize" if sanitize else None)
         
         if track:
@@ -464,13 +482,16 @@ def context(config, verbose, fmt, scope, sanitize, enrich, track):
             raise
 
 @cli.command()
-
 @click.option('--config', default="schemap.yaml", help="Path to configuration file.")
+@click.option('--db', default=None, help="Database connection URL (e.g. sqlite:///app.db, postgresql://...).")
 @click.option('--verbose', is_flag=True, help="Enable verbose output.")
-def score(config, verbose):
+@click.pass_context
+def score(ctx, config, db, verbose):
     """Calculate AI Readiness Score for the database schema."""
     try:
-        cfg = load_config(config)
+        prof = ctx.obj.get('profile') if ctx.obj else None
+        db_url = db or (ctx.obj.get('db') if ctx.obj else None)
+        cfg = load_config(config, profile=prof, db_url=db_url)
         schema_model, _, unresolved = _process_schema(cfg, enrich=False)
         
         ai_score, issues = calculate_score(schema_model, unresolved)
@@ -793,6 +814,7 @@ def join_tables(ctx, tables, config, json_output, verbose):
 
 @cli.command()
 @click.option('--config', default="schemap.yaml", help="Path to configuration file.")
+@click.option('--db', default=None, help="Database connection URL (e.g. sqlite:///app.db, postgresql://...).")
 @click.option('--targets', default=None, help="Target frameworks e.g. codex,claude,cursor or comma-separated.")
 @click.option('--scope', default='all', help="Filter schema scope by role profile (all, analytics, backend, core).")
 @click.option('--sanitize', is_flag=True, help="Automatically redact sensitive PII and credential columns for AI safety.")
@@ -803,11 +825,12 @@ def join_tables(ctx, tables, config, json_output, verbose):
 @click.option('--force', is_flag=True, help="Force overwrite existing agent files.")
 @click.option('--verbose', is_flag=True, help="Enable verbose output.")
 @click.pass_context
-def agents(ctx, config, targets, scope, sanitize, target_dir, dry_run, diff, merge, force, verbose):
+def agents(ctx, config, db, targets, scope, sanitize, target_dir, dry_run, diff, merge, force, verbose):
     """Generate CLAUDE.md, AGENTS.md, and agent rules for AI coding agents."""
     try:
         prof = ctx.obj.get('profile') if ctx.obj else None
-        cfg = load_config(config, profile=prof)
+        db_url = db or (ctx.obj.get('db') if ctx.obj else None)
+        cfg = load_config(config, profile=prof, db_url=db_url)
         schema_model, _, _ = _process_schema(cfg, enrich=False, required_feature="sanitize" if sanitize else None)
 
         

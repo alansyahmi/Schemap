@@ -119,7 +119,7 @@ def _deep_merge(target: dict, source: dict) -> dict:
             target[k] = v
     return target
 
-def load_config(config_path: str | None = None, profile: str | None = None) -> SchemapConfig:
+def load_config(config_path: str | None = None, profile: str | None = None, db_url: str | None = None) -> SchemapConfig:
     """Loads and validates the schemap configuration."""
     resolved_path = None
     if config_path and config_path != "schemap.yaml":
@@ -129,12 +129,20 @@ def load_config(config_path: str | None = None, profile: str | None = None) -> S
         resolved_path = discovered if discovered else Path("schemap.yaml")
         
     if not resolved_path.exists():
+        if db_url:
+            return SchemapConfig(
+                database=DatabaseConfig(connection_url=db_url)
+            )
         raise FileNotFoundError(f"Configuration file not found: {resolved_path}")
         
     with open(resolved_path, "r", encoding="utf-8") as f:
         data = yaml.safe_load(f)
         
     if not data:
+        if db_url:
+            return SchemapConfig(
+                database=DatabaseConfig(connection_url=db_url)
+            )
         raise ValueError("Configuration file is empty or invalid YAML.")
         
     if profile:
@@ -167,6 +175,11 @@ def load_config(config_path: str | None = None, profile: str | None = None) -> S
         if "database" not in data or not isinstance(data["database"], dict):
             data["database"] = {}
         data["database"]["connection_url"] = env_url
+
+    if db_url:
+        if "database" not in data or not isinstance(data["database"], dict):
+            data["database"] = {}
+        data["database"]["connection_url"] = db_url
         
     return SchemapConfig(**data)
 

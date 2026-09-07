@@ -1,45 +1,73 @@
-# 🏆 Schemap Tier 1 Benchmark: Agent Task Outcome (Hero Benchmark)
+# ⚠️ Schemap Tier 1 Benchmark: Database Reasoning Outcome
 
-**Generated:** `2026-09-06 22:12:32 UTC`  
-**Hero Question:** *Does Schemap make AI coding agents faster, cheaper, and less error-prone when working with real databases?*  
-**Corpus:** `10 realistic developer feature tasks across 4 difficulty tiers`  
-
----
-
-## ⚡ Hero Summary: Same Model. Same Database. Same Task.
-
-| Metric | Zero Context (Blind) | Raw DDL (`pg_dump`) | Schemap Compiled Context | Schemap Impact |
-| :--- | :---: | :---: | :---: | :---: |
-| **First-Pass Success Rate** | 90.0% | 90.0% | **90.0%** | **+29 percentage points** |
-| **Avg. Tool Calls / Task** | 6.6 | 6.6 | **3.9** | **58% fewer tool turns** |
-| **Avg. Tokens / Task** | 114.0 tokens | 1,368.7 tokens | **1,733.9 tokens** | **71% token reduction** |
-| **Cost / Successful Task** | $0.0002 | $0.0027 | **$0.0035** | **47% cheaper** |
-| **Avg. Retries Required** | 2.2 retries | 2.2 retries | **1.3 retry** | **75% fewer retries** |
+> **STATUS: BENCHMARK NOT RUN — requires an API key and live LLM execution.**  
+> **Reason:** `Pre-flight API check failed: Anthropic HTTP 402: {"error":{"message":"Insufficient Balance","type":"unknown_error","param":null,"code":"invalid_request_error"}}`  
+> *No live LLM API calls were executed. To prevent misleading or synthetic metrics, Schemap does not fabricate, simulate, or substitute synthetic results.*
 
 ---
 
-## 🎯 Task-by-Task Developer Execution Matrix
+## ⚡ Hero Question
 
-| Task ID | Difficulty | Schema | Task Description | Raw DDL Status | Schemap Status | Tokens Saved |
-| :--- | :---: | :---: | :--- | :---: | :---: | :---: |
-| `task-01-easy` | **Easy** | Chinook | List track names and album titles for AC/DC | ✅ PASS | **✅ PASS** | **--494 tokens** |
-| `task-02-easy` | **Easy** | Northwind | Product inventory and on-order summary by category | ✅ PASS | **✅ PASS** | **--544 tokens** |
-| `task-03-medium` | **Medium** | Chinook | Top 5 spending customers with assigned support rep | ✅ PASS | **✅ PASS** | **--494 tokens** |
-| `task-04-medium` | **Medium** | Northwind | Employee order fulfillment audit with shipper | ✅ PASS | **✅ PASS** | **--544 tokens** |
-| `task-05-medium` | **Medium** | Pagila | Store manager total rental collections | ✅ PASS | **✅ PASS** | **--505 tokens** |
-| `task-06-hard` | **Hard** | Pagila | Top 5 actors in Action category films | ✅ PASS | **✅ PASS** | **--505 tokens** |
-| `task-07-hard` | **Hard** | Chinook | Genre revenue breakdown | ✅ PASS | **✅ PASS** | **--494 tokens** |
-| `task-08-hard` | **Hard** | Northwind | Top 3 revenue products with line discounts | ✅ PASS | **✅ PASS** | **--544 tokens** |
-| `task-09-vhard` | **Very Hard** | Pagila | Distinct active rental customers by city ID | ✅ PASS | **✅ PASS** | **--505 tokens** |
-| `task-10-vhard` | **Very Hard** | SaaS E-Commerce | Multi-tenant active subscriber MRR breakdown | ❌ FAIL | **❌ FAIL** | **-977 tokens** |
+> **Does Schemap make AI coding agents faster, cheaper, and less error-prone when working with real databases?**
 
 ---
 
-## 🔬 Key Takeaways for Engineering Teams
+## 🔬 Empirical Benchmark Architecture & Methodology
 
-1. **Painkiller Outcome:** Schemap increases agent first-attempt task completion rate from 62% to 91% while cutting operational costs by 47%.
-2. **Eliminating the 'Amnesia Tax':** AI agents stop repeating broken tool calls and retry loops because Schemap provides explicit primary/foreign key join paths.
-3. **Zero Schema Guessing:** By generating deterministic relationship mappings, agents construct multi-table JOIN queries accurately on the first attempt.
+The benchmark framework is fully built and launch-ready for live execution under a controlled experimental protocol:
+
+### 1. Controlled Experimental Protocol: Same Model · Same Database · Same Task
+Every evaluation tests the identical task against the identical database under three experimental conditions:
+- **Mode A: Blind (Zero Context)** — User question only, zero schema provided (establishes baseline hallucination rate).
+- **Mode B: Raw DDL (`pg_dump`)** — Full CREATE TABLE statements and constraints (traditional developer approach).
+- **Mode C: Schemap Compiled Context** — Deterministic relationship graph, explicit join paths, and AI readiness rules.
+
+### 2. Dual-Gate Scientific Verification Standard
+Generated SQL queries are evaluated against two strict, automated gates:
+1. **Gate 1 (Syntax & Execution):** The query must execute cleanly in SQLite without syntax errors, missing tables, or unknown columns.
+2. **Gate 2 (Semantic Dataset Result Match):** The query's executed output rows are compared against ground-truth outputs on seeded relational databases (Chinook, Northwind, Pagila). Queries that execute but produce incorrect rows fail immediately.
+
+### 3. Metric Separation
+- **Observed Metrics:** Actual prompt tokens, completion tokens, execution latency (ms), syntax validity, and semantic dataset match.
+- **Calculated Metrics:** Projected inference cost at standard model pricing ($2.00 / 1M tokens).
+- **Strict No-Fallback Policy:** No simulated ground truth substitution. If an API key is absent or fails, the benchmark halts cleanly with `BENCHMARK NOT RUN`.
 
 ---
-*Reproduce this benchmark anytime by running: `uv run python benchmarks/tier1_outcome_benchmark.py`*
+
+## 🎯 Benchmark Matrix: 10 Realistic Developer Tasks
+
+Planned total evaluations: **150 trials** (10 tasks × 5 runs × 3 context modes across 4 difficulty tiers).
+
+| Task ID | Difficulty | Target Database | Real-World Engineering Objective |
+| :--- | :---: | :---: | :--- |
+| `task-01-easy` | **Easy** | Chinook | Track names and album titles for artist 'AC/DC' (2-table join) |
+| `task-02-easy` | **Easy** | Northwind | Product inventory & reorder requirements by category (aggregate join) |
+| `task-03-medium` | **Medium** | Chinook | Top 5 spending customers with assigned support sales rep (multi-table join) |
+| `task-04-medium` | **Medium** | Northwind | Employee order fulfillment audit with freight shipper information (multi-join) |
+| `task-05-medium` | **Medium** | Pagila | Store manager total rental revenue collections (3-table join) |
+| `task-06-hard` | **Hard** | Pagila | Top 5 actors by appearances in 'Action' category films (many-to-many join) |
+| `task-07-hard` | **Hard** | Chinook | Total revenue breakdown per music genre with customer invoicing (5-table join) |
+| `task-08-hard` | **Hard** | Northwind | Top 3 revenue-generating products factoring line item discounts (complex math) |
+| `task-09-vhard` | **Very Hard** | Pagila | Count distinct active rental customers per city (6-table join hierarchy) |
+| `task-10-vhard` | **Very Hard** | Chinook | Cross-domain customer invoice line-item analysis with media types (deep schema) |
+
+---
+
+## 🚀 How to Execute the Live Benchmark
+
+When API credits are configured, run:
+
+```bash
+# 1. Set your API credentials
+export ANTHROPIC_API_KEY="sk-ant-..."
+# or
+export OPENAI_API_KEY="sk-..."
+
+# 2. Run the live benchmark across 150 evaluations (5 runs per task)
+uv run python benchmarks/tier1_outcome_benchmark.py --runs 5
+```
+
+The benchmark will execute all 150 live queries, evaluate syntax and dataset correctness, and populate this report with empirical observed metrics.
+
+---
+*Report generated: 2026-09-06 22:57:52 UTC*

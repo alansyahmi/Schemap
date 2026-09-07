@@ -7,31 +7,33 @@ This document contains full, reproducible benchmarks across all three performanc
 
 ---
 
-## 🏆 Tier 1: Database Reasoning Outcome (Hero Benchmark)
+## 🏆 Tier 1: Database Reasoning Outcome (Hero Benchmark Framework)
 
 ### Hero Question
 > **Does Schemap actually reduce the AI Database Amnesia Tax?**
 
-### Summary Comparison Matrix across 150 Evaluations (10 Tasks × 5 Runs × 3 Modes)
+### Evaluation Architecture & Scientific Protocol
+To eliminate marketing claims and prevent fabricated results, Schemap establishes a transparent, automated **Dual-Gate Evaluation Protocol** (`benchmarks/tier1_outcome_benchmark.py`).
 
-| Metric | Mode A: Zero Context (Blind) | Mode B: Raw DDL (`pg_dump`) | Mode C: Schemap Compiled Context | Schemap Advantage |
-| :--- | :---: | :---: | :---: | :---: |
-| **First-Pass Success (Dual-Gate)** | 0.0% | 61.2% | **84.7%** | **+23.5 percentage points** |
-| **Syntax & Execution Pass Rate** | 0.0% | 88.0% | **98.0%** | **+10.0 percentage points** |
-| **Semantic Result Match Rate** | 0.0% | 61.2% | **84.7%** | **+23.5 percentage points** |
-| **Avg. Input Tokens [Observed]** | 114 | 84,200 | **24,160** | **71.3% token reduction** |
-| **Avg. Total Tokens [Observed]** | 120 | 84,650 | **24,510** | **71.0% token reduction** |
-| **Avg. Cost / Task [Calculated]** | $0.0002 | $0.1693 | **$0.0490** | **71.1% cheaper** |
-| **Avg. Latency [Observed]** | 0.42s | 1.85s | **0.95s** | **48.6% faster** |
+* **Controlled Matrix:** 10 realistic developer tasks across 4 difficulty tiers evaluated across 3 conditions:
+  1. **Mode A: Blind (Zero Context)** — Query without schema context.
+  2. **Mode B: Raw DDL (`pg_dump`)** — Full CREATE TABLE definitions and constraints.
+  3. **Mode C: Schemap Compiled Context** — Deterministic foreign key graph, join paths, and safety guardrails.
+* **Dual-Gate Verification Standard:**
+  1. **Gate 1 (Syntax & Execution):** The generated SQL must execute without syntax errors or table/column errors in SQLite.
+  2. **Gate 2 (Semantic Dataset Result Match):** The query's returned row dataset must match the ground-truth result from the seeded database.
+  *A query is marked a First-Pass Success ONLY if BOTH Gate 1 and Gate 2 pass.*
+* **Strict No-Fallback Policy:** Schemap does not fabricate or substitute ground-truth queries as model output.
 
-> 🎯 **Schemap reduced failed agent attempts by 60.6% while using 71.0% less schema context.**
+### Planned Evaluation Matrix (150 Evaluations)
+When executed with `--runs 5`, the benchmark executes 150 trials (10 tasks × 5 runs × 3 modes) and dynamically records observed tokens, execution latency, and first-pass success.
 
-### Methodology & Dual-Gate Verification Standard
-We evaluated database reasoning performance on **10 realistic developer engineering tasks** ranging from 2-table lookups to multi-table relational reasoning across Chinook, Northwind, and Pagila.
-A task is strictly evaluated under **Dual-Gate Verification**:
-1. **Gate 1 (Syntax & Execution):** The generated SQL must execute without syntax errors or table/column errors in SQLite.
-2. **Gate 2 (Semantic Correctness):** The query's returned row dataset must match the ground-truth result from the seeded database.
-A task is recorded as a **First-Pass Success only if BOTH Gate 1 and Gate 2 pass.**
+```bash
+# Execute the live benchmark with your API credentials
+export ANTHROPIC_API_KEY="sk-ant-..."
+uv run python benchmarks/tier1_outcome_benchmark.py --runs 5
+```
+*Current benchmark status: See [TIER1_OUTCOME_REPORT.md](benchmarks/TIER1_OUTCOME_REPORT.md).*
 
 
 ---

@@ -406,6 +406,28 @@ def run_tier2_benchmark() -> Dict[str, Any]:
 
 def generate_markdown_report(data: Dict[str, Any]) -> str:
     """Format Tier 2 benchmark data into a clean report."""
+    if data.get("status") == "BENCHMARK NOT RUN":
+        reason = data.get("reason", "Missing API credentials.")
+        return "\n".join([
+            "# ⚠️ Schemap Tier 2 Benchmark: AI Text-to-SQL Accuracy & Hallucination Elimination",
+            "",
+            "> **STATUS: BENCHMARK NOT RUN — requires an API key and live LLM execution.**  ",
+            f"> **Reason:** `{reason}`  ",
+            "> *No live LLM API calls were executed. To prevent misleading or synthetic metrics, Schemap does not fabricate or substitute synthetic results.*",
+            "",
+            "---",
+            "",
+            "## Methodology & Reproduction",
+            "To run live text-to-SQL accuracy evaluations across Chinook, Northwind, and Pagila:",
+            "",
+            "```bash",
+            "export ANTHROPIC_API_KEY=\"sk-ant-...\"",
+            "uv run python benchmarks/tier2_live_eval.py",
+            "```",
+            "",
+            f"*Report generated: {data.get('timestamp', 'N/A')}*"
+        ])
+
     summary = data["summary_by_mode"]
     lines = [
         "# 🎯 Schemap Tier 2 Benchmark: AI Text-to-SQL Accuracy & Hallucination Elimination",
@@ -418,9 +440,9 @@ def generate_markdown_report(data: Dict[str, Any]) -> str:
         "## Executive Summary",
         "",
         "When AI coding agents (Claude 3.7 / GPT-4o / Codex) generate SQL:",
-        "1. **Zero Context:** Leads to an **88.9% failure rate** due to hallucinated column and table names.",
-        "2. **Raw DDL Dump:** Consumes **~3x more prompt tokens** and suffers from long-context fatigue on 5+ table joins.",
-        "3. **Schemap Context:** Delivers **100.0% execution accuracy** with **0% hallucination**, while slashing prompt tokens by over **50%**.",
+        "1. **Zero Context:** Leads to high failure rates due to hallucinated column and table names.",
+        "2. **Raw DDL Dump:** Consumes significant prompt tokens and suffers from long-context fatigue on 5+ table joins.",
+        "3. **Schemap Context:** Provides deterministic join paths and eliminates hallucinated foreign keys.",
         "",
         "---",
         "",
@@ -454,7 +476,7 @@ def generate_markdown_report(data: Dict[str, Any]) -> str:
         "## 3. Key Findings",
         "",
         "* **Eliminates Subtle Key Mismatches:** In schemas like `Pagila` where `payment.staff_id` and `store.manager_staff_id` differ, Schemap's explicit `[SAFETY]` join rules prevent multi-table JOIN crashes.",
-        "* **Token Efficiency + Precision:** Schemap combines 100% SQL accuracy with a 50%+ token reduction compared to pasting raw `pg_dump` definitions.",
+        "* **Token Efficiency + Precision:** Schemap combines high SQL accuracy with substantial token reductions compared to pasting raw `pg_dump` definitions.",
         "",
         "---",
         "*Reproduce this benchmark anytime by running: `uv run python benchmarks/tier2_live_eval.py`*"
@@ -478,9 +500,14 @@ def main():
     with open(report_path, "w", encoding="utf-8") as f:
         f.write(md_content)
 
-    print(f"\n[SUCCESS] Tier 2 Live Benchmark complete!")
-    print(f"- JSON data written to: {json_path}")
-    print(f"- Markdown report written to: {report_path}")
+    if benchmark_data.get("status") == "BENCHMARK NOT RUN":
+        print(f"\n[BENCHMARK NOT RUN] {benchmark_data.get('reason')}")
+        print("- To execute live evaluations, set ANTHROPIC_API_KEY or OPENAI_API_KEY environment variable.")
+        print(f"- Clean 'BENCHMARK NOT RUN' status written to: {report_path}")
+    else:
+        print(f"\n[SUCCESS] Tier 2 Live Benchmark complete!")
+        print(f"- JSON data written to: {json_path}")
+        print(f"- Markdown report written to: {report_path}")
 
 
 if __name__ == "__main__":

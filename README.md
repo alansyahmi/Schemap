@@ -30,33 +30,28 @@ Modern AI coding agents (Claude Code, Cursor, GitHub Copilot, Codex) struggle wi
 
 ---
 
-## 📊 Benchmarks: Agent Outcome, Context Efficiency & Compiler Speed
+## 📊 Benchmarks: Empirical Framework, Context Efficiency & Compiler Speed
 
-### Does Schemap actually reduce the AI Database Amnesia Tax?
-*150 evaluations · 3 context conditions · 10 realistic engineering tasks · 5 runs each*
+### Tier 1 — Database Reasoning Outcome Benchmark (Empirical Protocol)
+> **Hero Question:** *Does Schemap make AI coding agents faster, cheaper, and less error-prone when working with real databases?*
 
-| Outcome | Blind (Zero Context) | Raw DDL (`pg_dump`) | Schemap Compiled Context |
-| :--- | :---: | :---: | :---: |
-| **First-pass success** | 0.0% | 61.2% | **84.7%** |
-| **Avg. input tokens** | 114 | 84,200 | **24,160** |
-| **Avg. total tokens** | 120 | 84,650 | **24,510** |
-| **Avg. cost / task (projected)** | $0.0002 | $0.1693 | **$0.0490** |
-| **Avg. time** | 0.42s | 1.85s | **0.95s** |
+To eliminate marketing hype and fabricated numbers, Schemap provides a rigorous, automated **Dual-Gate Evaluation Framework** (`benchmarks/tier1_outcome_benchmark.py`) designed to test real LLM reasoning outcomes against seeded databases:
 
-> 🎯 **Schemap reduced failed agent attempts by 60.6% while using 71.0% less schema context.**
+* **Controlled Protocol:** Same Model · Same Database · Same Task across 3 conditions:
+  1. **Mode A: Blind (Zero Context)** — Baseline query without schema.
+  2. **Mode B: Raw DDL (`pg_dump`)** — Full CREATE TABLE definitions and constraints.
+  3. **Mode C: Schemap Compiled Context** — Deterministic relationship graph, explicit join paths, and AI readiness rules.
+* **Dual-Gate Scientific Verification Standard:**
+  1. *Gate 1 (Syntax & Execution):* Query executes cleanly in SQLite without syntax or schema errors.
+  2. *Gate 2 (Semantic Dataset Result Match):* Query output rows are compared directly against ground-truth datasets on seeded production schemas.
+* **10 Real-World Engineering Tasks:** Spanning 4 difficulty tiers (Easy, Medium, Hard, Very Hard) across Chinook, Northwind, and Pagila.
+* **Zero Fake Results Policy:** Schemap never substitutes synthetic or simulated passes. When you run the benchmark with your own API key, it generates live empirical results.
 
----
-
-### 📈 First-Pass Success Rate by Task Difficulty Tier
-
-| Difficulty Tier | Raw DDL (`pg_dump`) | Schemap Context | Impact | Strategic Insight |
-| :--- | :---: | :---: | :---: | :--- |
-| **Easy (2 tables)** | 96.0% | **97.0%** | `+1.0% pts` | Simple schema lookups |
-| **Medium (3–4 tables)** | 82.0% | **91.0%** | `+9.0% pts` | Relational joins expand |
-| **Hard (5–7 tables)** | 54.0% | **84.0%** | `+30.0% pts` | FK ambiguity increases |
-| **Very Hard (Cross-domain)** | 31.0% | **79.0%** | `+48.0% pts` | Complex relational reasoning |
-
-> 💡 *"Schemap matters when your database stops being simple."*
+```bash
+# Run the live benchmark across 150 evaluations (10 tasks × 5 runs × 3 modes)
+uv run python benchmarks/tier1_outcome_benchmark.py --runs 5
+```
+*See current execution status and task details in [TIER1_OUTCOME_REPORT.md](benchmarks/TIER1_OUTCOME_REPORT.md).*
 
 ---
 
