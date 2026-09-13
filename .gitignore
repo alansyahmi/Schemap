@@ -60,3 +60,7 @@ Thumbs.db
 .vscode/
 *.swp
 *.swo
+
+# Video Assets
+video_assets/
+

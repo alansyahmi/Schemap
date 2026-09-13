@@ -99,7 +99,16 @@
                         </div>
                         <h3>Stop AI SQL Hallucinations</h3>
                         <p>Learn how to prevent Claude Code, Cursor, and Copilot from hallucinating invalid JOINs or exposing credentials with automated guardrails.</p>
-                        <a href="blog-preventing-ai-sql-hallucinations.html" style="color:var(--accent);font-weight:600;text-decoration:none;display:inline-block;margin-top:12px;">Read Technical Guide ↗</a>
+                        <a href="guide-preventing-destructive-ai-sql-queries.html" style="color:var(--accent);font-weight:600;text-decoration:none;display:inline-block;margin-top:12px;">Read Guardrails Guide ↗</a>
+                    </article>
+
+                    <article class="card feature-card">
+                        <div class="feature-icon" style="background:rgba(100,149,237,0.1);color:#6495ed;display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:8px;margin-bottom:12px;">
+                            <svg class="feature-svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+                        </div>
+                        <h3>Set Up Schemap MCP Server</h3>
+                        <p>Step-by-step setup guide for Cursor and Claude Desktop. Dynamic schema queries, multi-hop JOIN path solving, and SQL pre-validation.</p>
+                        <a href="guide-setup-schemap-mcp-cursor-claude.html" style="color:var(--accent);font-weight:600;text-decoration:none;display:inline-block;margin-top:12px;">Read MCP Guide ↗</a>
                     </article>
 
                     <article class="card feature-card">
@@ -184,6 +193,136 @@
                 </div>
             </section>
 
+            <section class="doc-section" style="margin-top:3rem;">
+                <h2 style="display:flex;align-items:center;gap:10px;"><svg class="inline-icon" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg> Database + AI Agent Integration Guides</h2>
+                <p style="color:var(--muted);margin-top:.5rem;">Step-by-step guides for every supported database and AI coding agent combination. Pick your stack.</p>
+
+                <!-- PostgreSQL -->
+                <h3 style="margin-top:2rem;font-size:1rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600;">PostgreSQL</h3>
+                <div class="grid feature-grid" style="margin-top:1rem;">
+                    <article class="card feature-card">
+                        <h3>PostgreSQL + Cursor</h3>
+                        <p>Auto-generate <code>.cursor/rules/schemap.mdc</code> from your live Postgres schema with foreign key graphs and safety guardrails.</p>
+                        <a href="for-postgresql-cursor.html" style="color:var(--accent);font-weight:600;text-decoration:none;display:inline-block;margin-top:12px;">Read Guide ↗</a>
+                    </article>
+                    <article class="card feature-card">
+                        <h3>PostgreSQL + Claude Code</h3>
+                        <p>Compile your Postgres schema into <code>CLAUDE.md</code> in sub-3ms — zero hallucinated JOINs, 89% token reduction.</p>
+                        <a href="for-postgresql-claude-code.html" style="color:var(--accent);font-weight:600;text-decoration:none;display:inline-block;margin-top:12px;">Read Guide ↗</a>
+                    </article>
+                    <article class="card feature-card">
+                        <h3>PostgreSQL + Codex</h3>
+                        <p>Generate <code>AGENTS.md</code> with deterministic Postgres schema context for OpenAI Codex CLI and coding agents.</p>
+                        <a href="for-postgresql-codex.html" style="color:var(--accent);font-weight:600;text-decoration:none;display:inline-block;margin-top:12px;">Read Guide ↗</a>
+                    </article>
+                    <article class="card feature-card">
+                        <h3>PostgreSQL + Copilot</h3>
+                        <p>Write accurate Postgres-aware code with GitHub Copilot by injecting schema context into <code>copilot-instructions.md</code>.</p>
+                        <a href="for-postgresql-copilot.html" style="color:var(--accent);font-weight:600;text-decoration:none;display:inline-block;margin-top:12px;">Read Guide ↗</a>
+                    </article>
+                </div>
+
+                <!-- SQLite -->
+                <h3 style="margin-top:2rem;font-size:1rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600;">SQLite</h3>
+                <div class="grid feature-grid" style="margin-top:1rem;">
+                    <article class="card feature-card">
+                        <h3>SQLite + Cursor</h3>
+                        <p>Give Cursor full SQLite schema awareness — table maps, inferred foreign keys, and [SAFETY] guardrails in your <code>.mdc</code> rules.</p>
+                        <a href="for-sqlite-cursor.html" style="color:var(--accent);font-weight:600;text-decoration:none;display:inline-block;margin-top:12px;">Read Guide ↗</a>
+                    </article>
+                    <article class="card feature-card">
+                        <h3>SQLite + Claude Code</h3>
+                        <p>Compile your SQLite schema into a token-optimised <code>CLAUDE.md</code> that travels with your repo.</p>
+                        <a href="for-sqlite-claude-code.html" style="color:var(--accent);font-weight:600;text-decoration:none;display:inline-block;margin-top:12px;">Read Guide ↗</a>
+                    </article>
+                    <article class="card feature-card">
+                        <h3>SQLite + Codex</h3>
+                        <p>Auto-generate <code>AGENTS.md</code> from your SQLite schema for zero-latency Codex context on every prompt.</p>
+                        <a href="for-sqlite-codex.html" style="color:var(--accent);font-weight:600;text-decoration:none;display:inline-block;margin-top:12px;">Read Guide ↗</a>
+                    </article>
+                    <article class="card feature-card">
+                        <h3>SQLite + Copilot</h3>
+                        <p>Prevent Copilot from guessing SQLite JOIN paths by injecting compiled schema context into <code>copilot-instructions.md</code>.</p>
+                        <a href="for-sqlite-copilot.html" style="color:var(--accent);font-weight:600;text-decoration:none;display:inline-block;margin-top:12px;">Read Guide ↗</a>
+                    </article>
+                </div>
+
+                <!-- MySQL -->
+                <h3 style="margin-top:2rem;font-size:1rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600;">MySQL</h3>
+                <div class="grid feature-grid" style="margin-top:1rem;">
+                    <article class="card feature-card">
+                        <h3>MySQL + Cursor</h3>
+                        <p>Extract your MySQL schema and compile Cursor rules that prevent hallucinated JOINs across your production tables.</p>
+                        <a href="for-mysql-cursor.html" style="color:var(--accent);font-weight:600;text-decoration:none;display:inline-block;margin-top:12px;">Read Guide ↗</a>
+                    </article>
+                    <article class="card feature-card">
+                        <h3>MySQL + Claude Code</h3>
+                        <p>Give Claude Code accurate MySQL context by compiling your schema into <code>CLAUDE.md</code> with 89% fewer tokens.</p>
+                        <a href="for-mysql-claude-code.html" style="color:var(--accent);font-weight:600;text-decoration:none;display:inline-block;margin-top:12px;">Read Guide ↗</a>
+                    </article>
+                    <article class="card feature-card">
+                        <h3>MySQL + Codex</h3>
+                        <p>Generate <code>AGENTS.md</code> from MySQL for deterministic Codex context — foreign keys, centrality scores, safety rules.</p>
+                        <a href="for-mysql-codex.html" style="color:var(--accent);font-weight:600;text-decoration:none;display:inline-block;margin-top:12px;">Read Guide ↗</a>
+                    </article>
+                    <article class="card feature-card">
+                        <h3>MySQL + Copilot</h3>
+                        <p>Inject compiled MySQL schema context into GitHub Copilot and stop it from generating invalid multi-table queries.</p>
+                        <a href="for-mysql-copilot.html" style="color:var(--accent);font-weight:600;text-decoration:none;display:inline-block;margin-top:12px;">Read Guide ↗</a>
+                    </article>
+                </div>
+
+                <!-- Turso -->
+                <h3 style="margin-top:2rem;font-size:1rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600;">Turso / libSQL</h3>
+                <div class="grid feature-grid" style="margin-top:1rem;">
+                    <article class="card feature-card">
+                        <h3>Turso + Cursor</h3>
+                        <p>Give Cursor deterministic Turso/libSQL schema context — compiled locally in sub-3ms, no cloud sync.</p>
+                        <a href="for-turso-cursor.html" style="color:var(--accent);font-weight:600;text-decoration:none;display:inline-block;margin-top:12px;">Read Guide ↗</a>
+                    </article>
+                    <article class="card feature-card">
+                        <h3>Turso + Claude Code</h3>
+                        <p>Compile your Turso edge database schema into <code>CLAUDE.md</code> with anti-hallucination guardrails baked in.</p>
+                        <a href="for-turso-claude-code.html" style="color:var(--accent);font-weight:600;text-decoration:none;display:inline-block;margin-top:12px;">Read Guide ↗</a>
+                    </article>
+                    <article class="card feature-card">
+                        <h3>Turso + Codex</h3>
+                        <p>Auto-generate accurate <code>AGENTS.md</code> from your Turso schema for Codex CLI workflows.</p>
+                        <a href="for-turso-codex.html" style="color:var(--accent);font-weight:600;text-decoration:none;display:inline-block;margin-top:12px;">Read Guide ↗</a>
+                    </article>
+                    <article class="card feature-card">
+                        <h3>Turso + Copilot</h3>
+                        <p>Stop Copilot from hallucinating Turso JOIN paths — inject compiled libSQL context into <code>copilot-instructions.md</code>.</p>
+                        <a href="for-turso-copilot.html" style="color:var(--accent);font-weight:600;text-decoration:none;display:inline-block;margin-top:12px;">Read Guide ↗</a>
+                    </article>
+                </div>
+
+                <!-- Oracle -->
+                <h3 style="margin-top:2rem;font-size:1rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600;">Oracle</h3>
+                <div class="grid feature-grid" style="margin-top:1rem;">
+                    <article class="card feature-card">
+                        <h3>Oracle + Cursor</h3>
+                        <p>Compile Oracle Database schema context into Cursor rules — foreign keys, safety guardrails, and token compression.</p>
+                        <a href="for-oracle-cursor.html" style="color:var(--accent);font-weight:600;text-decoration:none;display:inline-block;margin-top:12px;">Read Guide ↗</a>
+                    </article>
+                    <article class="card feature-card">
+                        <h3>Oracle + Claude Code</h3>
+                        <p>Give Claude Code accurate Oracle schema context in <code>CLAUDE.md</code> — no manual DDL copy-paste required.</p>
+                        <a href="for-oracle-claude-code.html" style="color:var(--accent);font-weight:600;text-decoration:none;display:inline-block;margin-top:12px;">Read Guide ↗</a>
+                    </article>
+                    <article class="card feature-card">
+                        <h3>Oracle + Codex</h3>
+                        <p>Auto-generate <code>AGENTS.md</code> from Oracle for Codex CLI agents — schema maps, FK graphs, and [SAFETY] rules.</p>
+                        <a href="for-oracle-codex.html" style="color:var(--accent);font-weight:600;text-decoration:none;display:inline-block;margin-top:12px;">Read Guide ↗</a>
+                    </article>
+                    <article class="card feature-card">
+                        <h3>Oracle + Copilot</h3>
+                        <p>Prevent GitHub Copilot from hallucinating Oracle JOIN paths by injecting compiled schema context automatically.</p>
+                        <a href="for-oracle-copilot.html" style="color:var(--accent);font-weight:600;text-decoration:none;display:inline-block;margin-top:12px;">Read Guide ↗</a>
+                    </article>
+                </div>
+            </section>
+
             <section class="doc-section" style="text-align: center; margin-top: 3rem;">
                 <h2>Ready to Give Your AI Agent Deterministic Context?</h2>
                 <div style="margin-top: 1.5rem; display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
@@ -201,9 +340,9 @@
             <p>© 2026 Schemap · Local-first database context for AI workflows.</p>
             <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin:10px 0;font-size:0.85rem;">
                 <a href="index.html">Home</a> ·
-                <a href="blog.html">Blog & Guides</a> ·
+                <a href="blog.html">Blog &amp; Guides</a> ·
                 <a href="docs.html">Docs</a> ·
-                <a href="security.html">Security & Privacy</a> ·
+                <a href="security.html">Security &amp; Privacy</a> ·
                 <a href="guide-cursor-database-rules.html">Cursor Rules Guide</a> ·
                 <a href="guide-claude-code-database-context.html">Claude Code Guide</a> ·
                 <a href="vs-custom-scripts.html">vs. Custom Scripts</a> ·
@@ -213,6 +352,26 @@
                 <a href="vs-tbls.html">vs. tbls</a> ·
                 <a href="vs-pg-dump.html">vs. pg_dump</a> ·
                 <a href="vs-mcp-sql.html">vs. MCP SQL</a> ·
+                <a href="for-postgresql-cursor.html">PostgreSQL + Cursor</a> ·
+                <a href="for-postgresql-claude-code.html">PostgreSQL + Claude Code</a> ·
+                <a href="for-postgresql-codex.html">PostgreSQL + Codex</a> ·
+                <a href="for-postgresql-copilot.html">PostgreSQL + Copilot</a> ·
+                <a href="for-sqlite-cursor.html">SQLite + Cursor</a> ·
+                <a href="for-sqlite-claude-code.html">SQLite + Claude Code</a> ·
+                <a href="for-sqlite-codex.html">SQLite + Codex</a> ·
+                <a href="for-sqlite-copilot.html">SQLite + Copilot</a> ·
+                <a href="for-mysql-cursor.html">MySQL + Cursor</a> ·
+                <a href="for-mysql-claude-code.html">MySQL + Claude Code</a> ·
+                <a href="for-mysql-codex.html">MySQL + Codex</a> ·
+                <a href="for-mysql-copilot.html">MySQL + Copilot</a> ·
+                <a href="for-turso-cursor.html">Turso + Cursor</a> ·
+                <a href="for-turso-claude-code.html">Turso + Claude Code</a> ·
+                <a href="for-turso-codex.html">Turso + Codex</a> ·
+                <a href="for-turso-copilot.html">Turso + Copilot</a> ·
+                <a href="for-oracle-cursor.html">Oracle + Cursor</a> ·
+                <a href="for-oracle-claude-code.html">Oracle + Claude Code</a> ·
+                <a href="for-oracle-codex.html">Oracle + Codex</a> ·
+                <a href="for-oracle-copilot.html">Oracle + Copilot</a> ·
                 <a href="llms.txt">llms.txt</a>
             </div>
             <a href="https://billing.stripe.com/p/login/28EaEXgO9dZ36S44fddIA00" target="_blank" rel="noopener">Manage Subscription</a>

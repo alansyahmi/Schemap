@@ -11,12 +11,12 @@
 - **Git Pre-Commit Automation (`schemap hook install`)**: One-command Git pre-commit hook installer to sync context maps on migration commits.
 - **AI Readiness Diagnostics (`schemap doctor`)**: Diagnoses schema clarity (0-100 score), detects missing foreign keys, unmapped abbreviations, and un-commented tables.
 - **Shortest JOIN Path Solver (`schemap join`)**: Resolves multi-hop relationship paths across foreign key graphs.
+- **Model Context Protocol (MCP) Server (`schemap mcp`)**: Dynamic JSON-RPC 2.0 tool endpoints for Claude Desktop, Cursor, and Windsurf (`schemap_get_schema`, `schemap_get_join_path`, `schemap_validate_query`, `schemap_check_blast_radius`).
 
-## Supported Databases
-- PostgreSQL
-- SQLite
+## Supported Databases & Platforms
+- PostgreSQL, Supabase, Neon
+- SQLite, Turso / libSQL
 - MySQL
-- Turso / libSQL
 - Oracle
 
 ## Quickstart & Installation
@@ -27,6 +27,9 @@ pipx install schemap-tool
 
 # Or using uv
 uv tool install schemap-tool
+
+# Run as Model Context Protocol (MCP) server
+uvx schemap-tool mcp --config ./schemap.yaml
 
 # Onboarding pipeline
 schemap quickstart
@@ -40,6 +43,8 @@ schemap uninstall --purge
 ```
 
 ## Competitor Comparisons & Technical Guides
+- Technical Guide: Preventing Destructive AI SQL Queries in Claude Code & Cursor: https://schemap-tool.pages.dev/guide-preventing-destructive-ai-sql-queries.html
+- Technical Guide: How to Set Up Schemap MCP Server in Cursor & Claude Desktop: https://schemap-tool.pages.dev/guide-setup-schemap-mcp-cursor-claude.html
 - Guide: How to Provide Database Schema Context in Cursor (.cursor/rules/*.mdc): https://schemap-tool.pages.dev/guide-cursor-database-rules.html
 - Guide: How to Give Claude Code Database Schema Context (CLAUDE.md vs MCP): https://schemap-tool.pages.dev/guide-claude-code-database-context.html
 - Stop Maintaining Custom Schema Scripts: https://schemap-tool.pages.dev/vs-custom-scripts.html
@@ -58,4 +63,5 @@ schemap uninstall --purge
 - Documentation: https://schemap-tool.pages.dev/docs.html
 - GitHub Repository: https://github.com/alansyahmi/Schemap
 - PyPI Package: https://pypi.org/project/schemap-tool/
-- Pricing: Free tier ($0 up to 100 tables) / Pro ($7.99/mo or $79.99 lifetime for unlimited tables & CI/CD)
+- Pricing: Free tier ($0 up to 100 tables) / Pro ($1.99/mo for unlimited tables & CI/CD)
+

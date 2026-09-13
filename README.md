@@ -11,8 +11,11 @@
     <a href="https://pypi.org/project/schemap-tool/"><img src="https://img.shields.io/pypi/v/schemap-tool.svg?color=blue" alt="PyPI Version"></a>
     <a href="https://pypi.org/project/schemap-tool/"><img src="https://img.shields.io/pypi/pyversions/schemap-tool.svg" alt="Python Versions"></a>
     <a href="https://github.com/alansyahmi/Schemap/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"></a>
+    <a href="https://smithery.ai/server/schemap-mcp"><img src="https://img.shields.io/badge/Smithery-schemap--mcp-blueviolet" alt="Smithery MCP"></a>
+    <img src="https://img.shields.io/badge/Model%20Context%20Protocol-MCP%20Ready-green" alt="MCP Ready">
     <img src="https://img.shields.io/badge/Claude%20Code-Supported-6366f1?logo=anthropic" alt="Claude Code">
     <img src="https://img.shields.io/badge/Cursor-Rules%20Ready-000000" alt="Cursor">
+    <img src="https://img.shields.io/badge/Windsurf-Ready-06b6d4" alt="Windsurf">
     <img src="https://img.shields.io/badge/Privacy-100%25%20Local--First-10b981" alt="Local First">
   </p>
 </div>
@@ -202,6 +205,7 @@ flowchart LR
 | `schemap doctor` | Run onboarding health check & schema diagnostic | `schemap doctor --json` |
 | `schemap context` | Compile `schemap_database_context.md` context map | `schemap context --format=json` |
 | `schemap agents` | Generate `CLAUDE.md`, `AGENTS.md`, and agent rules | N/A |
+| `schemap mcp` | Start Model Context Protocol (MCP) server for Claude / Cursor | `schemap mcp --snippet cursor` |
 | `schemap benchmark` | Measure raw SQL vs. Schemap token savings & speed | `schemap benchmark --json` |
 | `schemap score` | Calculate AI Readiness Score (0–100) & improvement roadmap | `schemap score --json` |
 | `schemap explain` | Explain table architecture, columns, and relationships | `schemap explain <table_name>` |
@@ -213,9 +217,9 @@ flowchart LR
 
 ---
 
-## 🗄️ Supported Databases
+## 🗄️ Supported Databases & Platforms
 
-* **PostgreSQL** (`postgresql://user:password@localhost:5432/my_db`)
+* **PostgreSQL & Supabase & Neon** (`postgresql://user:password@localhost:5432/my_db`)
 * **MySQL** (`mysql://user:password@localhost:3306/my_db`)
 * **SQLite** (`sqlite:///path/to/db.sqlite3`)
 * **Turso / Remote libSQL** (`libsql://[your-db].turso.io?authToken=[token]`)

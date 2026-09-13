@@ -2,4 +2,26 @@ User-agent: *
 Allow: /
 Disallow: /success.html
 
+# AI Crawlers — allow full access for AI Overviews and LLM citations
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Googlebot-Extended
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
 Sitemap: https://schemap-tool.pages.dev/sitemap.xml

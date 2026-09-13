@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>How to Set Up Schemap MCP Server in Cursor & Claude Desktop | Schemap</title>
+    <meta name="description"
+        content="Complete setup guide for Schemap MCP (Model Context Protocol). Give Cursor and Claude Desktop dynamic database schema context, automated JOIN resolution, and query guardrails.">
+    <link rel="canonical" href="https://schemap-tool.pages.dev/guide-setup-schemap-mcp-cursor-claude.html">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://schemap-tool.pages.dev/guide-setup-schemap-mcp-cursor-claude.html">
+    <meta property="og:title" content="How to Set Up Schemap MCP Server in Cursor & Claude Desktop">
+    <meta property="og:description"
+        content="Step-by-step walkthrough for configuring Schemap Model Context Protocol (MCP) server for Cursor, Windsurf, and Claude Desktop.">
+    <meta property="og:image" content="https://schemap-tool.pages.dev/assets/Icon%20Dark.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="How to Set Up Schemap MCP Server in Cursor & Claude Desktop">
+    <meta name="twitter:description"
+        content="Configure Schemap MCP server for Cursor and Claude Desktop. Dynamic schema context, JOIN path solving, and SQL validation.">
+    <link rel="icon" href="assets/Icon Dark.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400&family=Red+Hat+Display:wght@400;500;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css?v=10">
+    <script async src="https://startupbar.co/widget/loader.js"
+        data-startup-id="6a520807-b62b-4145-8c05-b2c862af8e05"></script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "How to Set Up Schemap MCP Server in Cursor & Claude Desktop",
+      "description": "Step-by-step walkthrough for installing and configuring the Schemap Model Context Protocol (MCP) server to provide token-compressed database schema context and safety checks to AI agents.",
+      "url": "https://schemap-tool.pages.dev/guide-setup-schemap-mcp-cursor-claude.html",
+      "inLanguage": "en",
+      "articleSection": "Developer Guides",
+      "datePublished": "2026-09-13",
+      "dateModified": "2026-09-13",
+      "author": {
+        "@type": "Person",
+        "name": "Alan Syahmi",
+        "url": "https://github.com/alansyahmi"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "Schemap",
+        "url": "https://schemap-tool.pages.dev/"
+      }
+    }
+    </script>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a class="logo" href="index.html" aria-label="Schemap home">
+                <img src="assets/Text_Logo__Dark_-removebg-preview2.png" alt="Schemap">
+            </a>
+            <div class="nav-links">
+                <a href="docs.html">Docs</a>
+                <a href="blog.html">Blog</a>
+                <a href="security.html">Security</a>
+                <a href="https://github.com/alansyahmi/Schemap" class="nav-cta" target="_blank" rel="noopener">GitHub</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="article-container">
+        <header class="article-header">
+            <div class="badge-tag">MCP &amp; Agent Tooling</div>
+            <h1>How to Set Up Schemap MCP Server in Cursor &amp; Claude Desktop</h1>
+            <p class="article-meta">Published September 2026 · By Alan Syahmi · 6 min read</p>
+        </header>
+
+        <section class="article-content">
+            <p class="lead-text">
+                The <strong>Model Context Protocol (MCP)</strong> allows AI assistants like Cursor, Claude Desktop, and Windsurf to dynamically invoke tools on your local system. With <strong>Schemap MCP</strong>, your agent gains access to token-compressed schema context, automated multi-hop JOIN path solving, and pre-execution query validation.
+            </p>
+
+            <h2>Available Schemap MCP Tools</h2>
+            <div class="table-responsive" style="margin: 1.5rem 0;">
+                <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                    <thead>
+                        <tr style="border-bottom: 2px solid #2d3748;">
+                            <th style="padding: 0.75rem;">Tool Name</th>
+                            <th style="padding: 0.75rem;">Purpose</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="border-bottom: 1px solid #1a202c;">
+                            <td style="padding: 0.75rem;"><code>schemap_get_schema</code></td>
+                            <td style="padding: 0.75rem;">Returns token-compressed database schema with column types, foreign keys, and safety guardrails.</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid #1a202c;">
+                            <td style="padding: 0.75rem;"><code>schemap_get_join_path</code></td>
+                            <td style="padding: 0.75rem;">Calculates the shortest verified SQL JOIN path between any two tables in the schema.</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid #1a202c;">
+                            <td style="padding: 0.75rem;"><code>schemap_validate_query</code></td>
+                            <td style="padding: 0.75rem;">Validates SQL queries against table columns and immutability guardrails before execution.</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid #1a202c;">
+                            <td style="padding: 0.75rem;"><code>schemap_check_blast_radius</code></td>
+                            <td style="padding: 0.75rem;">Analyzes table dependencies, cascade risks, and degree centrality.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h2>Setup for Cursor (.cursor/mcp.json)</h2>
+            <p>Create or update <code>.cursor/mcp.json</code> in your project repository:</p>
+            <div class="code-block" style="background: #0f1117; padding: 1.25rem; border-radius: 8px; border: 1px solid #2d3748; margin: 1.5rem 0;">
+                <pre style="margin: 0; color: #e2e8f0; font-family: 'JetBrains Mono', monospace; font-size: 0.9rem;"><code>{
+  "mcpServers": {
+    "schemap": {
+      "command": "uvx",
+      "args": ["schemap-tool", "mcp", "--config", "./schemap.yaml"]
+    }
+  }
+}</code></pre>
+            </div>
+
+            <h2>Setup for Claude Desktop</h2>
+            <p>Open your Claude Desktop configuration file:</p>
+            <ul>
+                <li><strong>macOS:</strong> <code>~/Library/Application Support/Claude/claude_desktop_config.json</code></li>
+                <li><strong>Windows:</strong> <code>%APPDATA%\Claude\claude_desktop_config.json</code></li>
+            </ul>
+
+            <div class="code-block" style="background: #0f1117; padding: 1.25rem; border-radius: 8px; border: 1px solid #2d3748; margin: 1.5rem 0;">
+                <pre style="margin: 0; color: #e2e8f0; font-family: 'JetBrains Mono', monospace; font-size: 0.9rem;"><code>{
+  "mcpServers": {
+    "schemap": {
+      "command": "uvx",
+      "args": ["schemap-tool", "mcp", "--config", "/absolute/path/to/schemap.yaml"]
+    }
+  }
+}</code></pre>
+            </div>
+
+            <h2>Testing the Connection</h2>
+            <p>Once configured, restart Cursor or Claude Desktop. You can prompt your assistant naturally:</p>
+            <blockquote style="border-left: 3px solid #3182ce; padding-left: 1rem; margin: 1.5rem 0; color: #cbd5e0; font-style: italic;">
+                "What is the shortest JOIN path between our customers table and the transaction line items?"
+            </blockquote>
+            <p>
+                The agent will invoke <code>schemap_get_join_path</code> and produce a 100% verified SQL JOIN without hallucinating non-existent junction tables.
+            </p>
+
+            <div class="cta-box" style="margin-top: 3rem; padding: 2rem; background: linear-gradient(180deg, rgba(30,35,45,0.8), rgba(20,24,33,0.9)); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; text-align: center;">
+                <h3 style="margin-top: 0;">Get Started with Schemap</h3>
+                <p style="color: #a0aec0; max-width: 500px; margin: 0 auto 1.5rem auto;">Install via pip or inspect the open-source repository.</p>
+                <a href="https://github.com/alansyahmi/Schemap" class="nav-cta" style="display: inline-block; padding: 0.75rem 1.5rem; text-decoration: none; border-radius: 6px; background: #3182ce; color: #fff; font-weight: 600;" target="_blank" rel="noopener">Explore Schemap on GitHub</a>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-container">
+            <p>&copy; 2026 Schemap. Open Source Developer Tooling.</p>
+        </div>
+    </footer>
+</body>
+</html>

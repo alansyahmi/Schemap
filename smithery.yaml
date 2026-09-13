@@ -1,0 +1,40 @@
+# Smithery.ai & Registry Manifest for Schemap MCP Server
+# https://smithery.ai/docs/config#smitheryyaml
+
+startCommand:
+  type: stdio
+  configSchema:
+    type: object
+    properties:
+      configPath:
+        type: string
+        description: "Path to schemap.yaml configuration file (defaults to ./schemap.yaml)"
+        default: "./schemap.yaml"
+    required: []
+  commandFunction:
+    # Uses uvx or pipx to run the Schemap MCP server with zero dependency hassle
+    command: "uvx"
+    args:
+      - "schemap-tool"
+      - "mcp"
+      - "--config"
+      - "{{configPath}}"
+
+metadata:
+  name: "schemap-mcp"
+  displayName: "Schemap - AI Database Context & Guardrails"
+  description: "Token-compressed database schema context, automated shortest-path SQL JOIN resolver, immutability guardrails, and blast-radius analyzer for Claude, Cursor, and AI coding agents."
+  author: "Alan Syahmi"
+  homepage: "https://schemap-tool.pages.dev"
+  repository: "https://github.com/alansyahmi/Schemap"
+  license: "MIT"
+  tags:
+    - "database"
+    - "postgres"
+    - "mysql"
+    - "sqlite"
+    - "cursor"
+    - "claude"
+    - "sql"
+    - "guardrails"
+    - "schema"

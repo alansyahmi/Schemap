@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Preventing Destructive AI SQL Queries in Claude Code, Cursor & Coding Agents | Schemap</title>
+    <meta name="description"
+        content="Learn how to prevent AI coding agents (Claude Code, Cursor, Codex) from generating destructive DELETE or DROP queries, leaking PII, or breaking production schemas using automated guardrails.">
+    <link rel="canonical" href="https://schemap-tool.pages.dev/guide-preventing-destructive-ai-sql-queries.html">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://schemap-tool.pages.dev/guide-preventing-destructive-ai-sql-queries.html">
+    <meta property="og:title" content="Preventing Destructive AI SQL Queries in Claude Code & Cursor">
+    <meta property="og:description"
+        content="How to prevent AI agents from dropping tables, hallucinating invalid joins, or bypassing soft-deletes with compile-time database guardrails.">
+    <meta property="og:image" content="https://schemap-tool.pages.dev/assets/Icon%20Dark.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Preventing Destructive AI SQL Queries in Claude Code & Cursor">
+    <meta name="twitter:description"
+        content="Step-by-step guide to locking down database interactions for AI coding agents with Schemap guardrails and context injection.">
+    <link rel="icon" href="assets/Icon Dark.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400&family=Red+Hat+Display:wght@400;500;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css?v=10">
+    <script async src="https://startupbar.co/widget/loader.js"
+        data-startup-id="6a520807-b62b-4145-8c05-b2c862af8e05"></script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "Preventing Destructive AI SQL Queries in Claude Code, Cursor & Coding Agents",
+      "description": "A comprehensive guide on eliminating destructive SQL statements (DROP, TRUNCATE, unconstrained DELETE), hallucinated joins, and PII leaks from LLM coding assistants.",
+      "url": "https://schemap-tool.pages.dev/guide-preventing-destructive-ai-sql-queries.html",
+      "inLanguage": "en",
+      "articleSection": "AI Safety & Developer Tooling",
+      "datePublished": "2026-09-13",
+      "dateModified": "2026-09-13",
+      "author": {
+        "@type": "Person",
+        "name": "Alan Syahmi",
+        "url": "https://github.com/alansyahmi"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "Schemap",
+        "url": "https://schemap-tool.pages.dev/"
+      }
+    }
+    </script>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a class="logo" href="index.html" aria-label="Schemap home">
+                <img src="assets/Text_Logo__Dark_-removebg-preview2.png" alt="Schemap">
+            </a>
+            <div class="nav-links">
+                <a href="docs.html">Docs</a>
+                <a href="blog.html">Blog</a>
+                <a href="security.html">Security</a>
+                <a href="https://github.com/alansyahmi/Schemap" class="nav-cta" target="_blank" rel="noopener">GitHub</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="article-container">
+        <header class="article-header">
+            <div class="badge-tag">AI Safety & Guardrails</div>
+            <h1>Preventing Destructive AI SQL Queries in Claude Code, Cursor & Autonomous Agents</h1>
+            <p class="article-meta">Published September 2026 · By Alan Syahmi · 8 min read</p>
+        </header>
+
+        <section class="article-content">
+            <p class="lead-text">
+                When developers hand terminal control or database tooling to autonomous coding agents like <strong>Claude Code</strong>, <strong>Cursor</strong>, or <strong>Windsurf</strong>, the agent frequently attempts to "test" its code by drafting and running SQL queries. Without explicit guardrails, agents regularly hallucinate destructive queries, bypass soft-delete rules, or perform cascading deletes across production tables.
+            </p>
+
+            <h2>The 3 Major Failure Modes of AI Database Interactions</h2>
+            <div class="comparison-grid" style="margin: 2rem 0;">
+                <div class="card" style="padding: 1.5rem; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px;">
+                    <h3 style="color: #ff6b6b; margin-top: 0;">1. Unconstrained Destructive DML</h3>
+                    <p style="font-size: 0.95rem; line-height: 1.5;">Agents executing <code>DELETE FROM users</code> without a <code>WHERE</code> clause during migration generation or debugging steps, or executing <code>DROP TABLE</code> when attempting to recreate temporary tables.</p>
+                </div>
+                <div class="card" style="padding: 1.5rem; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px;">
+                    <h3 style="color: #ff922b; margin-top: 0;">2. Hallucinated Multi-Hop JOINs</h3>
+                    <p style="font-size: 0.95rem; line-height: 1.5;">In schemas with 15+ tables, LLMs invent imaginary bridge tables (e.g. <code>user_orders</code> instead of <code>orders.user_id</code>) or produce cartesian products that spike database CPU to 100%.</p>
+                </div>
+                <div class="card" style="padding: 1.5rem; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px;">
+                    <h3 style="color: #fcc419; margin-top: 0;">3. Bypassing Soft-Deletes & Policies</h3>
+                    <p style="font-size: 0.95rem; line-height: 1.5;">Autonomous agents don't inherently know your organization uses <code>deleted_at IS NULL</code> or multi-tenant isolation, leading to silent data leaks in query generation.</p>
+                </div>
+            </div>
+
+            <h2>Why Traditional SQL MCP Servers Aren't Enough</h2>
+            <p>
+                Many teams connect raw database MCP servers directly to their agent. However, raw database connectors have no semantic awareness of business rules:
+            </p>
+            <ul>
+                <li>They expose your live database connection string directly to the LLM.</li>
+                <li>They allow any arbitrary SQL command supported by the database credentials.</li>
+                <li>They dump thousands of lines of uncompressed raw DDL, blowing through context limits.</li>
+            </ul>
+
+            <h2>The Solution: Compile-Time Safety Guardrails</h2>
+            <p>
+                Instead of giving the LLM raw credentials or pasting massive database dumps into system prompts, <strong>Schemap</strong> compiles a token-compressed topological map with deterministic guardrails.
+            </p>
+            <p>
+                When Schemap compiles your database into your repository's <code>AGENTS.md</code> or <code>.cursor/rules/database.mdc</code>, it injects explicit anti-hallucination guardrails:
+            </p>
+
+            <div class="code-block" style="background: #0f1117; padding: 1.25rem; border-radius: 8px; border: 1px solid #2d3748; margin: 1.5rem 0;">
+                <pre style="margin: 0; color: #a0aec0; font-family: 'JetBrains Mono', monospace; font-size: 0.9rem;"><code>&lt;!-- schemap:start --&gt;
+# AGENTS.md - Database Context &amp; Guardrails
+
+## AI Safety &amp; Anti-Hallucination Guardrails
+- [SAFETY] Immutability Guardrail: Do not generate DELETE or UPDATE queries for audit/financial records: `payments`, `audit_logs`
+- [SAFETY] Soft-Delete Guardrail: Always include `deleted_at IS NULL` when querying `users`, `teams`, `workspaces`
+- [SAFETY] Multi-Tenant Filter: Always filter queries by `organization_id = CURRENT_ORG_ID`
+
+## Table Map &amp; Verified JOIN Topologies
+### Table: `orders`
+Columns: id, user_id, order_number, status, total_cents, created_at
+Foreign Keys: user_id -&gt; users.id
+&lt;!-- schemap:end --&gt;</code></pre>
+            </div>
+
+            <h2>Step-by-Step Implementation</h2>
+
+            <h3>Step 1: Install Schemap</h3>
+            <p>Run Schemap locally without installing global bloat using <code>pip</code> or <code>uvx</code>:</p>
+            <div class="code-block" style="background: #0f1117; padding: 1rem; border-radius: 8px; border: 1px solid #2d3748;">
+                <pre style="margin: 0; color: #68d391; font-family: 'JetBrains Mono', monospace;"><code>pip install schemap-tool</code></pre>
+            </div>
+
+            <h3>Step 2: Define Your Guardrails in schemap.yaml</h3>
+            <p>Configure immutability, exclusions, and business definitions in your local config:</p>
+            <div class="code-block" style="background: #0f1117; padding: 1.25rem; border-radius: 8px; border: 1px solid #2d3748; margin: 1.5rem 0;">
+                <pre style="margin: 0; color: #e2e8f0; font-family: 'JetBrains Mono', monospace; font-size: 0.9rem;"><code>database:
+  connection_url: "postgresql://postgres:password@localhost:5432/production_replica"
+  exclude_tables:
+    - "spatial_ref_sys"
+    - "secret_tokens"
+
+output:
+  file_path: "./AGENTS.md"
+  format: "markdown"
+
+guardrails:
+  immutable_tables:
+    - "payments"
+    - "audit_logs"
+  soft_delete_column: "deleted_at"</code></pre>
+            </div>
+
+            <h3>Step 3: Compile Database Context</h3>
+            <div class="code-block" style="background: #0f1117; padding: 1rem; border-radius: 8px; border: 1px solid #2d3748;">
+                <pre style="margin: 0; color: #68d391; font-family: 'JetBrains Mono', monospace;"><code>schemap sync</code></pre>
+            </div>
+            <p>
+                Both <strong>Claude Code</strong> and <strong>Cursor</strong> automatically ingest <code>AGENTS.md</code> on every prompt. Your agent now understands your exact database relationships, respects immutability constraints, and writes correct SQL queries without needing a live connection to execute blind destructive mutations.
+            </p>
+
+            <h2>Using the Dynamic Model Context Protocol (MCP) Mode</h2>
+            <p>
+                If you prefer dynamic querying over static context, run Schemap's built-in MCP server:
+            </p>
+            <div class="code-block" style="background: #0f1117; padding: 1rem; border-radius: 8px; border: 1px solid #2d3748;">
+                <pre style="margin: 0; color: #68d391; font-family: 'JetBrains Mono', monospace;"><code>schemap mcp --snippet cursor</code></pre>
+            </div>
+            <p>
+                This enables tool calls like <code>schemap_validate_query</code> and <code>schemap_get_join_path</code>, ensuring your agent verifies SQL before touching any database.
+            </p>
+
+            <div class="cta-box" style="margin-top: 3rem; padding: 2rem; background: linear-gradient(180deg, rgba(30,35,45,0.8), rgba(20,24,33,0.9)); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; text-align: center;">
+                <h3 style="margin-top: 0;">Stop Database Hallucinations Today</h3>
+                <p style="color: #a0aec0; max-width: 500px; margin: 0 auto 1.5rem auto;">Compile token-compressed database context and protect your schema from autonomous AI errors.</p>
+                <a href="https://github.com/alansyahmi/Schemap" class="nav-cta" style="display: inline-block; padding: 0.75rem 1.5rem; text-decoration: none; border-radius: 6px; background: #3182ce; color: #fff; font-weight: 600;" target="_blank" rel="noopener">Star Schemap on GitHub</a>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-container">
+            <p>&copy; 2026 Schemap. Open Source Developer Tooling.</p>
+        </div>
+    </footer>
+</body>
+</html>
