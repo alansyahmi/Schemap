@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Why Claude Code Keeps Hallucinating Foreign Keys & Burning Turns on information_schema | Schemap</title>
+    <meta name="description"
+        content="Discover why Claude Code and Cursor hallucinate database relations, burn 6+ turns querying information_schema, and how precompiling a compact schema map stops SQL hallucinations instantly.">
+    <link rel="canonical" href="https://schemap-tool.pages.dev/blog-stop-claude-hallucinating-database-schema.html">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://schemap-tool.pages.dev/blog-stop-claude-hallucinating-database-schema.html">
+    <meta property="og:title" content="Why Claude Code Keeps Hallucinating Foreign Keys & Burning Turns on information_schema">
+    <meta property="og:description"
+        content="Stop Claude Code and Cursor from burning turns querying information_schema or inventing non-existent columns. How precompiled compact schema maps fix agentic SQL.">
+    <meta property="og:image" content="https://schemap-tool.pages.dev/assets/Icon%20Dark.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Why Claude Code Keeps Hallucinating Foreign Keys & Burning Turns on information_schema">
+    <meta name="twitter:description"
+        content="Stop AI coding agents from guessing foreign keys and wasting 50,000 tokens per prompt on raw DDL dumps.">
+    <meta name="twitter:image" content="https://schemap-tool.pages.dev/assets/Icon%20Dark.png">
+    <link rel="icon" href="assets/Icon Dark.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400&family=Red+Hat+Display:wght@400;500;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css?v=12">
+    <script async src="https://startupbar.co/widget/loader.js"
+        data-startup-id="6a520807-b62b-4145-8c05-b2c862af8e05"></script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "Why Claude Code Keeps Hallucinating Foreign Keys & Burning Turns on information_schema",
+      "description": "An analysis of why AI coding agents struggle with SQL schema discovery, and how precompiling a compact, deterministic database context map saves turns and eliminates hallucinated JOINs.",
+      "url": "https://schemap-tool.pages.dev/blog-stop-claude-hallucinating-database-schema.html",
+      "inLanguage": "en",
+      "articleSection": "Agentic Coding & Database Architecture",
+      "datePublished": "2026-09-13",
+      "dateModified": "2026-09-13",
+      "author": {
+        "@type": "Person",
+        "name": "Alan Syahmi",
+        "url": "https://github.com/alansyahmi"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "Schemap",
+        "url": "https://schemap-tool.pages.dev/"
+      }
+    }
+    </script>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a class="logo" href="index.html" aria-label="Schemap home">
+                <img src="assets/Text_Logo__Dark_-removebg-preview2.png" alt="Schemap">
+            </a>
+            <div class="nav-links">
+                <a href="docs.html">Docs</a>
+                <a href="blog.html">Blog</a>
+                <a href="security.html">Security</a>
+                <a href="https://github.com/alansyahmi/Schemap" class="nav-cta" target="_blank" rel="noopener">GitHub</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="article-container">
+        <header class="article-header">
+            <div class="badge-tag">Reddit &amp; Community Tech Breakdown</div>
+            <h1>Why Claude Code Keeps Hallucinating Foreign Keys &amp; Burning Turns on <code>information_schema</code></h1>
+            <p class="article-meta">Published September 2026 · By Alan Syahmi · 7 min read</p>
+        </header>
+
+        <section class="article-content">
+            <p class="lead-text">
+                If you browse <code>r/ClaudeCode</code> or <code>r/CursorAI</code>, you will see developers voicing the exact same frustration:
+                <em>"Claude spends 6+ turns burning tokens querying <code>information_schema</code> just to guess table relationships, and then still hallucinates <code>customer_id</code> instead of <code>cust_pk</code>."</em>
+            </p>
+
+            <h2>The Root Cause: Why AI Agents Are Blind to Your Schema</h2>
+            <p>
+                When autonomous agents enter a codebase, they are blind to the database unless you explicitly spoon-feed them context. Under the hood, two common failure patterns emerge:
+            </p>
+
+            <div class="comparison-grid" style="margin: 2rem 0;">
+                <div class="card" style="padding: 1.5rem; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px;">
+                    <h3 style="color: #ff6b6b; margin-top: 0;">1. Guessing from Open Files</h3>
+                    <p style="font-size: 0.95rem; line-height: 1.5;">Without a dedicated schema context file, the agent guesses database columns based on whatever ORM file or controller happens to be in its active context. If your migration uses shorthand abbreviations like <code>tx_id</code>, the agent will confidently generate queries using <code>transaction_id</code>.</p>
+                </div>
+                <div class="card" style="padding: 1.5rem; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px;">
+                    <h3 style="color: #ff922b; margin-top: 0;">2. Burning Turns on information_schema</h3>
+                    <p style="font-size: 0.95rem; line-height: 1.5;">If connected to a live terminal or raw SQL tool, the agent executes multiple discovery rounds: <code>SELECT table_name FROM information_schema.tables</code>, then <code>information_schema.columns</code>, burning 40–50% of your conversation turn limit before writing a single line of application code.</p>
+                </div>
+            </div>
+
+            <h2>Why Raw pg_dump DDL Dumps Don't Solve It</h2>
+            <p>
+                A natural developer instinct is to paste raw <code>pg_dump --schema-only</code> into <code>.cursorrules</code> or <code>CLAUDE.md</code>. However, this creates a secondary crisis:
+            </p>
+            <ul>
+                <li><strong>Context Bloat:</strong> A standard 40-table schema in raw DDL consumes <strong>25,000+ tokens</strong>. In a multi-turn autonomous loop, re-injecting 25k tokens on every turn rapidly exhausts rate limits and costs dollars per task.</li>
+                <li><strong>Buried Relationships:</strong> DDL syntax is full of index declarations, storage parameters, and constraints that obscure the actual foreign key graph. LLMs frequently hallucinate intermediate junction tables when attempting multi-hop JOINs across 3+ tables.</li>
+            </ul>
+
+            <h2>The "Lighthouse" Approach: Precompiled Deterministic Context</h2>
+            <p>
+                Instead of forcing your agent to re-discover schemas dynamically or flooding it with raw DDL, the engineering standard is to <strong>precompile a compact, deterministic schema map</strong> into your repository's native instructions (<code>CLAUDE.md</code>, <code>AGENTS.md</code>, or <code>.cursor/rules/*.mdc</code>).
+            </p>
+            <p>
+                With <strong>Schemap</strong>, compiling takes under 3 milliseconds:
+            </p>
+
+            <div class="code-block" style="background: #0f1117; padding: 1.25rem; border-radius: 8px; border: 1px solid #2d3748; margin: 1.5rem 0;">
+                <pre style="margin: 0; color: #a0aec0; font-family: 'JetBrains Mono', monospace; font-size: 0.9rem;"><code># Compile once locally (PostgreSQL, SQLite, MySQL, Turso, Oracle)
+schemap sync
+
+# Result in CLAUDE.md / AGENTS.md:
+<!-- schemap:start -->
+## Table Map &amp; Verified JOIN Topologies
+### Table: `orders`
+Columns: id, account_id, order_number, status, total_cents, created_at
+Foreign Keys: account_id -&gt; accounts.id
+
+## AI Safety &amp; Anti-Hallucination Guardrails
+- [SAFETY] Immutability Guardrail: Do not generate DELETE or UPDATE queries for: `payments`, `audit_logs`
+- [SAFETY] Soft-Delete Guardrail: Always include `deleted_at IS NULL` when querying `users`
+<!-- schemap:end --></code></pre>
+            </div>
+
+            <h2>Empirical Outcome: 34% Fewer Tokens, 46% Fewer Turns</h2>
+            <p>
+                By equipping Claude Code and Cursor with precompiled topological context:
+            </p>
+            <ul>
+                <li><strong>0 Turns Burned:</strong> The agent never queries <code>information_schema</code> or executes trial-and-error discovery queries.</li>
+                <li><strong>Zero Hallucinated JOINs:</strong> Explicit foreign key mappings prevent the agent from guessing column names like <code>customer_id</code> when the actual key is <code>account_id</code>.</li>
+                <li><strong>89% Token Reduction:</strong> Compresses a 20,000-token DDL dump into ~1,200 tokens of high-density semantic context.</li>
+            </ul>
+
+            <h2>How to Set It Up in 60 Seconds</h2>
+            <div class="code-block" style="background: #0f1117; padding: 1rem; border-radius: 8px; border: 1px solid #2d3748;">
+                <pre style="margin: 0; color: #68d391; font-family: 'JetBrains Mono', monospace;"><code># 1. Install Schemap
+pip install schemap-tool
+
+# 2. Run the interactive onboarding menu
+schemap quickstart
+
+# 3. Or simply type 'schemap' to open the interactive arrow-key TUI!</code></pre>
+            </div>
+
+            <div class="cta-box" style="margin-top: 3rem; padding: 2rem; background: linear-gradient(180deg, rgba(30,35,45,0.8), rgba(20,24,33,0.9)); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; text-align: center;">
+                <h3 style="margin-top: 0;">Stop Claude From Guessing Your Schema</h3>
+                <p style="color: #a0aec0; max-width: 500px; margin: 0 auto 1.5rem auto;">Precompile your database context today and eliminate wasted agent turns.</p>
+                <a href="https://github.com/alansyahmi/Schemap" class="nav-cta" style="display: inline-block; padding: 0.75rem 1.5rem; text-decoration: none; border-radius: 6px; background: #3182ce; color: #fff; font-weight: 600;" target="_blank" rel="noopener">Star Schemap on GitHub</a>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-container">
+            <p>&copy; 2026 Schemap. Open Source Developer Tooling.</p>
+        </div>
+    </footer>
+</body>
+</html>

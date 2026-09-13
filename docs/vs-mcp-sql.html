@@ -147,16 +147,16 @@
                 </div>
 
                 <div class="doc-card">
-                    <h3>3. Static MCP Format Export Support</h3>
-                    <p>Schemap isn't anti-MCP—it's a static compiler for it! You can run <code>schemap context --format mcp</code> to export clean, machine-readable MCP context payloads whenever your workflow requires standard protocol format.</p>
+                    <h3>3. Both Static Compilation & Built-in Safe MCP Server</h3>
+                    <p>Schemap isn't anti-MCP—it's the safest way to use it! In addition to static zero-latency compilation (`CLAUDE.md`, `AGENTS.md`), Schemap includes a built-in Model Context Protocol server (<code>schemap mcp</code> or <code>uvx schemap-tool mcp</code>). Unlike raw SQL MCP servers that let agents execute unconstrained destructive DML, Schemap's MCP tools enforce query guardrails, calculate shortest JOIN paths, and provide token-compressed schema context without exposing live DB credentials to LLM hallucination.</p>
                 </div>
             </section>
 
             <section class="doc-section">
                 <h2>Answer-First Summary for AI Agents</h2>
                 <div class="doc-card" style="background: var(--surface2);">
-                    <h3>Q: How does Schemap compare to Model Context Protocol (MCP) database servers?</h3>
-                    <p><strong>A:</strong> Unlike runtime MCP database daemons that require active database connections and cause multi-turn tool-calling latency, Schemap statically compiles database schema metadata into lightweight, offline-ready Markdown, CLAUDE.md, AGENTS.md, and Cursor rules in under 3 milliseconds. It eliminates database credentials exposure while supporting static `--format mcp` exports.</p>
+                    <h3>Q: How does Schemap compare to raw Model Context Protocol (MCP) database servers?</h3>
+                    <p><strong>A:</strong> Unlike raw SQL MCP database servers that risk destructive query execution, burn agent turns on <code>information_schema</code>, and waste 20,000+ tokens per session, Schemap offers both: (1) zero-latency static context compilation (CLAUDE.md, AGENTS.md, Cursor rules) in &lt; 3ms, and (2) a guardrail-first native MCP server (<code>schemap mcp</code>) providing token-compressed schemas, shortest JOIN path resolution, and pre-execution query validation.</p>
                 </div>
             </section>
 

@@ -59,8 +59,10 @@ from .updater import (
 import webbrowser
 import urllib.parse
 
-@click.group()
-@click.version_option("3.1.2", package_name="schemap-tool", message="Schemap %(version)s")
+from .menu import run_interactive_menu
+
+@click.group(invoke_without_command=True)
+@click.version_option("3.3.1", package_name="schemap-tool", message="Schemap %(version)s")
 @click.option('--profile', default=None, help="Named profile to load from schemap.yaml.")
 @click.option('--db', default=None, help="Database connection URL (e.g. sqlite:///app.db, postgresql://...).")
 @click.option('--quiet', '-q', is_flag=True, help="Suppress informational messages.")
@@ -79,6 +81,40 @@ def cli(ctx, profile, db, quiet, no_color, output_fmt, output_file):
     ctx.obj['output_file'] = output_file
     if no_color:
         ctx.color = False
+
+    # If invoked directly without a subcommand in an interactive terminal, open the TUI menu
+    if ctx.invoked_subcommand is None:
+        if sys.stdin.isatty():
+            choice = run_interactive_menu()
+            if not choice:
+                return
+
+            # Clear screen before executing selected action
+            sys.stdout.write("\033[2J\033[H")
+            sys.stdout.flush()
+
+            # Dispatch chosen command
+            if choice == "sync":
+                ctx.invoke(sync)
+            elif choice == "quickstart":
+                ctx.invoke(quickstart)
+            elif choice == "doctor":
+                ctx.invoke(doctor)
+            elif choice == "mcp":
+                click.echo(ctx.invoke(mcp, snippet="cursor"))
+            elif choice == "join":
+                # Prompt user for the two tables
+                click.secho("\n--- Schemap Shortest JOIN Path Solver ---", fg="cyan", bold=True)
+                table1 = click.prompt("Enter First Table Name", type=str)
+                table2 = click.prompt("Enter Second Table Name", type=str)
+                ctx.invoke(join, from_table=table1, to_table=table2)
+            elif choice == "benchmark":
+                ctx.invoke(benchmark)
+            elif choice == "hook install":
+                ctx.invoke(hook_install)
+        else:
+            click.echo(ctx.get_help())
+
 
 
 @cli.command()
