@@ -118,13 +118,23 @@ def compile_semantic_graph(
                         break
             else:
                 # Search columns for tenant pattern
-                for col in t_copy.columns:
-                    if any(re.match(pat, col.name.lower()) for pat in TENANT_COLUMN_PATTERNS):
-                        tenant_key = col.name
-                        col.semantic_role = SemanticRole.TENANT_KEY
-                        col.provenance = Provenance.INFERRED
-                        graph.provenance_map[f"{t_copy.name}:tenant_key"] = Provenance.INFERRED
-                        break
+                tenant_candidates = [
+                    col for col in t_copy.columns
+                    if any(re.match(pat, col.name.lower()) for pat in TENANT_COLUMN_PATTERNS)
+                ]
+                if len(tenant_candidates) == 1:
+                    col = tenant_candidates[0]
+                    tenant_key = col.name
+                    col.semantic_role = SemanticRole.TENANT_KEY
+                    col.provenance = Provenance.INFERRED
+                    graph.provenance_map[f"{t_copy.name}:tenant_key"] = Provenance.INFERRED
+                elif len(tenant_candidates) > 1:
+                    # Deceptive / Ambiguous schema detected! Do not pick arbitrarily
+                    candidate_names = [c.name for c in tenant_candidates]
+                    graph.provenance_map[f"{t_copy.name}:tenant_key"] = Provenance.UNKNOWN
+                    graph.declared_invariants.append(
+                        f"AMBIGUITY: Multiple tenant keys detected on '{t_copy.name}': {candidate_names}. Human declaration required."
+                    )
 
         if tenant_key:
             t_copy.tenant_key = tenant_key
@@ -136,13 +146,23 @@ def compile_semantic_graph(
             soft_del_col = declared_soft_deletes[t_copy.name]
             graph.provenance_map[f"{t_copy.name}:soft_delete"] = Provenance.DECLARED
         else:
-            for col in t_copy.columns:
-                if any(re.match(pat, col.name.lower()) for pat in SOFT_DELETE_PATTERNS):
-                    soft_del_col = col.name
-                    col.semantic_role = SemanticRole.SOFT_DELETE
-                    col.provenance = Provenance.INFERRED
-                    graph.provenance_map[f"{t_copy.name}:soft_delete"] = Provenance.INFERRED
-                    break
+            sd_candidates = [
+                col for col in t_copy.columns
+                if any(re.match(pat, col.name.lower()) for pat in SOFT_DELETE_PATTERNS)
+            ]
+            if len(sd_candidates) == 1:
+                col = sd_candidates[0]
+                soft_del_col = col.name
+                col.semantic_role = SemanticRole.SOFT_DELETE
+                col.provenance = Provenance.INFERRED
+                graph.provenance_map[f"{t_copy.name}:soft_delete"] = Provenance.INFERRED
+            elif len(sd_candidates) > 1:
+                # Ambiguity detected
+                candidate_names = [c.name for c in sd_candidates]
+                graph.provenance_map[f"{t_copy.name}:soft_delete"] = Provenance.UNKNOWN
+                graph.declared_invariants.append(
+                    f"AMBIGUITY: Multiple soft-delete columns detected on '{t_copy.name}': {candidate_names}. Human declaration required."
+                )
 
         if soft_del_col:
             t_copy.soft_delete_column = soft_del_col
