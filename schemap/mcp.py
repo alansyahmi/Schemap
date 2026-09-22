@@ -101,6 +101,65 @@ MCP_TOOLS = [
             },
             "required": ["target_table"]
         }
+    },
+    {
+        "name": "schemap_ground",
+        "description": "Grounds a natural language query into deterministic target tables, spanning-tree JOIN paths, and mandatory tenant/soft-delete invariants with full provenance (INFERRED vs DECLARED). Call this before generating SQL.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "question": {
+                    "type": "string",
+                    "description": "The natural language business or analytical question to ground."
+                },
+                "tenant_id": {
+                    "type": "string",
+                    "description": "Optional tenant identifier to isolate query scope."
+                }
+            },
+            "required": ["question"]
+        }
+    },
+    {
+        "name": "schemap_verify",
+        "description": "Validates SQL against the database policy graph using AST parsing. Deny-by-default for mutations (DELETE, UPDATE, DROP, ALTER, TRUNCATE, INSERT). SELECT queries are allowed unless policy fails (missing tenant filter, soft-delete violation, Cartesian join).",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "sql": {
+                    "type": "string",
+                    "description": "The SQL query to verify."
+                },
+                "tenant_id": {
+                    "type": "string",
+                    "description": "Optional tenant identifier to enforce."
+                },
+                "patch": {
+                    "type": "boolean",
+                    "default": False,
+                    "description": "Generate auto-patched SQL if violations occur. Defaults to false (never silently rewrites SQL unless explicitly requested)."
+                }
+            },
+            "required": ["sql"]
+        }
+    },
+    {
+        "name": "schemap_patch",
+        "description": "Explicitly auto-patches a SQL query to inject missing tenant isolation and soft-delete filters using AST transformation. Returns sanitized SQL without silent execution.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "sql": {
+                    "type": "string",
+                    "description": "The SQL query to patch."
+                },
+                "tenant_id": {
+                    "type": "string",
+                    "description": "Tenant identifier to inject."
+                }
+            },
+            "required": ["sql", "tenant_id"]
+        }
     }
 ]
 
@@ -238,6 +297,110 @@ def execute_tool(name: str, arguments: Dict[str, Any], schema_model: DatabaseSch
         except Exception as e:
             return {"isError": True, "content": [{"type": "text", "text": f"Error: {str(e)}"}]}
 
+    elif name == "schemap_ground":
+        from .semantic import compile_semantic_graph
+        from .ground import ground as run_ground
+
+        question = arguments.get("question", "").strip()
+        if not question:
+            return {"isError": True, "content": [{"type": "text", "text": "Error: 'question' argument is required."}]}
+
+        tenant_id = arguments.get("tenant_id")
+        graph = compile_semantic_graph(schema_model)
+        plan = run_ground(question, graph=graph, tenant_id=tenant_id)
+
+        lines = [
+            "### Schemap Deterministic Grounding Plan",
+            f"- **Question**: \"{question}\"",
+            f"- **Target Tables**: `{', '.join(plan.target_tables)}`",
+        ]
+        if tenant_id:
+            lines.append(f"- **Tenant Scope**: `{tenant_id}` (Enforced)")
+
+        if plan.join_path:
+            join_prov = "DECLARED (Virtual Relations)" if any(s.is_virtual for s in plan.join_path.steps) else "INFERRED (Physical Foreign Keys)"
+            lines.append(f"\n**Deterministic Join Path [{join_prov}]**:\n```sql\n{plan.join_path.sql_join_clause}\n```")
+
+        if plan.mandatory_filters:
+            lines.append("\n**Mandatory Invariants (MUST be included in WHERE clause)**:")
+            for f in plan.mandatory_filters:
+                tbl = f.split(".")[0]
+                if "IS NULL" in f:
+                    prov = graph.provenance_map.get(f"{tbl}:soft_delete", "INFERRED")
+                else:
+                    prov = graph.provenance_map.get(f"{tbl}:tenant_key", "INFERRED")
+                prov_str = prov.value if hasattr(prov, "value") else str(prov)
+                lines.append(f"- `* {f}` `[{prov_str}]`")
+
+        if plan.measures:
+            lines.append("\n**Resolved Measures**:")
+            for m in plan.measures:
+                expr = m.expression or f"SUM({m.table}.{m.column})"
+                lines.append(f"- `{m.table}.{m.column}` `[{m.provenance.value}]`: `{expr}`")
+
+        if plan.ambiguities:
+            lines.append("\n**Semantic Ambiguities / Warnings**:")
+            for a in plan.ambiguities:
+                lines.append(f"- ⚠️ `[UNKNOWN]`: {a}")
+
+        return {"content": [{"type": "text", "text": "\n".join(lines)}]}
+
+    elif name == "schemap_verify":
+        from .semantic import compile_semantic_graph
+        from .validator import verify_sql as run_verify_sql
+
+        sql = arguments.get("sql", "").strip()
+        if not sql:
+            return {"isError": True, "content": [{"type": "text", "text": "Error: 'sql' argument is required."}]}
+
+        tenant_id = arguments.get("tenant_id")
+        patch = bool(arguments.get("patch", False))
+
+        graph = compile_semantic_graph(schema_model)
+        val_res = run_verify_sql(sql, graph=graph, tenant_id=tenant_id, auto_patch=patch)
+
+        lines = ["### Schemap AST SQL Policy Verification", ""]
+        if val_res.passed:
+            lines.append("🟢 **STATUS: ALLOWED** — Query is policy-compliant and tenant-safe.")
+        else:
+            lines.append("🔴 **STATUS: REJECTED (Deny-by-Default)** — Policy violations detected:")
+            for v in val_res.violations:
+                lines.append(f"- ❌ {v}")
+
+        if patch and val_res.patched_sql:
+            lines.append("\n**Explicitly Auto-Patched Sanitized SQL**:")
+            lines.append(f"```sql\n{val_res.patched_sql}\n```")
+        elif not val_res.passed and not patch:
+            lines.append("\n*(Note: Auto-patching is disabled by default. Pass `patch: true` or call `schemap_patch` to generate sanitized SQL.)*")
+
+        return {"content": [{"type": "text", "text": "\n".join(lines)}]}
+
+    elif name == "schemap_patch":
+        from .semantic import compile_semantic_graph
+        from .validator import verify_sql as run_verify_sql
+
+        sql = arguments.get("sql", "").strip()
+        if not sql:
+            return {"isError": True, "content": [{"type": "text", "text": "Error: 'sql' argument is required."}]}
+
+        tenant_id = arguments.get("tenant_id")
+        graph = compile_semantic_graph(schema_model)
+        val_res = run_verify_sql(sql, graph=graph, tenant_id=tenant_id, auto_patch=True)
+
+        lines = ["### Schemap AST SQL Patch Result", ""]
+        if val_res.patched_sql:
+            lines.append("🔧 **Sanitized SQL with injected tenant & soft-delete filters**:")
+            lines.append(f"```sql\n{val_res.patched_sql}\n```")
+        elif val_res.passed:
+            lines.append("🟢 **No Patch Needed** — Query is already policy-compliant.")
+            lines.append(f"```sql\n{sql}\n```")
+        else:
+            lines.append("🔴 **Unpatchable Security Hazard** — The query contains violations that cannot be safely auto-patched (e.g. destructive mutation):")
+            for v in val_res.violations:
+                lines.append(f"- ❌ {v}")
+
+        return {"content": [{"type": "text", "text": "\n".join(lines)}]}
+
     else:
         return {
             "isError": True,
@@ -318,7 +481,10 @@ def generate_mcp_config_snippet(platform: str = "cursor") -> str:
         "mcpServers": {
             "schemap": {
                 "command": "uvx",
-                "args": ["schemap-tool", "mcp"]
+                "args": ["schemap-tool", "mcp"],
+                "env": {
+                    "DATABASE_URL": "postgresql://user:password@localhost:5432/dbname"
+                }
             }
         }
     }
@@ -326,7 +492,10 @@ def generate_mcp_config_snippet(platform: str = "cursor") -> str:
         "mcpServers": {
             "schemap": {
                 "command": "uvx",
-                "args": ["schemap-tool", "mcp", "--config", "./schemap.yaml"]
+                "args": ["schemap-tool", "mcp", "--config", "./schemap.yaml"],
+                "env": {
+                    "DATABASE_URL": "postgresql://user:password@localhost:5432/dbname"
+                }
             }
         }
     }

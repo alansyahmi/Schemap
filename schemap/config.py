@@ -128,10 +128,13 @@ def load_config(config_path: str | None = None, profile: str | None = None, db_u
         discovered = find_config_path()
         resolved_path = discovered if discovered else Path("schemap.yaml")
         
+    env_url = os.environ.get("SCHEMAP_DATABASE_URL") or os.environ.get("DATABASE_URL")
+    target_db_url = db_url or env_url
+
     if not resolved_path.exists():
-        if db_url:
+        if target_db_url:
             return SchemapConfig(
-                database=DatabaseConfig(connection_url=db_url)
+                database=DatabaseConfig(connection_url=target_db_url)
             )
         raise FileNotFoundError(f"Configuration file not found: {resolved_path}")
         
@@ -139,9 +142,9 @@ def load_config(config_path: str | None = None, profile: str | None = None, db_u
         data = yaml.safe_load(f)
         
     if not data:
-        if db_url:
+        if target_db_url:
             return SchemapConfig(
-                database=DatabaseConfig(connection_url=db_url)
+                database=DatabaseConfig(connection_url=target_db_url)
             )
         raise ValueError("Configuration file is empty or invalid YAML.")
         

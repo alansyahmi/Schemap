@@ -141,12 +141,19 @@ def ground(
     ]
 
     if join_path:
-        instructions_lines.append(f"- Deterministic Join Path:\n```sql\n{join_path.sql_join_clause}\n```")
+        join_prov = "DECLARED (Virtual Relations)" if any(s.is_virtual for s in join_path.steps) else "INFERRED (Physical Foreign Keys)"
+        instructions_lines.append(f"- Deterministic Join Path [{join_prov}]:\n```sql\n{join_path.sql_join_clause}\n```")
 
     if mandatory_filters:
         instructions_lines.append("- Mandatory Filters (MUST be included in WHERE clause):")
         for f in mandatory_filters:
-            instructions_lines.append(f"  * {f}")
+            tbl = f.split(".")[0]
+            if "IS NULL" in f:
+                prov = graph.provenance_map.get(f"{tbl}:soft_delete", "INFERRED")
+            else:
+                prov = graph.provenance_map.get(f"{tbl}:tenant_key", "INFERRED")
+            prov_str = prov.value if hasattr(prov, "value") else str(prov)
+            instructions_lines.append(f"  * {f} [{prov_str}]")
 
     if matched_measures:
         instructions_lines.append("- Recommended Measure Expressions:")
