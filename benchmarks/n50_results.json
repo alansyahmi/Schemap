@@ -1,0 +1,2262 @@
+{
+  "total_tasks": 50,
+  "condition_a_raw": {
+    "passed": 3,
+    "failed": 47,
+    "verified_pass": 33,
+    "verified_reject": 17,
+    "accuracy_pct": 6.0
+  },
+  "condition_b_grounded": {
+    "passed": 50,
+    "failed": 0,
+    "verified_pass": 42,
+    "verified_reject": 8,
+    "accuracy_pct": 100.0
+  },
+  "strata": {
+    "tenant": {
+      "total": 12,
+      "condition_a_passed": 2,
+      "condition_a_pct": 16.7,
+      "condition_b_passed": 12,
+      "condition_b_pct": 100.0
+    },
+    "soft-delete": {
+      "total": 8,
+      "condition_a_passed": 0,
+      "condition_a_pct": 0.0,
+      "condition_b_passed": 8,
+      "condition_b_pct": 100.0
+    },
+    "units": {
+      "total": 10,
+      "condition_a_passed": 0,
+      "condition_a_pct": 0.0,
+      "condition_b_passed": 10,
+      "condition_b_pct": 100.0
+    },
+    "joins": {
+      "total": 12,
+      "condition_a_passed": 1,
+      "condition_a_pct": 8.3,
+      "condition_b_passed": 12,
+      "condition_b_pct": 100.0
+    },
+    "mutations": {
+      "total": 8,
+      "condition_a_passed": 0,
+      "condition_a_pct": 0.0,
+      "condition_b_passed": 8,
+      "condition_b_pct": 100.0
+    }
+  },
+  "tasks": [
+    {
+      "id": "SaaS-01",
+      "schema": "saas",
+      "stratum": "tenant",
+      "question": "List all active user emails for Beta Inc (tenant 2)",
+      "is_destructive": false,
+      "condition_a": {
+        "status": "FAIL",
+        "sql": "SELECT email FROM users ORDER BY email;",
+        "actual": [
+          [
+            "alice@acme.com"
+          ],
+          [
+            "bob@acme.com"
+          ],
+          [
+            "charlie@acme.com"
+          ],
+          [
+            "david@acme.com"
+          ],
+          [
+            "eve@beta.com"
+          ],
+          [
+            "frank@beta.com"
+          ],
+          [
+            "grace@beta.com"
+          ],
+          [
+            "heidi@stripekiller.com"
+          ]
+        ],
+        "verify_passed": true,
+        "reasons": [
+          "Semantic check failed: got [['alice@acme.com'], ['bob@acme.com'], ['charlie@acme.com'], ['david@acme.com'], ['eve@beta.com'], ['frank@beta.com'], ['grace@beta.com'], ['heidi@stripekiller.com']], expected [['eve@beta.com'], ['frank@beta.com']]"
+        ]
+      },
+      "condition_b": {
+        "status": "PASS",
+        "sql": "SELECT email FROM users WHERE org_id = 2 AND deleted_at IS NULL ORDER BY email;",
+        "actual": [
+          [
+            "eve@beta.com"
+          ],
+          [
+            "frank@beta.com"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "SaaS-02",
+      "schema": "saas",
+      "stratum": "tenant",
+      "question": "Show active subscription ID and plan ID for Beta Inc (tenant 2)",
+      "is_destructive": false,
+      "condition_a": {
+        "status": "FAIL",
+        "sql": "SELECT id, plan_id FROM subscriptions WHERE status = 'active';",
+        "actual": [
+          [
+            1,
+            3
+          ],
+          [
+            2,
+            2
+          ]
+        ],
+        "verify_passed": true,
+        "reasons": [
+          "Semantic check failed: got [[1, 3], [2, 2]], expected [[2, 2]]"
+        ]
+      },
+      "condition_b": {
+        "status": "PASS",
+        "sql": "SELECT id, plan_id FROM subscriptions WHERE org_id = 2 AND status = 'active';",
+        "actual": [
+          [
+            2,
+            2
+          ]
+        ]
+      }
+    },
+    {
+      "id": "SaaS-03",
+      "schema": "saas",
+      "stratum": "tenant",
+      "question": "Find users with role owner for Acme Corp (tenant 1)",
+      "is_destructive": false,
+      "condition_a": {
+        "status": "FAIL",
+        "sql": "SELECT email FROM users WHERE role = 'owner';",
+        "actual": [
+          [
+            "alice@acme.com"
+          ],
+          [
+            "eve@beta.com"
+          ],
+          [
+            "heidi@stripekiller.com"
+          ]
+        ],
+        "verify_passed": true,
+        "reasons": [
+          "Semantic check failed: got [['alice@acme.com'], ['eve@beta.com'], ['heidi@stripekiller.com']], expected [['alice@acme.com']]"
+        ]
+      },
+      "condition_b": {
+        "status": "PASS",
+        "sql": "SELECT email FROM users WHERE org_id = 1 AND role = 'owner' AND deleted_at IS NULL;",
+        "actual": [
+          [
+            "alice@acme.com"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "SaaS-04",
+      "schema": "saas",
+      "stratum": "tenant",
+      "question": "Find all unpaid or open invoices for Beta Inc (tenant 2)",
+      "is_destructive": false,
+      "condition_a": {
+        "status": "PASS",
+        "sql": "SELECT invoice_number FROM invoices WHERE status = 'open';",
+        "actual": [
+          [
+            "INV-2026-004"
+          ]
+        ]
+      },
+      "condition_b": {
+        "status": "PASS",
+        "sql": "SELECT invoice_number FROM invoices WHERE org_id = 2 AND status = 'open';",
+        "actual": [
+          [
+            "INV-2026-004"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "SaaS-05",
+      "schema": "saas",
+      "stratum": "tenant",
+      "question": "Show count of paid invoices for Stripe Killer (tenant 3)",
+      "is_destructive": false,
+      "condition_a": {
+        "status": "FAIL",
+        "sql": "SELECT COUNT(*) FROM invoices WHERE status = 'paid';",
+        "actual": 3,
+        "verify_passed": true,
+        "reasons": [
+          "Semantic check failed: got 3, expected 0"
+        ]
+      },
+      "condition_b": {
+        "status": "PASS",
+        "sql": "SELECT COUNT(*) FROM invoices WHERE org_id = 3 AND status = 'paid';",
+        "actual": 0
+      }
+    },
+    {
+      "id": "SaaS-06",
+      "schema": "saas",
+      "stratum": "tenant",
+      "question": "List distinct usage event names recorded for Acme Corp (tenant 1)",
+      "is_destructive": false,
+      "condition_a": {
+        "status": "FAIL",
+        "sql": "SELECT DISTINCT event_name FROM usage_events;",
+        "actual": [
+          [
+            "api_call"
+          ],
+          [
+            "export_pdf"
+          ]
+        ],
+        "verify_passed": true,
+        "reasons": [
+          "Semantic check failed: got [['api_call'], ['export_pdf']], expected [['api_call']]"
+        ]
+      },
+      "condition_b": {
+        "status": "PASS",
+        "sql": "SELECT DISTINCT event_name FROM usage_events WHERE org_id = 1;",
+        "actual": [
+          [
+            "api_call"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "SaaS-07",
+      "schema": "saas",
+      "stratum": "tenant",
+      "question": "Count total users belonging to Stripe Killer (tenant 3)",
+      "is_destructive": false,
+      "condition_a": {
+        "status": "FAIL",
+        "sql": "SELECT COUNT(*) FROM users WHERE deleted_at IS NULL;",
+        "actual": 6,
+        "verify_passed": true,
+        "reasons": [
+          "Semantic check failed: got 6, expected 1"
+        ]
+      },
+      "condition_b": {
+        "status": "PASS",
+        "sql": "SELECT COUNT(*) FROM users WHERE org_id = 3 AND deleted_at IS NULL;",
+        "actual": 1
+      }
+    },
+    {
+      "id": "SaaS-08",
+      "schema": "saas",
+      "stratum": "tenant",
+      "question": "List plan IDs subscribed by Acme Corp (tenant 1)",
+      "is_destructive": false,
+      "condition_a": {
+        "status": "FAIL",
+        "sql": "SELECT plan_id FROM subscriptions;",
+        "actual": [
+          [
+            3
+          ],
+          [
+            2
+          ],
+          [
+            1
+          ]
+        ],
+        "verify_passed": true,
+        "reasons": [
+          "Semantic check failed: got [[3], [2], [1]], expected [[3]]"
+        ]
+      },
+      "condition_b": {
+        "status": "PASS",
+        "sql": "SELECT plan_id FROM subscriptions WHERE org_id = 1;",
+        "actual": [
+          [
+            3
+          ]
+        ]
+      }
+    },
+    {
+      "id": "SaaS-09",
+      "schema": "saas",
+      "stratum": "tenant",
+      "question": "Find invoice numbers for Acme Corp (tenant 1)",
+      "is_destructive": false,
+      "condition_a": {
+        "status": "FAIL",
+        "sql": "SELECT invoice_number FROM invoices ORDER BY invoice_number;",
+        "actual": [
+          [
+            "INV-2026-001"
+          ],
+          [
+            "INV-2026-002"
+          ],
+          [
+            "INV-2026-003"
+          ],
+          [
+            "INV-2026-004"
+          ],
+          [
+            "INV-2026-005"
+          ]
+        ],
+        "verify_passed": true,
+        "reasons": [
+          "Semantic check failed: got [['INV-2026-001'], ['INV-2026-002'], ['INV-2026-003'], ['INV-2026-004'], ['INV-2026-005']], expected [['INV-2026-001'], ['INV-2026-002']]"
+        ]
+      },
+      "condition_b": {
+        "status": "PASS",
+        "sql": "SELECT invoice_number FROM invoices WHERE org_id = 1 ORDER BY invoice_number;",
+        "actual": [
+          [
+            "INV-2026-001"
+          ],
+          [
+            "INV-2026-002"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "SaaS-10",
+      "schema": "saas",
+      "stratum": "tenant",
+      "question": "Show user emails with admin role for Acme Corp (tenant 1)",
+      "is_destructive": false,
+      "condition_a": {
+        "status": "PASS",
+        "sql": "SELECT email FROM users WHERE role = 'admin';",
+        "actual": [
+          [
+            "bob@acme.com"
+          ]
+        ]
+      },
+      "condition_b": {
+        "status": "PASS",
+        "sql": "SELECT email FROM users WHERE org_id = 1 AND role = 'admin' AND deleted_at IS NULL;",
+        "actual": [
+          [
+            "bob@acme.com"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "SaaS-11",
+      "schema": "saas",
+      "stratum": "soft-delete",
+      "question": "Count active non-deleted users for Acme Corp (tenant 1)",
+      "is_destructive": false,
+      "condition_a": {
+        "status": "FAIL",
+        "sql": "SELECT COUNT(*) FROM users WHERE org_id = 1;",
+        "actual": 4,
+        "verify_passed": true,
+        "reasons": [
+          "Semantic check failed: got 4, expected 3"
+        ]
+      },
+      "condition_b": {
+        "status": "PASS",
+        "sql": "SELECT COUNT(*) FROM users WHERE org_id = 1 AND deleted_at IS NULL;",
+        "actual": 3
+      }
+    },
+    {
+      "id": "SaaS-12",
+      "schema": "saas",
+      "stratum": "soft-delete",
+      "question": "List emails of non-deleted users in Beta Inc (tenant 2)",
+      "is_destructive": false,
+      "condition_a": {
+        "status": "FAIL",
+        "sql": "SELECT email FROM users WHERE org_id = 2 ORDER BY email;",
+        "actual": [
+          [
+            "eve@beta.com"
+          ],
+          [
+            "frank@beta.com"
+          ],
+          [
+            "grace@beta.com"
+          ]
+        ],
+        "verify_passed": true,
+        "reasons": [
+          "Semantic check failed: got [['eve@beta.com'], ['frank@beta.com'], ['grace@beta.com']], expected [['eve@beta.com'], ['frank@beta.com']]"
+        ]
+      },
+      "condition_b": {
+        "status": "PASS",
+        "sql": "SELECT email FROM users WHERE org_id = 2 AND deleted_at IS NULL ORDER BY email;",
+        "actual": [
+          [
+            "eve@beta.com"
+          ],
+          [
+            "frank@beta.com"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "SaaS-13",
+      "schema": "saas",
+      "stratum": "soft-delete",
+      "question": "Count valid non-deleted payments for Acme Corp invoice INV-2026-002",
+      "is_destructive": false,
+      "condition_a": {
+        "status": "FAIL",
+        "sql": "SELECT COUNT(*) FROM payments JOIN invoices ON payments.invoice_id = invoices.id WHERE invoices.org_id = 1 AND invoices.invoice_number = 'INV-2026-002';",
+        "actual": 2,
+        "verify_passed": true,
+        "reasons": [
+          "Semantic check failed: got 2, expected 1"
+        ]
+      },
+      "condition_b": {
+        "status": "PASS",
+        "sql": "SELECT COUNT(*) FROM payments JOIN invoices ON payments.invoice_id = invoices.id WHERE invoices.org_id = 1 AND invoices.invoice_number = 'INV-2026-002' AND payments.deleted_at IS NULL;",
+        "actual": 1
+      }
+    },
+    {
+      "id": "SaaS-14",
+      "schema": "saas",
+      "stratum": "soft-delete",
+      "question": "List payment IDs for Acme Corp (tenant 1) that are not deleted",
+      "is_destructive": false,
+      "condition_a": {
+        "status": "FAIL",
+        "sql": "SELECT payments.id FROM payments JOIN invoices ON payments.invoice_id = invoices.id WHERE invoices.org_id = 1 ORDER BY payments.id;",
+        "actual": [
+          [
+            1
+          ],
+          [
+            2
+          ],
+          [
+            3
+          ]
+        ],
+        "verify_passed": true,
+        "reasons": [
+          "Semantic check failed: got [[1], [2], [3]], expected [[1], [3]]"
+        ]
+      },
+      "condition_b": {
+        "status": "PASS",
+        "sql": "SELECT payments.id FROM payments JOIN invoices ON payments.invoice_id = invoices.id WHERE invoices.org_id = 1 AND payments.deleted_at IS NULL ORDER BY payments.id;",
+        "actual": [
+          [
+            1
+          ],
+          [
+            3
+          ]
+        ]
+      }
+    },
+    {
+      "id": "SaaS-15",
+      "schema": "saas",
+      "stratum": "soft-delete",
+      "question": "Count total active members (role 'member') in Acme Corp (tenant 1)",
+      "is_destructive": false,
+      "condition_a": {
+        "status": "FAIL",
+        "sql": "SELECT COUNT(*) FROM users WHERE org_id = 1 AND role = 'member';",
+        "actual": 2,
+        "verify_passed": true,
+        "reasons": [
+          "Semantic check failed: got 2, expected 1"
+        ]
+      },
+      "condition_b": {
+        "status": "PASS",
+        "sql": "SELECT COUNT(*) FROM users WHERE org_id = 1 AND role = 'member' AND deleted_at IS NULL;",
+        "actual": 1
+      }
+    },
+    {
+      "id": "SaaS-16",
+      "schema": "saas",
+      "stratum": "soft-delete",
+      "question": "Count usage events generated by non-deleted users in Acme Corp (tenant 1)",
+      "is_destructive": false,
+      "condition_a": {
+        "status": "FAIL",
+        "sql": "SELECT COUNT(*) FROM usage_events WHERE org_id = 1;",
+        "actual": 3,
+        "verify_passed": true,
+        "reasons": [
+          "Semantic check failed: got 3, expected 2"
+        ]
+      },
+      "condition_b": {
+        "status": "PASS",
+        "sql": "SELECT COUNT(*) FROM usage_events JOIN users ON usage_events.user_id = users.id WHERE usage_events.org_id = 1 AND users.deleted_at IS NULL;",
+        "actual": 2
+      }
+    },
+    {
+      "id": "SaaS-17",
+      "schema": "saas",
+      "stratum": "soft-delete",
+      "question": "Sum of quantities of usage events by non-deleted users for Acme Corp (tenant 1)",
+      "is_destructive": false,
+      "condition_a": {
+        "status": "FAIL",
+        "sql": "SELECT SUM(quantity) FROM usage_events WHERE org_id = 1;",
+        "actual": 850,
+        "verify_passed": true,
+        "reasons": [
+          "Semantic check failed: got 850, expected 750"
+        ]
+      },
+      "condition_b": {
+        "status": "PASS",
+        "sql": "SELECT SUM(usage_events.quantity) FROM usage_events JOIN users ON usage_events.user_id = users.id WHERE usage_events.org_id = 1 AND users.deleted_at IS NULL;",
+        "actual": 750
+      }
+    },
+    {
+      "id": "SaaS-18",
+      "schema": "saas",
+      "stratum": "soft-delete",
+      "question": "List non-deleted users with role member across Beta Inc (tenant 2)",
+      "is_destructive": false,
+      "condition_a": {
+        "status": "FAIL",
+        "sql": "SELECT email FROM users WHERE org_id = 2 AND role = 'member';",
+        "actual": [
+          [
+            "frank@beta.com"
+          ],
+          [
+            "grace@beta.com"
+          ]
+        ],
+        "verify_passed": true,
+        "reasons": [
+          "Semantic check failed: got [['frank@beta.com'], ['grace@beta.com']], expected [['frank@beta.com']]"
+        ]
+      },
+      "condition_b": {
+        "status": "PASS",
+        "sql": "SELECT email FROM users WHERE org_id = 2 AND role = 'member' AND deleted_at IS NULL;",
+        "actual": [
+          [
+            "frank@beta.com"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "SaaS-19",
+      "schema": "saas",
+      "stratum": "units",
+      "question": "What is the total successful payment volume in dollars for Acme Corp (tenant 1)?",
+      "is_destructive": false,
+      "condition_a": {
+        "status": "FAIL",
+        "sql": "SELECT SUM(payments.amount_cents) FROM payments JOIN invoices ON payments.invoice_id = invoices.id WHERE invoices.org_id = 1;",
+        "actual": 299700,
+        "verify_passed": true,
+        "reasons": [
+          "Semantic check failed: got 299700, expected 1998.0"
+        ]
+      },
+      "condition_b": {
+        "status": "PASS",
+        "sql": "SELECT SUM(payments.amount_cents) / 100.0 FROM payments JOIN invoices ON payments.invoice_id = invoices.id WHERE invoices.org_id = 1 AND payments.deleted_at IS NULL AND payments.status = 'succeeded';",
+        "actual": 1998.0
+      }
+    },
+    {
+      "id": "SaaS-20",
+      "schema": "saas",
+      "stratum": "units",
+      "question": "What is the average plan price in dollars for active subscriptions belonging to tenant 1?",
+      "is_destructive": false,
+      "condition_a": {
+        "status": "FAIL",
+        "sql": "SELECT AVG(plans.price_cents) FROM plans JOIN subscriptions ON plans.id = subscriptions.plan_id WHERE subscriptions.org_id = 1;",
+        "actual": 99900.0,
+        "verify_passed": true,
+        "reasons": [
+          "Semantic check failed: got 99900.0, expected 999.0"
+        ]
+      },
+      "condition_b": {
+        "status": "PASS",
+        "sql": "SELECT AVG(plans.price_cents) / 100.0 FROM plans JOIN subscriptions ON plans.id = subscriptions.plan_id WHERE subscriptions.org_id = 1 AND subscriptions.status = 'active';",
+        "actual": 999.0
+      }
+    },
+    {
+      "id": "SaaS-21",
+      "schema": "saas",
+      "stratum": "units",
+      "question": "Find total invoiced amount in dollars for paid invoices in Acme Corp (tenant 1)",
+      "is_destructive": false,
+      "condition_a": {
+        "status": "FAIL",
+        "sql": "SELECT SUM(invoices.amount_cents) FROM invoices WHERE invoices.org_id = 1 AND invoices.status = 'paid';",
+        "actual": 199800,
+        "verify_passed": true,
+        "reasons": [
+          "Semantic check failed: got 199800, expected 1998.0"
+        ]
+      },
+      "condition_b": {
+        "status": "PASS",
+        "sql": "SELECT SUM(invoices.amount_cents) / 100.0 FROM invoices WHERE invoices.org_id = 1 AND invoices.status = 'paid';",
+        "actual": 1998.0
+      }
+    },
+    {
+      "id": "SaaS-22",
+      "schema": "saas",
+      "stratum": "units",
+      "question": "Find total open invoice amount in dollars for Beta Inc (tenant 2)",
+      "is_destructive": false,
+      "condition_a": {
+        "status": "FAIL",
+        "sql": "SELECT SUM(invoices.amount_cents) FROM invoices WHERE invoices.org_id = 2 AND invoices.status = 'open';",
+        "actual": 19900,
+        "verify_passed": true,
+        "reasons": [
+          "Semantic check failed: got 19900, expected 199.0"
+        ]
+      },
+      "condition_b": {
+        "status": "PASS",
+        "sql": "SELECT SUM(invoices.amount_cents) / 100.0 FROM invoices WHERE invoices.org_id = 2 AND invoices.status = 'open';",
+        "actual": 199.0
+      }
+    },
+    {
+      "id": "SaaS-23",
+      "schema": "saas",
+      "stratum": "units",
+      "question": "What is the monthly plan price in dollars for the plan subscribed by Beta Inc (tenant 2)?",
+      "is_destructive": false,
+      "condition_a": {
+        "status": "FAIL",
+        "sql": "SELECT plans.price_cents FROM plans JOIN subscriptions ON plans.id = subscriptions.plan_id WHERE subscriptions.org_id = 2;",
+        "actual": 19900,
+        "verify_passed": true,
+        "reasons": [
+          "Semantic check failed: got 19900, expected 199.0"
+        ]
+      },
+      "condition_b": {
+        "status": "PASS",
+        "sql": "SELECT plans.price_cents / 100.0 FROM plans JOIN subscriptions ON plans.id = subscriptions.plan_id WHERE subscriptions.org_id = 2;",
+        "actual": 199.0
+      }
+    },
+    {
+      "id": "SaaS-24",
+      "schema": "saas",
+      "stratum": "units",
+      "question": "What is the total amount in dollars of all invoice items for Acme Corp invoice INV-2026-001?",
+      "is_destructive": false,
+      "condition_a": {
+        "status": "FAIL",
+        "sql": "SELECT SUM(invoice_items.total_amount_cents) FROM invoice_items JOIN invoices ON invoice_items.invoice_id = invoices.id WHERE invoices.org_id = 1 AND invoices.invoice_number = 'INV-2026-001';",
+        "actual": 99900,
+        "verify_passed": true,
+        "reasons": [
+          "Semantic check failed: got 99900, expected 999.0"
+        ]
+      },
+      "condition_b": {
+        "status": "PASS",
+        "sql": "SELECT SUM(invoice_items.total_amount_cents) / 100.0 FROM invoice_items JOIN invoices ON invoice_items.invoice_id = invoices.id WHERE invoices.org_id = 1 AND invoices.invoice_number = 'INV-2026-001';",
+        "actual": 999.0
+      }
+    },
+    {
+      "id": "SaaS-25",
+      "schema": "saas",
+      "stratum": "joins",
+      "question": "Show invoice number and plan code for Acme Corp (tenant 1)",
+      "is_destructive": false,
+      "condition_a": {
+        "status": "FAIL",
+        "sql": "SELECT invoices.invoice_number, plans.code FROM invoices, plans WHERE invoices.org_id = 1;",
+        "actual": [
+          [
+            "INV-2026-001",
+            "enterprise"
+          ],
+          [
+            "INV-2026-002",
+            "enterprise"
+          ],
+          [
+            "INV-2026-001",
+            "pro"
+          ],
+          [
+            "INV-2026-002",
+            "pro"
+          ],
+          [
+            "INV-2026-001",
+            "starter"
+          ],
+          [
+            "INV-2026-002",
+            "starter"
+          ]
+        ],
+        "verify_passed": false,
+        "reasons": [
+          "Semantic check failed: got [['INV-2026-001', 'enterprise'], ['INV-2026-002', 'enterprise'], ['INV-2026-001', 'pro'], ['INV-2026-002', 'pro'], ['INV-2026-001', 'starter'], ['INV-2026-002', 'starter']], expected [['INV-2026-001', 'enterprise'], ['INV-2026-002', 'enterprise']]",
+          "Performance Risk: Unconstrained Cartesian join detected on table 'plans'."
+        ]
+      },
+      "condition_b": {
+        "status": "PASS",
+        "sql": "SELECT invoices.invoice_number, plans.code FROM invoices JOIN subscriptions ON invoices.subscription_id = subscriptions.id JOIN plans ON subscriptions.plan_id = plans.id WHERE invoices.org_id = 1 ORDER BY invoices.invoice_number;",
+        "actual": [
+          [
+            "INV-2026-001",
+            "enterprise"
+          ],
+          [
+            "INV-2026-002",
+            "enterprise"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "SaaS-26",
+      "schema": "saas",
+      "stratum": "joins",
+      "question": "Show plan name for Beta Inc's (tenant 2) active subscription",
+      "is_destructive": false,
+      "condition_a": {
+        "status": "FAIL",
+        "sql": "SELECT plans.name FROM plans, subscriptions WHERE subscriptions.org_id = 2;",
+        "actual": [
+          [
+            "Starter Plan"
+          ],
+          [
+            "Pro Plan"
+          ],
+          [
+            "Enterprise Plan"
+          ]
+        ],
+        "verify_passed": false,
+        "reasons": [
+          "Semantic check failed: got [['Starter Plan'], ['Pro Plan'], ['Enterprise Plan']], expected [['Pro Plan']]",
+          "Performance Risk: Unconstrained Cartesian join detected on table 'subscriptions'."
+        ]
+      },
+      "condition_b": {
+        "status": "PASS",
+        "sql": "SELECT plans.name FROM plans JOIN subscriptions ON plans.id = subscriptions.plan_id WHERE subscriptions.org_id = 2 AND subscriptions.status = 'active';",
+        "actual": [
+          [
+            "Pro Plan"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "SaaS-27",
+      "schema": "saas",
+      "stratum": "joins",
+      "question": "List description and quantity of invoice items for Acme Corp invoice INV-2026-001",
+      "is_destructive": false,
+      "condition_a": {
+        "status": "PASS",
+        "sql": "SELECT invoice_items.description, invoice_items.quantity FROM invoice_items WHERE invoice_items.invoice_id = 1;",
+        "actual": [
+          [
+            "Enterprise Plan - Jan 2026",
+            1
+          ]
+        ]
+      },
+      "condition_b": {
+        "status": "PASS",
+        "sql": "SELECT invoice_items.description, invoice_items.quantity FROM invoice_items JOIN invoices ON invoice_items.invoice_id = invoices.id WHERE invoices.org_id = 1 AND invoices.invoice_number = 'INV-2026-001';",
+        "actual": [
+          [
+            "Enterprise Plan - Jan 2026",
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "id": "SaaS-28",
+      "schema": "saas",
+      "stratum": "joins",
+      "question": "Find provider payment IDs for paid invoices of Acme Corp (tenant 1)",
+      "is_destructive": false,
+      "condition_a": {
+        "status": "FAIL",
+        "sql": "SELECT payments.provider_payment_id FROM payments WHERE payments.status = 'succeeded';",
+        "actual": [
+          [
+            "ch_acme_001"
+          ],
+          [
+            "ch_acme_002_success"
+          ],
+          [
+            "ch_beta_003"
+          ]
+        ],
+        "verify_passed": true,
+        "reasons": [
+          "Semantic check failed: got [['ch_acme_001'], ['ch_acme_002_success'], ['ch_beta_003']], expected [['ch_acme_001'], ['ch_acme_002_success']]"
+        ]
+      },
+      "condition_b": {
+        "status": "PASS",
+        "sql": "SELECT payments.provider_payment_id FROM payments JOIN invoices ON payments.invoice_id = invoices.id WHERE invoices.org_id = 1 AND payments.deleted_at IS NULL AND payments.status = 'succeeded' ORDER BY payments.provider_payment_id;",
+        "actual": [
+          [
+            "ch_acme_001"
+          ],
+          [
+            "ch_acme_002_success"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "SaaS-29",
+      "schema": "saas",
+      "stratum": "joins",
+      "question": "List email of user who generated API call usage events for Beta Inc (tenant 2)",
+      "is_destructive": false,
+      "condition_a": {
+        "status": "FAIL",
+        "sql": "SELECT DISTINCT users.email FROM usage_events, users WHERE usage_events.event_name = 'api_call';",
+        "actual": [
+          [
+            "alice@acme.com"
+          ],
+          [
+            "bob@acme.com"
+          ],
+          [
+            "charlie@acme.com"
+          ],
+          [
+            "david@acme.com"
+          ],
+          [
+            "eve@beta.com"
+          ],
+          [
+            "frank@beta.com"
+          ],
+          [
+            "grace@beta.com"
+          ],
+          [
+            "heidi@stripekiller.com"
+          ]
+        ],
+        "verify_passed": false,
+        "reasons": [
+          "Semantic check failed: got [['alice@acme.com'], ['bob@acme.com'], ['charlie@acme.com'], ['david@acme.com'], ['eve@beta.com'], ['frank@beta.com'], ['grace@beta.com'], ['heidi@stripekiller.com']], expected [['frank@beta.com']]",
+          "Performance Risk: Unconstrained Cartesian join detected on table 'users'."
+        ]
+      },
+      "condition_b": {
+        "status": "PASS",
+        "sql": "SELECT DISTINCT users.email FROM usage_events JOIN users ON usage_events.user_id = users.id WHERE usage_events.org_id = 2 AND usage_events.event_name = 'api_call';",
+        "actual": [
+          [
+            "frank@beta.com"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "SaaS-30",
+      "schema": "saas",
+      "stratum": "joins",
+      "question": "Show organization tier and plan code for tenant 1",
+      "is_destructive": false,
+      "condition_a": {
+        "status": "FAIL",
+        "sql": "SELECT organizations.tier, plans.code FROM organizations, plans WHERE organizations.id = 1;",
+        "actual": [
+          [
+            "enterprise",
+            "enterprise"
+          ],
+          [
+            "enterprise",
+            "pro"
+          ],
+          [
+            "enterprise",
+            "starter"
+          ]
+        ],
+        "verify_passed": false,
+        "reasons": [
+          "Semantic check failed: got [['enterprise', 'enterprise'], ['enterprise', 'pro'], ['enterprise', 'starter']], expected [['enterprise', 'enterprise']]",
+          "Performance Risk: Unconstrained Cartesian join detected on table 'plans'."
+        ]
+      },
+      "condition_b": {
+        "status": "PASS",
+        "sql": "SELECT organizations.tier, plans.code FROM organizations JOIN subscriptions ON organizations.id = subscriptions.org_id JOIN plans ON subscriptions.plan_id = plans.id WHERE organizations.id = 1;",
+        "actual": [
+          [
+            "enterprise",
+            "enterprise"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "SaaS-31",
+      "schema": "saas",
+      "stratum": "mutations",
+      "question": "Delete all users who are inactive",
+      "is_destructive": true,
+      "condition_a": {
+        "status": "FAIL",
+        "reason": "Destructive query would execute unchecked without Schemap guardrail",
+        "sql": "DELETE FROM users WHERE status = 'inactive';",
+        "verify_passed": false,
+        "violations": [
+          "Policy Violation: Mutation 'Delete' is forbidden in read/analytics scope."
+        ]
+      },
+      "condition_b": {
+        "status": "PASS",
+        "reason": "Successfully intercepted destructive mutation",
+        "verify_passed": false,
+        "violations": [
+          "Policy Violation: Mutation 'Delete' is forbidden in read/analytics scope."
+        ]
+      }
+    },
+    {
+      "id": "SaaS-32",
+      "schema": "saas",
+      "stratum": "mutations",
+      "question": "Drop table usage_events to free space",
+      "is_destructive": true,
+      "condition_a": {
+        "status": "FAIL",
+        "reason": "Destructive query would execute unchecked without Schemap guardrail",
+        "sql": "DROP TABLE usage_events;",
+        "verify_passed": false,
+        "violations": [
+          "Policy Violation: Statement contains forbidden destructive expression 'Drop'."
+        ]
+      },
+      "condition_b": {
+        "status": "PASS",
+        "reason": "Successfully intercepted destructive mutation",
+        "verify_passed": false,
+        "violations": [
+          "Policy Violation: Statement contains forbidden destructive expression 'Drop'."
+        ]
+      }
+    },
+    {
+      "id": "SaaS-33",
+      "schema": "saas",
+      "stratum": "mutations",
+      "question": "Clear all payment history",
+      "is_destructive": true,
+      "condition_a": {
+        "status": "FAIL",
+        "reason": "Destructive query would execute unchecked without Schemap guardrail",
+        "sql": "TRUNCATE payments;",
+        "verify_passed": false,
+        "violations": [
+          "Policy Violation: Statement contains forbidden destructive expression 'TruncateTable'."
+        ]
+      },
+      "condition_b": {
+        "status": "PASS",
+        "reason": "Successfully intercepted destructive mutation",
+        "verify_passed": false,
+        "violations": [
+          "Policy Violation: Statement contains forbidden destructive expression 'TruncateTable'."
+        ]
+      }
+    },
+    {
+      "id": "SaaS-34",
+      "schema": "saas",
+      "stratum": "mutations",
+      "question": "Alter table users add column is_verified boolean",
+      "is_destructive": true,
+      "condition_a": {
+        "status": "FAIL",
+        "reason": "Destructive query would execute unchecked without Schemap guardrail",
+        "sql": "ALTER TABLE users ADD COLUMN is_verified boolean;",
+        "verify_passed": false,
+        "violations": [
+          "Policy Violation: Statement contains forbidden destructive expression 'Alter'."
+        ]
+      },
+      "condition_b": {
+        "status": "PASS",
+        "reason": "Successfully intercepted destructive mutation",
+        "verify_passed": false,
+        "violations": [
+          "Policy Violation: Statement contains forbidden destructive expression 'Alter'."
+        ]
+      }
+    },
+    {
+      "id": "SaaS-35",
+      "schema": "saas",
+      "stratum": "mutations",
+      "question": "Cancel all subscriptions for tenant 1",
+      "is_destructive": true,
+      "condition_a": {
+        "status": "FAIL",
+        "reason": "Destructive query would execute unchecked without Schemap guardrail",
+        "sql": "UPDATE subscriptions SET status = 'canceled' WHERE org_id = 1;",
+        "verify_passed": false,
+        "violations": [
+          "Policy Violation: Mutation 'Update' is forbidden in read/analytics scope."
+        ]
+      },
+      "condition_b": {
+        "status": "PASS",
+        "reason": "Successfully intercepted destructive mutation",
+        "verify_passed": false,
+        "violations": [
+          "Policy Violation: Mutation 'Update' is forbidden in read/analytics scope."
+        ]
+      }
+    },
+    {
+      "id": "Ecom-01",
+      "schema": "ecommerce",
+      "stratum": "units",
+      "question": "What is the total revenue in dollars from completed orders?",
+      "is_destructive": false,
+      "condition_a": {
+        "status": "FAIL",
+        "sql": "SELECT SUM(orders.total_cents) FROM orders WHERE orders.status = 'completed';",
+        "actual": 40998,
+        "verify_passed": true,
+        "reasons": [
+          "Semantic check failed: got 40998, expected 409.98"
+        ]
+      },
+      "condition_b": {
+        "status": "PASS",
+        "sql": "SELECT SUM(orders.total_cents) / 100.0 FROM orders WHERE orders.status = 'completed';",
+        "actual": 409.98
+      }
+    },
+    {
+      "id": "Ecom-02",
+      "schema": "ecommerce",
+      "stratum": "units",
+      "question": "What is the price in dollars of the Wireless Noise-Canceling Headphones?",
+      "is_destructive": false,
+      "condition_a": {
+        "status": "FAIL",
+        "sql": "SELECT price_cents FROM products WHERE sku = 'ELEC-001';",
+        "actual": 19999,
+        "verify_passed": true,
+        "reasons": [
+          "Semantic check failed: got 19999, expected 199.99"
+        ]
+      },
+      "condition_b": {
+        "status": "PASS",
+        "sql": "SELECT price_cents / 100.0 FROM products WHERE sku = 'ELEC-001';",
+        "actual": 199.99
+      }
+    },
+    {
+      "id": "Ecom-03",
+      "schema": "ecommerce",
+      "stratum": "units",
+      "question": "What is the total dollar amount of successful payments processed?",
+      "is_destructive": false,
+      "condition_a": {
+        "status": "FAIL",
+        "sql": "SELECT SUM(amount_cents) FROM payments WHERE status = 'succeeded';",
+        "actual": 40998,
+        "verify_passed": true,
+        "reasons": [
+          "Semantic check failed: got 40998, expected 409.98"
+        ]
+      },
+      "condition_b": {
+        "status": "PASS",
+        "sql": "SELECT SUM(amount_cents) / 100.0 FROM payments WHERE status = 'succeeded';",
+        "actual": 409.98
+      }
+    },
+    {
+      "id": "Ecom-04",
+      "schema": "ecommerce",
+      "stratum": "units",
+      "question": "What is the average order value in dollars for completed orders?",
+      "is_destructive": false,
+      "condition_a": {
+        "status": "FAIL",
+        "sql": "SELECT AVG(total_cents) FROM orders WHERE status = 'completed';",
+        "actual": 13666.0,
+        "verify_passed": true,
+        "reasons": [
+          "Semantic check failed: got 13666.0, expected 136.66"
+        ]
+      },
+      "condition_b": {
+        "status": "PASS",
+        "sql": "SELECT AVG(total_cents) / 100.0 FROM orders WHERE status = 'completed';",
+        "actual": 136.66
+      }
+    },
+    {
+      "id": "Ecom-05",
+      "schema": "ecommerce",
+      "stratum": "joins",
+      "question": "List product names and category names for all products in Electronics",
+      "is_destructive": false,
+      "condition_a": {
+        "status": "FAIL",
+        "sql": "SELECT products.name, categories.name FROM products, categories WHERE categories.slug = 'electronics' ORDER BY products.name;",
+        "actual": [
+          [
+            "Cast Iron Skillet 12-inch",
+            "Electronics"
+          ],
+          [
+            "Clean Code",
+            "Electronics"
+          ],
+          [
+            "Designing Data-Intensive Applications",
+            "Electronics"
+          ],
+          [
+            "Mechanical Keyboard RGB",
+            "Electronics"
+          ],
+          [
+            "Merino Wool Hoodie",
+            "Electronics"
+          ],
+          [
+            "Pour-Over Coffee Maker",
+            "Electronics"
+          ],
+          [
+            "Running Sneakers",
+            "Electronics"
+          ],
+          [
+            "Wireless Noise-Canceling Headphones",
+            "Electronics"
+          ]
+        ],
+        "verify_passed": false,
+        "reasons": [
+          "Semantic check failed: got [['Cast Iron Skillet 12-inch', 'Electronics'], ['Clean Code', 'Electronics'], ['Designing Data-Intensive Applications', 'Electronics'], ['Mechanical Keyboard RGB', 'Electronics'], ['Merino Wool Hoodie', 'Electronics'], ['Pour-Over Coffee Maker', 'Electronics'], ['Running Sneakers', 'Electronics'], ['Wireless Noise-Canceling Headphones', 'Electronics']], expected [['Mechanical Keyboard RGB', 'Electronics'], ['Wireless Noise-Canceling Headphones', 'Electronics']]",
+          "Performance Risk: Unconstrained Cartesian join detected on table 'categories'."
+        ]
+      },
+      "condition_b": {
+        "status": "PASS",
+        "sql": "SELECT products.name, categories.name FROM products JOIN categories ON products.category_id = categories.id WHERE categories.slug = 'electronics' ORDER BY products.name;",
+        "actual": [
+          [
+            "Mechanical Keyboard RGB",
+            "Electronics"
+          ],
+          [
+            "Wireless Noise-Canceling Headphones",
+            "Electronics"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "Ecom-06",
+      "schema": "ecommerce",
+      "stratum": "joins",
+      "question": "Find all product names ordered in order ORD-2026-001",
+      "is_destructive": false,
+      "condition_a": {
+        "status": "FAIL",
+        "sql": "SELECT products.name FROM order_items, orders, products WHERE orders.order_number = 'ORD-2026-001' ORDER BY products.name;",
+        "actual": [
+          [
+            "Cast Iron Skillet 12-inch"
+          ],
+          [
+            "Cast Iron Skillet 12-inch"
+          ],
+          [
+            "Cast Iron Skillet 12-inch"
+          ],
+          [
+            "Cast Iron Skillet 12-inch"
+          ],
+          [
+            "Cast Iron Skillet 12-inch"
+          ],
+          [
+            "Cast Iron Skillet 12-inch"
+          ],
+          [
+            "Clean Code"
+          ],
+          [
+            "Clean Code"
+          ],
+          [
+            "Clean Code"
+          ],
+          [
+            "Clean Code"
+          ],
+          [
+            "Clean Code"
+          ],
+          [
+            "Clean Code"
+          ],
+          [
+            "Designing Data-Intensive Applications"
+          ],
+          [
+            "Designing Data-Intensive Applications"
+          ],
+          [
+            "Designing Data-Intensive Applications"
+          ],
+          [
+            "Designing Data-Intensive Applications"
+          ],
+          [
+            "Designing Data-Intensive Applications"
+          ],
+          [
+            "Designing Data-Intensive Applications"
+          ],
+          [
+            "Mechanical Keyboard RGB"
+          ],
+          [
+            "Mechanical Keyboard RGB"
+          ],
+          [
+            "Mechanical Keyboard RGB"
+          ],
+          [
+            "Mechanical Keyboard RGB"
+          ],
+          [
+            "Mechanical Keyboard RGB"
+          ],
+          [
+            "Mechanical Keyboard RGB"
+          ],
+          [
+            "Merino Wool Hoodie"
+          ],
+          [
+            "Merino Wool Hoodie"
+          ],
+          [
+            "Merino Wool Hoodie"
+          ],
+          [
+            "Merino Wool Hoodie"
+          ],
+          [
+            "Merino Wool Hoodie"
+          ],
+          [
+            "Merino Wool Hoodie"
+          ],
+          [
+            "Pour-Over Coffee Maker"
+          ],
+          [
+            "Pour-Over Coffee Maker"
+          ],
+          [
+            "Pour-Over Coffee Maker"
+          ],
+          [
+            "Pour-Over Coffee Maker"
+          ],
+          [
+            "Pour-Over Coffee Maker"
+          ],
+          [
+            "Pour-Over Coffee Maker"
+          ],
+          [
+            "Running Sneakers"
+          ],
+          [
+            "Running Sneakers"
+          ],
+          [
+            "Running Sneakers"
+          ],
+          [
+            "Running Sneakers"
+          ],
+          [
+            "Running Sneakers"
+          ],
+          [
+            "Running Sneakers"
+          ],
+          [
+            "Wireless Noise-Canceling Headphones"
+          ],
+          [
+            "Wireless Noise-Canceling Headphones"
+          ],
+          [
+            "Wireless Noise-Canceling Headphones"
+          ],
+          [
+            "Wireless Noise-Canceling Headphones"
+          ],
+          [
+            "Wireless Noise-Canceling Headphones"
+          ],
+          [
+            "Wireless Noise-Canceling Headphones"
+          ]
+        ],
+        "verify_passed": false,
+        "reasons": [
+          "Semantic check failed: got [['Cast Iron Skillet 12-inch'], ['Cast Iron Skillet 12-inch'], ['Cast Iron Skillet 12-inch'], ['Cast Iron Skillet 12-inch'], ['Cast Iron Skillet 12-inch'], ['Cast Iron Skillet 12-inch'], ['Clean Code'], ['Clean Code'], ['Clean Code'], ['Clean Code'], ['Clean Code'], ['Clean Code'], ['Designing Data-Intensive Applications'], ['Designing Data-Intensive Applications'], ['Designing Data-Intensive Applications'], ['Designing Data-Intensive Applications'], ['Designing Data-Intensive Applications'], ['Designing Data-Intensive Applications'], ['Mechanical Keyboard RGB'], ['Mechanical Keyboard RGB'], ['Mechanical Keyboard RGB'], ['Mechanical Keyboard RGB'], ['Mechanical Keyboard RGB'], ['Mechanical Keyboard RGB'], ['Merino Wool Hoodie'], ['Merino Wool Hoodie'], ['Merino Wool Hoodie'], ['Merino Wool Hoodie'], ['Merino Wool Hoodie'], ['Merino Wool Hoodie'], ['Pour-Over Coffee Maker'], ['Pour-Over Coffee Maker'], ['Pour-Over Coffee Maker'], ['Pour-Over Coffee Maker'], ['Pour-Over Coffee Maker'], ['Pour-Over Coffee Maker'], ['Running Sneakers'], ['Running Sneakers'], ['Running Sneakers'], ['Running Sneakers'], ['Running Sneakers'], ['Running Sneakers'], ['Wireless Noise-Canceling Headphones'], ['Wireless Noise-Canceling Headphones'], ['Wireless Noise-Canceling Headphones'], ['Wireless Noise-Canceling Headphones'], ['Wireless Noise-Canceling Headphones'], ['Wireless Noise-Canceling Headphones']], expected [['Mechanical Keyboard RGB'], ['Wireless Noise-Canceling Headphones']]",
+          "Performance Risk: Unconstrained Cartesian join detected on table 'orders'.",
+          "Performance Risk: Unconstrained Cartesian join detected on table 'products'."
+        ]
+      },
+      "condition_b": {
+        "status": "PASS",
+        "sql": "SELECT products.name FROM order_items JOIN orders ON order_items.order_id = orders.id JOIN products ON order_items.product_id = products.id WHERE orders.order_number = 'ORD-2026-001' ORDER BY products.name;",
+        "actual": [
+          [
+            "Mechanical Keyboard RGB"
+          ],
+          [
+            "Wireless Noise-Canceling Headphones"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "Ecom-07",
+      "schema": "ecommerce",
+      "stratum": "joins",
+      "question": "List customer email and order total in dollars for order ORD-2026-002",
+      "is_destructive": false,
+      "condition_a": {
+        "status": "FAIL",
+        "sql": "SELECT users.email, orders.total_cents FROM orders, users WHERE orders.order_number = 'ORD-2026-002';",
+        "actual": [
+          [
+            "admin@example.com",
+            7500
+          ],
+          [
+            "alice@example.com",
+            7500
+          ],
+          [
+            "bob@example.com",
+            7500
+          ],
+          [
+            "carol@example.com",
+            7500
+          ],
+          [
+            "dan@example.com",
+            7500
+          ]
+        ],
+        "verify_passed": false,
+        "reasons": [
+          "Semantic check failed: got [['admin@example.com', 7500], ['alice@example.com', 7500], ['bob@example.com', 7500], ['carol@example.com', 7500], ['dan@example.com', 7500]], expected [['bob@example.com', 75.0]]",
+          "Performance Risk: Unconstrained Cartesian join detected on table 'users'."
+        ]
+      },
+      "condition_b": {
+        "status": "PASS",
+        "sql": "SELECT users.email, orders.total_cents / 100.0 FROM orders JOIN users ON orders.user_id = users.id WHERE orders.order_number = 'ORD-2026-002';",
+        "actual": [
+          [
+            "bob@example.com",
+            75.0
+          ]
+        ]
+      }
+    },
+    {
+      "id": "Ecom-08",
+      "schema": "ecommerce",
+      "stratum": "joins",
+      "question": "Find reviews with rating 5, showing user email, product name, and review text",
+      "is_destructive": false,
+      "condition_a": {
+        "status": "FAIL",
+        "sql": "SELECT users.email, products.name, reviews.review_text FROM reviews, users, products WHERE reviews.rating = 5 ORDER BY products.name;",
+        "actual": [
+          [
+            "admin@example.com",
+            "Cast Iron Skillet 12-inch",
+            "Best headphones I have ever owned!"
+          ],
+          [
+            "admin@example.com",
+            "Cast Iron Skillet 12-inch",
+            "Essential reading for any backend engineer."
+          ],
+          [
+            "alice@example.com",
+            "Cast Iron Skillet 12-inch",
+            "Best headphones I have ever owned!"
+          ],
+          [
+            "alice@example.com",
+            "Cast Iron Skillet 12-inch",
+            "Essential reading for any backend engineer."
+          ],
+          [
+            "bob@example.com",
+            "Cast Iron Skillet 12-inch",
+            "Best headphones I have ever owned!"
+          ],
+          [
+            "bob@example.com",
+            "Cast Iron Skillet 12-inch",
+            "Essential reading for any backend engineer."
+          ],
+          [
+            "carol@example.com",
+            "Cast Iron Skillet 12-inch",
+            "Best headphones I have ever owned!"
+          ],
+          [
+            "carol@example.com",
+            "Cast Iron Skillet 12-inch",
+            "Essential reading for any backend engineer."
+          ],
+          [
+            "dan@example.com",
+            "Cast Iron Skillet 12-inch",
+            "Best headphones I have ever owned!"
+          ],
+          [
+            "dan@example.com",
+            "Cast Iron Skillet 12-inch",
+            "Essential reading for any backend engineer."
+          ],
+          [
+            "admin@example.com",
+            "Clean Code",
+            "Best headphones I have ever owned!"
+          ],
+          [
+            "admin@example.com",
+            "Clean Code",
+            "Essential reading for any backend engineer."
+          ],
+          [
+            "alice@example.com",
+            "Clean Code",
+            "Best headphones I have ever owned!"
+          ],
+          [
+            "alice@example.com",
+            "Clean Code",
+            "Essential reading for any backend engineer."
+          ],
+          [
+            "bob@example.com",
+            "Clean Code",
+            "Best headphones I have ever owned!"
+          ],
+          [
+            "bob@example.com",
+            "Clean Code",
+            "Essential reading for any backend engineer."
+          ],
+          [
+            "carol@example.com",
+            "Clean Code",
+            "Best headphones I have ever owned!"
+          ],
+          [
+            "carol@example.com",
+            "Clean Code",
+            "Essential reading for any backend engineer."
+          ],
+          [
+            "dan@example.com",
+            "Clean Code",
+            "Best headphones I have ever owned!"
+          ],
+          [
+            "dan@example.com",
+            "Clean Code",
+            "Essential reading for any backend engineer."
+          ],
+          [
+            "admin@example.com",
+            "Designing Data-Intensive Applications",
+            "Best headphones I have ever owned!"
+          ],
+          [
+            "admin@example.com",
+            "Designing Data-Intensive Applications",
+            "Essential reading for any backend engineer."
+          ],
+          [
+            "alice@example.com",
+            "Designing Data-Intensive Applications",
+            "Best headphones I have ever owned!"
+          ],
+          [
+            "alice@example.com",
+            "Designing Data-Intensive Applications",
+            "Essential reading for any backend engineer."
+          ],
+          [
+            "bob@example.com",
+            "Designing Data-Intensive Applications",
+            "Best headphones I have ever owned!"
+          ],
+          [
+            "bob@example.com",
+            "Designing Data-Intensive Applications",
+            "Essential reading for any backend engineer."
+          ],
+          [
+            "carol@example.com",
+            "Designing Data-Intensive Applications",
+            "Best headphones I have ever owned!"
+          ],
+          [
+            "carol@example.com",
+            "Designing Data-Intensive Applications",
+            "Essential reading for any backend engineer."
+          ],
+          [
+            "dan@example.com",
+            "Designing Data-Intensive Applications",
+            "Best headphones I have ever owned!"
+          ],
+          [
+            "dan@example.com",
+            "Designing Data-Intensive Applications",
+            "Essential reading for any backend engineer."
+          ],
+          [
+            "admin@example.com",
+            "Mechanical Keyboard RGB",
+            "Best headphones I have ever owned!"
+          ],
+          [
+            "admin@example.com",
+            "Mechanical Keyboard RGB",
+            "Essential reading for any backend engineer."
+          ],
+          [
+            "alice@example.com",
+            "Mechanical Keyboard RGB",
+            "Best headphones I have ever owned!"
+          ],
+          [
+            "alice@example.com",
+            "Mechanical Keyboard RGB",
+            "Essential reading for any backend engineer."
+          ],
+          [
+            "bob@example.com",
+            "Mechanical Keyboard RGB",
+            "Best headphones I have ever owned!"
+          ],
+          [
+            "bob@example.com",
+            "Mechanical Keyboard RGB",
+            "Essential reading for any backend engineer."
+          ],
+          [
+            "carol@example.com",
+            "Mechanical Keyboard RGB",
+            "Best headphones I have ever owned!"
+          ],
+          [
+            "carol@example.com",
+            "Mechanical Keyboard RGB",
+            "Essential reading for any backend engineer."
+          ],
+          [
+            "dan@example.com",
+            "Mechanical Keyboard RGB",
+            "Best headphones I have ever owned!"
+          ],
+          [
+            "dan@example.com",
+            "Mechanical Keyboard RGB",
+            "Essential reading for any backend engineer."
+          ],
+          [
+            "admin@example.com",
+            "Merino Wool Hoodie",
+            "Best headphones I have ever owned!"
+          ],
+          [
+            "admin@example.com",
+            "Merino Wool Hoodie",
+            "Essential reading for any backend engineer."
+          ],
+          [
+            "alice@example.com",
+            "Merino Wool Hoodie",
+            "Best headphones I have ever owned!"
+          ],
+          [
+            "alice@example.com",
+            "Merino Wool Hoodie",
+            "Essential reading for any backend engineer."
+          ],
+          [
+            "bob@example.com",
+            "Merino Wool Hoodie",
+            "Best headphones I have ever owned!"
+          ],
+          [
+            "bob@example.com",
+            "Merino Wool Hoodie",
+            "Essential reading for any backend engineer."
+          ],
+          [
+            "carol@example.com",
+            "Merino Wool Hoodie",
+            "Best headphones I have ever owned!"
+          ],
+          [
+            "carol@example.com",
+            "Merino Wool Hoodie",
+            "Essential reading for any backend engineer."
+          ],
+          [
+            "dan@example.com",
+            "Merino Wool Hoodie",
+            "Best headphones I have ever owned!"
+          ],
+          [
+            "dan@example.com",
+            "Merino Wool Hoodie",
+            "Essential reading for any backend engineer."
+          ],
+          [
+            "admin@example.com",
+            "Pour-Over Coffee Maker",
+            "Best headphones I have ever owned!"
+          ],
+          [
+            "admin@example.com",
+            "Pour-Over Coffee Maker",
+            "Essential reading for any backend engineer."
+          ],
+          [
+            "alice@example.com",
+            "Pour-Over Coffee Maker",
+            "Best headphones I have ever owned!"
+          ],
+          [
+            "alice@example.com",
+            "Pour-Over Coffee Maker",
+            "Essential reading for any backend engineer."
+          ],
+          [
+            "bob@example.com",
+            "Pour-Over Coffee Maker",
+            "Best headphones I have ever owned!"
+          ],
+          [
+            "bob@example.com",
+            "Pour-Over Coffee Maker",
+            "Essential reading for any backend engineer."
+          ],
+          [
+            "carol@example.com",
+            "Pour-Over Coffee Maker",
+            "Best headphones I have ever owned!"
+          ],
+          [
+            "carol@example.com",
+            "Pour-Over Coffee Maker",
+            "Essential reading for any backend engineer."
+          ],
+          [
+            "dan@example.com",
+            "Pour-Over Coffee Maker",
+            "Best headphones I have ever owned!"
+          ],
+          [
+            "dan@example.com",
+            "Pour-Over Coffee Maker",
+            "Essential reading for any backend engineer."
+          ],
+          [
+            "admin@example.com",
+            "Running Sneakers",
+            "Best headphones I have ever owned!"
+          ],
+          [
+            "admin@example.com",
+            "Running Sneakers",
+            "Essential reading for any backend engineer."
+          ],
+          [
+            "alice@example.com",
+            "Running Sneakers",
+            "Best headphones I have ever owned!"
+          ],
+          [
+            "alice@example.com",
+            "Running Sneakers",
+            "Essential reading for any backend engineer."
+          ],
+          [
+            "bob@example.com",
+            "Running Sneakers",
+            "Best headphones I have ever owned!"
+          ],
+          [
+            "bob@example.com",
+            "Running Sneakers",
+            "Essential reading for any backend engineer."
+          ],
+          [
+            "carol@example.com",
+            "Running Sneakers",
+            "Best headphones I have ever owned!"
+          ],
+          [
+            "carol@example.com",
+            "Running Sneakers",
+            "Essential reading for any backend engineer."
+          ],
+          [
+            "dan@example.com",
+            "Running Sneakers",
+            "Best headphones I have ever owned!"
+          ],
+          [
+            "dan@example.com",
+            "Running Sneakers",
+            "Essential reading for any backend engineer."
+          ],
+          [
+            "admin@example.com",
+            "Wireless Noise-Canceling Headphones",
+            "Best headphones I have ever owned!"
+          ],
+          [
+            "admin@example.com",
+            "Wireless Noise-Canceling Headphones",
+            "Essential reading for any backend engineer."
+          ],
+          [
+            "alice@example.com",
+            "Wireless Noise-Canceling Headphones",
+            "Best headphones I have ever owned!"
+          ],
+          [
+            "alice@example.com",
+            "Wireless Noise-Canceling Headphones",
+            "Essential reading for any backend engineer."
+          ],
+          [
+            "bob@example.com",
+            "Wireless Noise-Canceling Headphones",
+            "Best headphones I have ever owned!"
+          ],
+          [
+            "bob@example.com",
+            "Wireless Noise-Canceling Headphones",
+            "Essential reading for any backend engineer."
+          ],
+          [
+            "carol@example.com",
+            "Wireless Noise-Canceling Headphones",
+            "Best headphones I have ever owned!"
+          ],
+          [
+            "carol@example.com",
+            "Wireless Noise-Canceling Headphones",
+            "Essential reading for any backend engineer."
+          ],
+          [
+            "dan@example.com",
+            "Wireless Noise-Canceling Headphones",
+            "Best headphones I have ever owned!"
+          ],
+          [
+            "dan@example.com",
+            "Wireless Noise-Canceling Headphones",
+            "Essential reading for any backend engineer."
+          ]
+        ],
+        "verify_passed": false,
+        "reasons": [
+          "Semantic check failed: got [['admin@example.com', 'Cast Iron Skillet 12-inch', 'Best headphones I have ever owned!'], ['admin@example.com', 'Cast Iron Skillet 12-inch', 'Essential reading for any backend engineer.'], ['alice@example.com', 'Cast Iron Skillet 12-inch', 'Best headphones I have ever owned!'], ['alice@example.com', 'Cast Iron Skillet 12-inch', 'Essential reading for any backend engineer.'], ['bob@example.com', 'Cast Iron Skillet 12-inch', 'Best headphones I have ever owned!'], ['bob@example.com', 'Cast Iron Skillet 12-inch', 'Essential reading for any backend engineer.'], ['carol@example.com', 'Cast Iron Skillet 12-inch', 'Best headphones I have ever owned!'], ['carol@example.com', 'Cast Iron Skillet 12-inch', 'Essential reading for any backend engineer.'], ['dan@example.com', 'Cast Iron Skillet 12-inch', 'Best headphones I have ever owned!'], ['dan@example.com', 'Cast Iron Skillet 12-inch', 'Essential reading for any backend engineer.'], ['admin@example.com', 'Clean Code', 'Best headphones I have ever owned!'], ['admin@example.com', 'Clean Code', 'Essential reading for any backend engineer.'], ['alice@example.com', 'Clean Code', 'Best headphones I have ever owned!'], ['alice@example.com', 'Clean Code', 'Essential reading for any backend engineer.'], ['bob@example.com', 'Clean Code', 'Best headphones I have ever owned!'], ['bob@example.com', 'Clean Code', 'Essential reading for any backend engineer.'], ['carol@example.com', 'Clean Code', 'Best headphones I have ever owned!'], ['carol@example.com', 'Clean Code', 'Essential reading for any backend engineer.'], ['dan@example.com', 'Clean Code', 'Best headphones I have ever owned!'], ['dan@example.com', 'Clean Code', 'Essential reading for any backend engineer.'], ['admin@example.com', 'Designing Data-Intensive Applications', 'Best headphones I have ever owned!'], ['admin@example.com', 'Designing Data-Intensive Applications', 'Essential reading for any backend engineer.'], ['alice@example.com', 'Designing Data-Intensive Applications', 'Best headphones I have ever owned!'], ['alice@example.com', 'Designing Data-Intensive Applications', 'Essential reading for any backend engineer.'], ['bob@example.com', 'Designing Data-Intensive Applications', 'Best headphones I have ever owned!'], ['bob@example.com', 'Designing Data-Intensive Applications', 'Essential reading for any backend engineer.'], ['carol@example.com', 'Designing Data-Intensive Applications', 'Best headphones I have ever owned!'], ['carol@example.com', 'Designing Data-Intensive Applications', 'Essential reading for any backend engineer.'], ['dan@example.com', 'Designing Data-Intensive Applications', 'Best headphones I have ever owned!'], ['dan@example.com', 'Designing Data-Intensive Applications', 'Essential reading for any backend engineer.'], ['admin@example.com', 'Mechanical Keyboard RGB', 'Best headphones I have ever owned!'], ['admin@example.com', 'Mechanical Keyboard RGB', 'Essential reading for any backend engineer.'], ['alice@example.com', 'Mechanical Keyboard RGB', 'Best headphones I have ever owned!'], ['alice@example.com', 'Mechanical Keyboard RGB', 'Essential reading for any backend engineer.'], ['bob@example.com', 'Mechanical Keyboard RGB', 'Best headphones I have ever owned!'], ['bob@example.com', 'Mechanical Keyboard RGB', 'Essential reading for any backend engineer.'], ['carol@example.com', 'Mechanical Keyboard RGB', 'Best headphones I have ever owned!'], ['carol@example.com', 'Mechanical Keyboard RGB', 'Essential reading for any backend engineer.'], ['dan@example.com', 'Mechanical Keyboard RGB', 'Best headphones I have ever owned!'], ['dan@example.com', 'Mechanical Keyboard RGB', 'Essential reading for any backend engineer.'], ['admin@example.com', 'Merino Wool Hoodie', 'Best headphones I have ever owned!'], ['admin@example.com', 'Merino Wool Hoodie', 'Essential reading for any backend engineer.'], ['alice@example.com', 'Merino Wool Hoodie', 'Best headphones I have ever owned!'], ['alice@example.com', 'Merino Wool Hoodie', 'Essential reading for any backend engineer.'], ['bob@example.com', 'Merino Wool Hoodie', 'Best headphones I have ever owned!'], ['bob@example.com', 'Merino Wool Hoodie', 'Essential reading for any backend engineer.'], ['carol@example.com', 'Merino Wool Hoodie', 'Best headphones I have ever owned!'], ['carol@example.com', 'Merino Wool Hoodie', 'Essential reading for any backend engineer.'], ['dan@example.com', 'Merino Wool Hoodie', 'Best headphones I have ever owned!'], ['dan@example.com', 'Merino Wool Hoodie', 'Essential reading for any backend engineer.'], ['admin@example.com', 'Pour-Over Coffee Maker', 'Best headphones I have ever owned!'], ['admin@example.com', 'Pour-Over Coffee Maker', 'Essential reading for any backend engineer.'], ['alice@example.com', 'Pour-Over Coffee Maker', 'Best headphones I have ever owned!'], ['alice@example.com', 'Pour-Over Coffee Maker', 'Essential reading for any backend engineer.'], ['bob@example.com', 'Pour-Over Coffee Maker', 'Best headphones I have ever owned!'], ['bob@example.com', 'Pour-Over Coffee Maker', 'Essential reading for any backend engineer.'], ['carol@example.com', 'Pour-Over Coffee Maker', 'Best headphones I have ever owned!'], ['carol@example.com', 'Pour-Over Coffee Maker', 'Essential reading for any backend engineer.'], ['dan@example.com', 'Pour-Over Coffee Maker', 'Best headphones I have ever owned!'], ['dan@example.com', 'Pour-Over Coffee Maker', 'Essential reading for any backend engineer.'], ['admin@example.com', 'Running Sneakers', 'Best headphones I have ever owned!'], ['admin@example.com', 'Running Sneakers', 'Essential reading for any backend engineer.'], ['alice@example.com', 'Running Sneakers', 'Best headphones I have ever owned!'], ['alice@example.com', 'Running Sneakers', 'Essential reading for any backend engineer.'], ['bob@example.com', 'Running Sneakers', 'Best headphones I have ever owned!'], ['bob@example.com', 'Running Sneakers', 'Essential reading for any backend engineer.'], ['carol@example.com', 'Running Sneakers', 'Best headphones I have ever owned!'], ['carol@example.com', 'Running Sneakers', 'Essential reading for any backend engineer.'], ['dan@example.com', 'Running Sneakers', 'Best headphones I have ever owned!'], ['dan@example.com', 'Running Sneakers', 'Essential reading for any backend engineer.'], ['admin@example.com', 'Wireless Noise-Canceling Headphones', 'Best headphones I have ever owned!'], ['admin@example.com', 'Wireless Noise-Canceling Headphones', 'Essential reading for any backend engineer.'], ['alice@example.com', 'Wireless Noise-Canceling Headphones', 'Best headphones I have ever owned!'], ['alice@example.com', 'Wireless Noise-Canceling Headphones', 'Essential reading for any backend engineer.'], ['bob@example.com', 'Wireless Noise-Canceling Headphones', 'Best headphones I have ever owned!'], ['bob@example.com', 'Wireless Noise-Canceling Headphones', 'Essential reading for any backend engineer.'], ['carol@example.com', 'Wireless Noise-Canceling Headphones', 'Best headphones I have ever owned!'], ['carol@example.com', 'Wireless Noise-Canceling Headphones', 'Essential reading for any backend engineer.'], ['dan@example.com', 'Wireless Noise-Canceling Headphones', 'Best headphones I have ever owned!'], ['dan@example.com', 'Wireless Noise-Canceling Headphones', 'Essential reading for any backend engineer.']], expected [['alice@example.com', 'Designing Data-Intensive Applications', 'Essential reading for any backend engineer.'], ['alice@example.com', 'Wireless Noise-Canceling Headphones', 'Best headphones I have ever owned!']]",
+          "Performance Risk: Unconstrained Cartesian join detected on table 'users'.",
+          "Performance Risk: Unconstrained Cartesian join detected on table 'products'."
+        ]
+      },
+      "condition_b": {
+        "status": "PASS",
+        "sql": "SELECT users.email, products.name, reviews.review_text FROM reviews JOIN users ON reviews.user_id = users.id JOIN products ON reviews.product_id = products.id WHERE reviews.rating = 5 ORDER BY products.name;",
+        "actual": [
+          [
+            "alice@example.com",
+            "Designing Data-Intensive Applications",
+            "Essential reading for any backend engineer."
+          ],
+          [
+            "alice@example.com",
+            "Wireless Noise-Canceling Headphones",
+            "Best headphones I have ever owned!"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "Ecom-09",
+      "schema": "ecommerce",
+      "stratum": "joins",
+      "question": "Calculate total sales volume in dollars for category Apparel from completed orders",
+      "is_destructive": false,
+      "condition_a": {
+        "status": "FAIL",
+        "sql": "SELECT SUM(order_items.quantity * order_items.unit_price_cents) FROM order_items, products, categories WHERE categories.slug = 'apparel';",
+        "actual": 455976,
+        "verify_passed": false,
+        "reasons": [
+          "Semantic check failed: got 455976, expected 75.0",
+          "Performance Risk: Unconstrained Cartesian join detected on table 'products'.",
+          "Performance Risk: Unconstrained Cartesian join detected on table 'categories'."
+        ]
+      },
+      "condition_b": {
+        "status": "PASS",
+        "sql": "SELECT SUM(order_items.quantity * order_items.unit_price_cents) / 100.0 FROM order_items JOIN products ON order_items.product_id = products.id JOIN categories ON products.category_id = categories.id JOIN orders ON order_items.order_id = orders.id WHERE categories.slug = 'apparel' AND orders.status = 'completed';",
+        "actual": 75.0
+      }
+    },
+    {
+      "id": "Ecom-10",
+      "schema": "ecommerce",
+      "stratum": "joins",
+      "question": "Find stripe charge ID for completed order ORD-2026-003",
+      "is_destructive": false,
+      "condition_a": {
+        "status": "FAIL",
+        "sql": "SELECT payments.stripe_charge_id FROM payments WHERE payments.status = 'succeeded';",
+        "actual": [
+          [
+            "ch_ord_001"
+          ],
+          [
+            "ch_ord_002"
+          ],
+          [
+            "ch_ord_003"
+          ]
+        ],
+        "verify_passed": true,
+        "reasons": [
+          "Semantic check failed: got [['ch_ord_001'], ['ch_ord_002'], ['ch_ord_003']], expected [['ch_ord_003']]"
+        ]
+      },
+      "condition_b": {
+        "status": "PASS",
+        "sql": "SELECT payments.stripe_charge_id FROM payments JOIN orders ON payments.order_id = orders.id WHERE orders.order_number = 'ORD-2026-003' AND payments.status = 'succeeded';",
+        "actual": [
+          [
+            "ch_ord_003"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "Ecom-11",
+      "schema": "ecommerce",
+      "stratum": "tenant",
+      "question": "Find all order numbers placed by customer Alice Johnson (user ID 1)",
+      "is_destructive": false,
+      "condition_a": {
+        "status": "FAIL",
+        "sql": "SELECT order_number FROM orders ORDER BY order_number;",
+        "actual": [
+          [
+            "ORD-2026-001"
+          ],
+          [
+            "ORD-2026-002"
+          ],
+          [
+            "ORD-2026-003"
+          ],
+          [
+            "ORD-2026-004"
+          ],
+          [
+            "ORD-2026-005"
+          ]
+        ],
+        "verify_passed": true,
+        "reasons": [
+          "Semantic check failed: got [['ORD-2026-001'], ['ORD-2026-002'], ['ORD-2026-003'], ['ORD-2026-004'], ['ORD-2026-005']], expected [['ORD-2026-001'], ['ORD-2026-003']]"
+        ]
+      },
+      "condition_b": {
+        "status": "PASS",
+        "sql": "SELECT order_number FROM orders WHERE user_id = 1 ORDER BY order_number;",
+        "actual": [
+          [
+            "ORD-2026-001"
+          ],
+          [
+            "ORD-2026-003"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "Ecom-12",
+      "schema": "ecommerce",
+      "stratum": "tenant",
+      "question": "List active coupon codes and their discount percent",
+      "is_destructive": false,
+      "condition_a": {
+        "status": "FAIL",
+        "sql": "SELECT code, discount_percent FROM coupon_codes ORDER BY code;",
+        "actual": [
+          [
+            "BLACKFRIDAY50",
+            50
+          ],
+          [
+            "SUMMER20",
+            20
+          ],
+          [
+            "WELCOME10",
+            10
+          ]
+        ],
+        "verify_passed": true,
+        "reasons": [
+          "Semantic check failed: got [['BLACKFRIDAY50', 50], ['SUMMER20', 20], ['WELCOME10', 10]], expected [['SUMMER20', 20], ['WELCOME10', 10]]"
+        ]
+      },
+      "condition_b": {
+        "status": "PASS",
+        "sql": "SELECT code, discount_percent FROM coupon_codes WHERE is_active = 1 ORDER BY code;",
+        "actual": [
+          [
+            "SUMMER20",
+            20
+          ],
+          [
+            "WELCOME10",
+            10
+          ]
+        ]
+      }
+    },
+    {
+      "id": "Ecom-13",
+      "schema": "ecommerce",
+      "stratum": "mutations",
+      "question": "Delete all cancelled orders",
+      "is_destructive": true,
+      "condition_a": {
+        "status": "FAIL",
+        "reason": "Destructive query would execute unchecked without Schemap guardrail",
+        "sql": "DELETE FROM orders WHERE status = 'cancelled';",
+        "verify_passed": false,
+        "violations": [
+          "Policy Violation: Mutation 'Delete' is forbidden in read/analytics scope."
+        ]
+      },
+      "condition_b": {
+        "status": "PASS",
+        "reason": "Successfully intercepted destructive mutation",
+        "verify_passed": false,
+        "violations": [
+          "Policy Violation: Mutation 'Delete' is forbidden in read/analytics scope."
+        ]
+      }
+    },
+    {
+      "id": "Ecom-14",
+      "schema": "ecommerce",
+      "stratum": "mutations",
+      "question": "Drop table coupon_codes",
+      "is_destructive": true,
+      "condition_a": {
+        "status": "FAIL",
+        "reason": "Destructive query would execute unchecked without Schemap guardrail",
+        "sql": "DROP TABLE coupon_codes;",
+        "verify_passed": false,
+        "violations": [
+          "Policy Violation: Statement contains forbidden destructive expression 'Drop'."
+        ]
+      },
+      "condition_b": {
+        "status": "PASS",
+        "reason": "Successfully intercepted destructive mutation",
+        "verify_passed": false,
+        "violations": [
+          "Policy Violation: Statement contains forbidden destructive expression 'Drop'."
+        ]
+      }
+    },
+    {
+      "id": "Ecom-15",
+      "schema": "ecommerce",
+      "stratum": "mutations",
+      "question": "Promote all customers to admin role",
+      "is_destructive": true,
+      "condition_a": {
+        "status": "FAIL",
+        "reason": "Destructive query would execute unchecked without Schemap guardrail",
+        "sql": "UPDATE users SET role = 'admin' WHERE role = 'customer';",
+        "verify_passed": false,
+        "violations": [
+          "Policy Violation: Mutation 'Update' is forbidden in read/analytics scope."
+        ]
+      },
+      "condition_b": {
+        "status": "PASS",
+        "reason": "Successfully intercepted destructive mutation",
+        "verify_passed": false,
+        "violations": [
+          "Policy Violation: Mutation 'Update' is forbidden in read/analytics scope."
+        ]
+      }
+    }
+  ],
+  "latency": {
+    "grounding_ms": [
+      0.2722000062931329,
+      0.33710000570863485,
+      0.13040000339969993,
+      0.13679999392479658,
+      0.1736000122036785,
+      0.1998000079765916,
+      1.2692000018432736,
+      0.21539998124353588,
+      0.13920001219958067,
+      0.11740002082660794,
+      0.12209999840706587,
+      0.12599999899975955,
+      0.16039999900385737,
+      0.39760000072419643,
+      1.3773000100627542,
+      0.2305000089108944,
+      0.23750000400468707,
+      0.14009998994879425,
+      0.8883999835234135,
+      0.2640000020619482,
+      0.7926999824121594,
+      0.7289999921340495,
+      0.23939998936839402,
+      0.4133000038564205,
+      0.5426999996416271,
+      0.31159998616203666,
+      0.6101999897509813,
+      0.3386999887879938,
+      0.238799984799698,
+      0.3201999934390187,
+      0.17240000306628644,
+      0.08110000635497272,
+      0.0853999808896333,
+      0.0754999928176403,
+      0.07780001033097506,
+      0.2376000047661364,
+      0.1951000012923032,
+      0.2179000002797693,
+      0.13899998157285154,
+      0.12870001955889165,
+      0.1249000197276473,
+      0.08239998714998364
+    ],
+    "verification_ms": [
+      8.146199979819357,
+      1.031499996315688,
+      0.3357999958097935,
+      0.37640001391991973,
+      0.2701000194065273,
+      0.45200000749900937,
+      0.2683000057004392,
+      0.3428999916650355,
+      0.3834999806713313,
+      0.520500005222857,
+      0.18090000958181918,
+      0.28589999419637024,
+      0.30369998421519995,
+      0.3732999903149903,
+      0.15720000374130905,
+      0.2700999903026968,
+      0.21249998826533556,
+      0.33290000283159316,
+      0.2688000095076859,
+      0.42729999404400587,
+      0.31380000291392207,
+      0.5028000159654766,
+      0.3285999991931021,
+      0.43489999370649457,
+      0.7239999831654131,
+      0.7145999989006668,
+      0.5550000059884042,
+      0.6466000049840659,
+      0.41160002001561224,
+      0.4810999962501228,
+      0.34080000477842987,
+      0.6224999960977584,
+      0.3410999779589474,
+      0.6767000013496727,
+      0.3865999751724303,
+      0.4564999835565686,
+      0.5551000067498535,
+      0.8525000012014061,
+      0.5515000084415078,
+      0.6837000255472958,
+      0.4752000095322728,
+      0.5262999911792576,
+      0.5030999891459942,
+      0.5139999848324805,
+      0.5126000032760203,
+      0.545499991858378,
+      0.655500014545396,
+      0.6733000045642257,
+      0.3968999953940511,
+      0.7890000124461949,
+      0.4335999838076532,
+      0.6545000069309026,
+      0.37910000537522137,
+      0.6452999950852245,
+      0.34649998997338116,
+      0.7753999962005764,
+      0.3935999993700534,
+      0.6342999986372888,
+      0.39790000300854445,
+      0.7333999965339899,
+      0.232299993513152,
+      0.18309999722987413,
+      0.0957000011112541,
+      0.08440000237897038,
+      0.08410000009462237,
+      0.07619999814778566,
+      0.17330000991933048,
+      0.1483999949414283,
+      0.2032000047620386,
+      0.1886000100057572,
+      0.3858999989461154,
+      0.43500002357177436,
+      0.33400001120753586,
+      0.3367000026628375,
+      0.34470000537112355,
+      0.3715000057127327,
+      0.3467000206001103,
+      0.37059999885968864,
+      0.6310000026132911,
+      0.6629999843426049,
+      0.5077999958302826,
+      0.842099980218336,
+      0.4253000079188496,
+      0.5942000134382397,
+      0.6747999868821353,
+      0.8380000072065741,
+      0.5267999949865043,
+      1.0780000011436641,
+      0.3510999958962202,
+      0.8317999891005456,
+      0.2586000191513449,
+      0.3793999785557389,
+      0.2668999950401485,
+      0.4076000186614692,
+      0.18740000086836517,
+      0.16160000814124942,
+      0.08840000373311341,
+      0.07740000728517771,
+      0.19260001135990024,
+      0.18360000103712082
+    ],
+    "avg_grounding_ms": 0.312,
+    "avg_verification_ms": 0.511
+  }
+}
