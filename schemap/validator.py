@@ -29,9 +29,22 @@ def verify_sql(
     violations: List[str] = []
     patched_sql: str | None = None
 
-    # 1. Parse SQL
+    # 1. Parse SQL (Detect multi-statement payloads)
     try:
-        parsed = sqlglot.parse_one(sql, read="postgres")
+        statements = [s for s in sqlglot.parse(sql, read="postgres") if s is not None]
+        if not statements:
+            return ValidationResult(
+                passed=False,
+                violations=["SQL Parse Failure: Empty SQL string."],
+                tables_analyzed=[],
+            )
+        if len(statements) > 1:
+            return ValidationResult(
+                passed=False,
+                violations=[f"Security Policy Violation: Multi-statement execution ({len(statements)} statements) is forbidden."],
+                tables_analyzed=[],
+            )
+        parsed = statements[0]
     except Exception as e:
         return ValidationResult(
             passed=False,
@@ -39,29 +52,32 @@ def verify_sql(
             tables_analyzed=[],
         )
 
-    # 2. Check for destructive expressions
+    # 2. Check for destructive expressions (including nested in CTEs or subqueries)
     if not allow_mutations:
-        if isinstance(parsed, DESTRUCTIVE_EXPRESSIONS):
+        destructive_node = parsed if isinstance(parsed, DESTRUCTIVE_EXPRESSIONS) else parsed.find(DESTRUCTIVE_EXPRESSIONS)
+        if destructive_node:
             return ValidationResult(
                 passed=False,
-                violations=[f"Policy Violation: Statement of type '{type(parsed).__name__}' is strictly forbidden."],
+                violations=[f"Policy Violation: Statement contains forbidden destructive expression '{type(destructive_node).__name__}'."],
                 tables_analyzed=[],
             )
 
-        if isinstance(parsed, (exp.Delete, exp.Update)):
+        mutation_node = parsed if isinstance(parsed, (exp.Delete, exp.Update)) else parsed.find((exp.Delete, exp.Update))
+        if mutation_node:
             return ValidationResult(
                 passed=False,
-                violations=[f"Policy Violation: Mutation '{type(parsed).__name__}' is forbidden in read/analytics scope."],
+                violations=[f"Policy Violation: Mutation '{type(mutation_node).__name__}' is forbidden in read/analytics scope."],
                 tables_analyzed=[],
             )
     else:
         # If mutations are allowed, verify that DELETE/UPDATE has a WHERE clause
-        if isinstance(parsed, (exp.Delete, exp.Update)):
-            where_clause = parsed.find(exp.Where)
+        mutation_node = parsed if isinstance(parsed, (exp.Delete, exp.Update)) else parsed.find((exp.Delete, exp.Update))
+        if mutation_node:
+            where_clause = mutation_node.find(exp.Where)
             if not where_clause:
                 return ValidationResult(
                     passed=False,
-                    violations=[f"Critical Safety Violation: '{type(parsed).__name__}' statement without WHERE clause is prohibited."],
+                    violations=[f"Critical Safety Violation: '{type(mutation_node).__name__}' statement without WHERE clause is prohibited."],
                     tables_analyzed=[],
                 )
 
