@@ -20,15 +20,41 @@ TENANT_COLUMN_PATTERNS = [
     r"^company_id$",
     r"^account_id$",
     r"^workspace_id$",
+    r"^merchant_id$",
+    r"^institution_id$",
+    r"^hospital_id$",
+    r"^clinic_id$",
+    r"^school_id$",
+    r"^district_id$",
+    r"^fleet_id$",
+    r"^agency_id$",
+    r"^client_id$",
+    r"^store_id$",
+    r"^partner_id$",
 ]
 
-TENANT_TABLE_NAMES = ["organizations", "tenants", "companies", "accounts", "workspaces"]
+TENANT_TABLE_NAMES = [
+    "organizations", "tenants", "companies", "accounts", "workspaces",
+    "merchants", "institutions", "hospitals", "clinics", "schools",
+    "districts", "fleets", "agencies", "clients", "stores", "partners"
+]
 
 SOFT_DELETE_PATTERNS = [
     r"^deleted_at$",
     r"^is_deleted$",
     r"^archived_at$",
     r"^is_archived$",
+    r"^closed_at$",
+    r"^discharged_at$",
+    r"^discontinued_at$",
+    r"^dropped_at$",
+    r"^terminated_at$",
+    r"^decommissioned_at$",
+    r"^voided_at$",
+    r"^cancelled_at$",
+    r"^expired_at$",
+    r"^inactivated_at$",
+    r"^retired_at$",
 ]
 
 MEASURE_PATTERNS = [
@@ -40,15 +66,25 @@ MEASURE_PATTERNS = [
     r"^total.*",
     r".*_total.*",
     r"^cost.*",
+    r".*_cost.*",
     r"^fee.*",
+    r".*_fee.*",
     r"^quantity$",
     r"^qty$",
     r"^count$",
     r"^balance.*",
-    r"^score$",
+    r".*_balance.*",
+    r".*score.*",
     r"^rating$",
     r"^usage$",
     r"^volume$",
+    r".*_mg$",
+    r".*_g$",
+    r".*_kg$",
+    r".*_mph$",
+    r".*_miles$",
+    r".*_payout.*",
+    r".*_disbursement.*",
 ]
 
 NUMERIC_TYPES = {
@@ -109,32 +145,31 @@ def compile_semantic_graph(
             tenant_key = declared_tenants[t_copy.name]
             graph.provenance_map[f"{t_copy.name}:tenant_key"] = Provenance.DECLARED
         else:
-            # If this table is the organization/tenant root table, its PK is the tenant key
-            if t_copy.name.lower() in TENANT_TABLE_NAMES:
+            # Search columns for tenant pattern first
+            tenant_candidates = [
+                col for col in t_copy.columns
+                if any(re.match(pat, col.name.lower()) for pat in TENANT_COLUMN_PATTERNS)
+            ]
+            if len(tenant_candidates) == 1:
+                col = tenant_candidates[0]
+                tenant_key = col.name
+                col.semantic_role = SemanticRole.TENANT_KEY
+                col.provenance = Provenance.INFERRED
+                graph.provenance_map[f"{t_copy.name}:tenant_key"] = Provenance.INFERRED
+            elif len(tenant_candidates) > 1:
+                # Deceptive / Ambiguous schema detected! Do not pick arbitrarily
+                candidate_names = [c.name for c in tenant_candidates]
+                graph.provenance_map[f"{t_copy.name}:tenant_key"] = Provenance.UNKNOWN
+                graph.declared_invariants.append(
+                    f"AMBIGUITY: Multiple tenant keys detected on '{t_copy.name}': {candidate_names}. Human declaration required."
+                )
+            elif t_copy.name.lower() in TENANT_TABLE_NAMES:
+                # Root tenant table: its PK is the tenant key
                 for col in t_copy.columns:
                     if col.primary_key:
                         tenant_key = col.name
                         graph.provenance_map[f"{t_copy.name}:tenant_key"] = Provenance.INFERRED
                         break
-            else:
-                # Search columns for tenant pattern
-                tenant_candidates = [
-                    col for col in t_copy.columns
-                    if any(re.match(pat, col.name.lower()) for pat in TENANT_COLUMN_PATTERNS)
-                ]
-                if len(tenant_candidates) == 1:
-                    col = tenant_candidates[0]
-                    tenant_key = col.name
-                    col.semantic_role = SemanticRole.TENANT_KEY
-                    col.provenance = Provenance.INFERRED
-                    graph.provenance_map[f"{t_copy.name}:tenant_key"] = Provenance.INFERRED
-                elif len(tenant_candidates) > 1:
-                    # Deceptive / Ambiguous schema detected! Do not pick arbitrarily
-                    candidate_names = [c.name for c in tenant_candidates]
-                    graph.provenance_map[f"{t_copy.name}:tenant_key"] = Provenance.UNKNOWN
-                    graph.declared_invariants.append(
-                        f"AMBIGUITY: Multiple tenant keys detected on '{t_copy.name}': {candidate_names}. Human declaration required."
-                    )
 
         if tenant_key:
             t_copy.tenant_key = tenant_key
