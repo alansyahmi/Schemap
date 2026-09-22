@@ -62,5 +62,9 @@ Thumbs.db
 *.swo
 
 # Video Assets
-video_assets/
+video_assets/*
+!video_assets/schemap_demo_cinema.html
+!video_assets/capture_demo.py
+!video_assets/rendered_demo/
+!video_assets/rendered_demo/*
 

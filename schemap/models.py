@@ -13,6 +13,7 @@ class SemanticRole(str, Enum):
     TIME_GRAIN = "TIME_GRAIN"
     TENANT_KEY = "TENANT_KEY"
     SOFT_DELETE = "SOFT_DELETE"
+    LIFECYCLE_STATE = "LIFECYCLE_STATE"
     PRIMARY_KEY = "PRIMARY_KEY"
     FOREIGN_KEY = "FOREIGN_KEY"
 
@@ -81,6 +82,7 @@ class SemanticPolicyGraph(BaseModel):
     tables: dict[str, TableModel] = Field(default_factory=dict)
     tenant_keys: dict[str, str] = Field(default_factory=dict)
     soft_deletes: dict[str, str] = Field(default_factory=dict)
+    lifecycle_columns: dict[str, str] = Field(default_factory=dict)
     measures: list[SemanticEntity] = Field(default_factory=list)
     dimensions: list[SemanticEntity] = Field(default_factory=list)
     provenance_map: dict[str, Provenance] = Field(default_factory=dict)

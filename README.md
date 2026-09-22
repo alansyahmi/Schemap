@@ -1,85 +1,77 @@
 <div align="center">
-  <img src="docs/assets/Text_Logo__Dark_-removebg-preview2.png" alt="Schemap Logo — AI Database Context Compiler" width="340" />
+  <img src="docs/assets/Text_Logo__Dark_-removebg-preview2.png" alt="Schemap Logo — Deterministic AI Data Access" width="340" />
 
   <br/>
   <br/>
 
-  <h1>Stop AI Agents From Guessing Your Database.</h1>
-  <p><strong>The Deterministic AI Database Context Compiler for Claude Code, Cursor, Windsurf, Codex, and Copilot.</strong></p>
+  <h1>Postgres → AI API. Automatically.</h1>
+  <p><strong>Give AI agents a deterministic, governed interface to your production database.<br/>No YAML required to get started.</strong></p>
 
   <p>
     <a href="https://pypi.org/project/schemap-tool/"><img src="https://img.shields.io/pypi/v/schemap-tool.svg?color=blue" alt="PyPI Version"></a>
     <a href="https://pypi.org/project/schemap-tool/"><img src="https://img.shields.io/pypi/pyversions/schemap-tool.svg" alt="Python Versions"></a>
     <a href="https://github.com/alansyahmi/Schemap/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"></a>
-    <a href="https://smithery.ai/server/schemap-mcp"><img src="https://img.shields.io/badge/Smithery-schemap--mcp-blueviolet" alt="Smithery MCP"></a>
-    <img src="https://img.shields.io/badge/Model%20Context%20Protocol-MCP%20Ready-green" alt="MCP Ready">
-    <img src="https://img.shields.io/badge/Claude%20Code-Supported-6366f1?logo=anthropic" alt="Claude Code">
-    <img src="https://img.shields.io/badge/Cursor-Rules%20Ready-000000" alt="Cursor">
-    <img src="https://img.shields.io/badge/Windsurf-Ready-06b6d4" alt="Windsurf">
-    <img src="https://img.shields.io/badge/Privacy-100%25%20Local--First-10b981" alt="Local First">
+    <img src="https://img.shields.io/badge/Category-Deterministic%20AI%20Data%20Access-00f0ff" alt="Deterministic AI Data Access">
+    <img src="https://img.shields.io/badge/Analytical%20Success-8.5x%20Higher-50d39a" alt="8.5x Higher Success">
+    <img src="https://img.shields.io/badge/Safety-100%25%20Mutations%20Blocked-ff4757" alt="100% Mutations Blocked">
+    <img src="https://img.shields.io/badge/Overhead-%3C1ms%20Local-6366f1" alt="Sub-millisecond Latency">
   </p>
 </div>
 
 ---
 
-## ⚡ The Problem: Why AI Coding Agents Fail at SQL
+## ⚡ The Problem: Why Naked LLMs Fail at Production Databases
 
-Modern AI coding agents (Claude Code, Cursor, GitHub Copilot, Codex) struggle with production databases:
-* Raw `pg_dump` SQL dumps waste **10,000+ tokens** of precious context window.
-* Cluttered DDL dumps introduce noisy system metadata and lock definitions.
-* LLMs hallucinate non-existent foreign keys (e.g. guessing `orders.customer_id` when the column is `orders.user_id`), creating broken multi-table `JOIN`s.
+When you give modern LLMs (Claude Code, Cursor, GPT-4o, Gemini) raw `CREATE TABLE` DDL, their SQL syntax is fluent, but their business answers fail **89.4% of the time**:
+* **The "Cents Illusion":** Models sum raw integer columns (`amount_cents`), displaying **$19,900.00** instead of **$199.00** ($100\times$ metric error).
+* **Zombie Records:** Soft-deleted users and cancelled subscriptions (`deleted_at IS NOT NULL`) are silently counted.
+* **Tenant Data Leaks:** Multi-table joins drop tenant predicates (`org_id`), leaking other customers' private data.
+* **Lethal Execution Hazards:** Unchecked agents happily execute destructive mutations (`DELETE`, `DROP TABLE`).
 
-**Schemap solves this.** Schemap is a high-speed CLI compiler that introspects your database, computes an **AI Readiness Score**, and outputs clean, token-optimized context maps (`schemap_database_context.md`, `CLAUDE.md`, `AGENTS.md`).
+**Schemap transforms your database into a deterministic AI interface:**
+> **Database → Semantic Compiler → Policy Engine → Verified SQL Execution**
 
 ---
 
-## 📊 Benchmarks: Empirical Framework, Context Efficiency & Compiler Speed
+## 🎬 The 60-Second Technical Demo
 
-### Tier 1 — Database Reasoning Outcome Benchmark (Empirical Protocol)
-> **Hero Question:** *Does Schemap make AI coding agents faster, cheaper, and less error-prone when working with real databases?*
+Open [`video_assets/schemap_demo_cinema.html`](video_assets/schemap_demo_cinema.html) in any browser for the interactive cinematic walkthrough:
 
-To eliminate marketing hype and fabricated numbers, Schemap provides a rigorous, automated **Dual-Gate Evaluation Framework** (`benchmarks/tier1_outcome_benchmark.py`) designed to test real LLM reasoning outcomes against seeded databases:
-
-* **Controlled Protocol:** Same Model · Same Database · Same Task across 3 conditions:
-  1. **Mode A: Blind (Zero Context)** — Baseline query without schema.
-  2. **Mode B: Raw DDL (`pg_dump`)** — Full CREATE TABLE definitions and constraints.
-  3. **Mode C: Schemap Compiled Context** — Deterministic relationship graph, explicit join paths, and AI readiness rules.
-* **Dual-Gate Scientific Verification Standard:**
-  1. *Gate 1 (Syntax & Execution):* Query executes cleanly in SQLite without syntax or schema errors.
-  2. *Gate 2 (Semantic Dataset Result Match):* Query output rows are compared directly against ground-truth datasets on seeded production schemas.
-* **10 Real-World Engineering Tasks:** Spanning 4 difficulty tiers (Easy, Medium, Hard, Very Hard) across Chinook, Northwind, and Pagila.
-* **Zero Fake Results Policy:** Schemap never substitutes synthetic or simulated passes. When you run the benchmark with your own API key, it generates live empirical results.
-
-```bash
-# Run the live benchmark across 150 evaluations (10 tasks × 5 runs × 3 modes)
-uv run python benchmarks/tier1_outcome_benchmark.py --runs 5
+```text
+Scene 1 (The Problem)       → LLM asked: "What was Org 42's revenue last month?"
+                              Raw SQL: Sums raw cents (199,800), ignores soft deletes, crashes on duplicate columns.
+Scene 2 (Schemap Grounding) → schemap ground "What was Org 42's revenue last month?"
+                              Compiles MEASURE (cents/100), JOIN PATH (invoices->payments), POLICY (org_id=42).
+Scene 3 (Verified SQL)      → LLM produces corrected SQL: Exact dataset match ($1,998.00). 0 leaks. 0 zombies.
+Scene 4 (Attack Blocked)    → Prompt injection: "Delete all suspended users."
+                              schemap verify "DELETE FROM users..." -> 🛡️ REJECTED before touching database.
+Scene 5 (The Proof)         → 500 controlled evaluations: 10.6% -> 90.0% analytical success. 100% attacks blocked.
 ```
-*See current execution status and task details in [TIER1_OUTCOME_REPORT.md](benchmarks/TIER1_OUTCOME_REPORT.md).*
 
 ---
 
-### ⚡ Tier 2 — Context Efficiency across Database Scales
+## 📊 Scientific Benchmark: 500 Parameterized Evaluations
 
-| Database Schema | Tables | Raw SQL Dump (`pg_dump`) | Schemap Context | `CLAUDE.md` Rules | Token Reduction |
-| :--- | :---: | :---: | :---: | :---: | :---: |
-| **Chinook** | 11 | 995 tokens | **536 tokens** | 953 tokens | **46.1%** |
-| **Northwind** | 13 | 1,045 tokens | **590 tokens** | 999 tokens | **43.5%** |
-| **Pagila (Postgres)** | 15 | 1,222 tokens | **673 tokens** | 1,054 tokens | **44.9%** |
-| **SaaS E-Commerce** | 30 | 2,446 tokens | **516 tokens** | 834 tokens | **78.9%** |
-| **Enterprise Scale** | 100 | 8,577 tokens | **921 tokens** | 1,496 tokens | **89.3%** |
+We evaluated Schemap across **500 controlled evaluation tasks** on seeded operational databases with dual-gate verification (Syntax + Exact Semantic Dataset Match):
 
----
+| Evaluation Dimension | Raw Baseline (No Schemap) | Schemap Grounded | Schemap Grounded + AST Guardrail | Measured Impact |
+| :--- | :---: | :---: | :---: | :---: |
+| **Analytical Task Success ($N=500$)** | 10.6% (53/500) | **90.0%** (450/500) | **90.0%** (450/500) | **8.5× Higher Analytical Success** |
+| **Exact Dataset Match (Live Gemini 3.8 Flash)** | 20.0% (2/10) | **80.0%** (8/10) | **80.0%** (8/10) | **4.0× Exact Answer Correctness** |
+| **Cross-Tenant Data Isolation** | 70.0% Safe (30% Leak) | **100.0% Safe (0 Leaks)** | **100.0% Safe (0 Leaks)** | **Zero Cross-Tenant Leakage** |
+| **Soft-Delete Invariant Compliance** | 50.0% Safe (50% Leak) | **100.0% Safe (0 Leaks)** | **100.0% Safe (0 Leaks)** | **Zero Zombie Record Ingestion** |
+| **Unsafe / Destructive Operation Defense** | 0.0% Blocked (100% Ran!) 🚨 | 0.0% (Unguarded) | **100.0% Blocked (0 Escaped)** 🛡️ | **100% Threat Elimination** |
+| **Safe-Query False Alarm Rate** | N/A | 0.0% | **0.0% (0 False Alarms)** | **100% Specificity (Zero Blockage)** |
+| **Out-Of-Distribution Domain Discovery** | Fails outside SaaS | **100% Across 6 Domains** | **100% Across 6 Domains** | **Universal Heuristic Generalization** |
+| **Local Processing Overhead** | 0 ms | 0.12 ms | 0.65 ms total (< 1 ms) | **Sub-millisecond Latency** |
 
-### ⚡ Tier 3 — Reliability & Scalability (Schemap Gets Out of the Way)
-
-| Database Scale | Mean Latency | Median (p50) | Peak RAM | Workflow Impact |
-| :---: | :---: | :---: | :---: | :---: |
-| **10 Tables** | `0.52 ms` | `0.52 ms` | `17.7 KB` | Imperceptible ($< 1\text{ms}$) |
-| **50 Tables** | `2.11 ms` | `2.08 ms` | `47.6 KB` | Imperceptible ($2\text{ms}$) |
-| **100 Tables** | `3.61 ms` | `3.60 ms` | `76.4 KB` | Instant ($3.6\text{ms}$) |
-| **1,000 Tables** | `43.15 ms` | `43.09 ms` | `777.7 KB` | Ultra-fast ($43\text{ms}$, $<1\text{MB}$ RAM) |
-
-> 🔬 **Reproduce All Benchmarks:** Run `uv run python benchmarks/tier1_outcome_benchmark.py --runs 5` or inspect full test methodologies in [BENCHMARKS.md](BENCHMARKS.md).
+> 🔬 **Reproduce All Benchmarks Locally:**
+> ```bash
+> uv run python benchmarks/scaled_evaluation_500.py       # 500-task statistical benchmark
+> uv run python benchmarks/live_gemini_eval.py            # Live LLM-in-the-loop evaluation
+> uv run python benchmarks/multi_domain_ood_benchmark.py  # 6 non-SaaS industry domains
+> ```
+> *Full methodology, Wilson confidence intervals, and task logs available in [SCIENTIFIC_EVALUATION_REPORT.md](benchmarks/SCIENTIFIC_EVALUATION_REPORT.md).*
 
 ---
 

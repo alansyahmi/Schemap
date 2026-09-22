@@ -42,6 +42,9 @@ TENANT_TABLE_NAMES = [
 SOFT_DELETE_PATTERNS = [
     r"^deleted_at$",
     r"^is_deleted$",
+]
+
+LIFECYCLE_STATE_PATTERNS = [
     r"^archived_at$",
     r"^is_archived$",
     r"^closed_at$",
@@ -203,10 +206,18 @@ def compile_semantic_graph(
             t_copy.soft_delete_column = soft_del_col
             graph.soft_deletes[t_copy.name] = soft_del_col
 
+        # Check lifecycle state columns (e.g. closed_at, archived_at, terminated_at)
+        for col in t_copy.columns:
+            if col.name != soft_del_col and any(re.match(pat, col.name.lower()) for pat in LIFECYCLE_STATE_PATTERNS):
+                col.semantic_role = SemanticRole.LIFECYCLE_STATE
+                col.provenance = Provenance.INFERRED
+                graph.lifecycle_columns[f"{t_copy.name}.{col.name}"] = col.name
+                graph.provenance_map[f"{t_copy.name}:{col.name}:lifecycle"] = Provenance.INFERRED
+
         # Classify all columns into semantic roles
         for col in t_copy.columns:
-            # Skip if already identified as tenant_key or soft_delete
-            if col.semantic_role in (SemanticRole.TENANT_KEY, SemanticRole.SOFT_DELETE):
+            # Skip if already identified as tenant_key, soft_delete, or lifecycle_state
+            if col.semantic_role in (SemanticRole.TENANT_KEY, SemanticRole.SOFT_DELETE, SemanticRole.LIFECYCLE_STATE):
                 continue
 
             if col.primary_key:

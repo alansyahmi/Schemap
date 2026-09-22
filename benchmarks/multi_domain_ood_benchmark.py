@@ -279,37 +279,37 @@ def run_ood_benchmark():
     domains = [
         ("E-Commerce & Logistics", build_ecommerce_schema(), {
             "expected_tenant": "merchant_id",
-            "expected_soft_delete": "is_deleted",
+            "expected_sd_or_lifecycle": "is_deleted",
             "measure_keywords": ["cost_cents", "order_total_cents", "price_cents"],
             "join_test": (["merchants", "orders", "order_items", "inventory_items"], True)
         }),
         ("Fintech Ledger", build_fintech_schema(), {
             "expected_tenant": "institution_id",
-            "expected_soft_delete": "closed_at",
+            "expected_sd_or_lifecycle": "closed_at",
             "measure_keywords": ["balance_cents", "amount_cents"],
             "join_test": (["institutions", "accounts", "transactions"], True)
         }),
         ("Healthcare EHR", build_healthcare_schema(), {
             "expected_tenant": "hospital_id",
-            "expected_soft_delete": "archived_at",
+            "expected_sd_or_lifecycle": "archived_at",
             "measure_keywords": ["dosage_mg"],
             "join_test": (["hospitals", "patients", "encounters", "prescriptions"], True)
         }),
         ("Education LMS", build_education_schema(), {
             "expected_tenant": "school_id",
-            "expected_soft_delete": "dropped_at",
+            "expected_sd_or_lifecycle": "dropped_at",
             "measure_keywords": ["max_score"],
             "join_test": (["schools", "courses", "enrollments"], True)
         }),
         ("HR & Payroll", build_hr_schema(), {
             "expected_tenant": "company_id",
-            "expected_soft_delete": "terminated_at",
+            "expected_sd_or_lifecycle": "terminated_at",
             "measure_keywords": ["salary_cents", "total_payout_cents"],
             "join_test": (["companies", "departments", "employees"], True)
         }),
         ("IoT Fleet Telematics", build_iot_schema(), {
             "expected_tenant": "fleet_id",
-            "expected_soft_delete": "decommissioned_at",
+            "expected_sd_or_lifecycle": "decommissioned_at",
             "measure_keywords": ["speed_mph", "odometer_miles"],
             "join_test": (["fleets", "vehicles", "telemetry_logs"], True)
         })
@@ -325,7 +325,7 @@ def run_ood_benchmark():
         "",
         "**Methodology:** Evaluates Schemap's heuristic compiler, provenance classification, and spanning-tree join engine across **6 completely distinct industry domains** outside SaaS billing with zero human configuration.",
         "",
-        "| Industry Domain | Tables | Inferred Tenant Key | Inferred Soft Delete | Inferred Measures | Multi-Hop Spanning Join | Status |",
+        "| Industry Domain | Tables | Inferred Tenant Key | Inferred Soft Delete / Lifecycle | Inferred Measures | Multi-Hop Spanning Join | Status |",
         "| :--- | :---: | :---: | :---: | :---: | :---: | :---: |"
     ]
 
@@ -340,10 +340,12 @@ def run_ood_benchmark():
         exp_tenant = reqs["expected_tenant"]
         tenant_ok = exp_tenant in found_tenants
 
-        # 2. Soft-Delete Discovery
+        # 2. Soft-Delete & Lifecycle State Discovery
         found_soft_deletes = list(graph.soft_deletes.values())
-        exp_sd = reqs["expected_soft_delete"]
-        sd_ok = exp_sd in found_soft_deletes
+        found_lifecycles = list(graph.lifecycle_columns.values())
+        all_state_cols = found_soft_deletes + found_lifecycles
+        exp_state = reqs["expected_sd_or_lifecycle"]
+        sd_ok = exp_state in all_state_cols
 
         # 3. Measures Discovery
         found_measures = [m.column for m in graph.measures]
@@ -361,15 +363,16 @@ def run_ood_benchmark():
         status_str = "PASS" if domain_passed else "FAIL"
         print(f"[{status_str}] Domain: {name}")
         print(f"  Tenant Keys:  {found_tenants} (Expected '{exp_tenant}': {tenant_ok})")
-        print(f"  Soft Deletes: {found_soft_deletes} (Expected '{exp_sd}': {sd_ok})")
+        print(f"  SD/Lifecycle: {all_state_cols} (Expected '{exp_state}': {sd_ok})")
         print(f"  Measures:     {found_measures} (Expected {reqs['measure_keywords']}: {measures_ok})")
         print(f"  Join Path:    {len(join_path.tables) if join_path else 0} tables connected: {join_ok}")
 
         scoped_tenants = [t for t in found_tenants if t != "id"]
         tenant_display = scoped_tenants[0] if scoped_tenants else (found_tenants[0] if found_tenants else "None")
+        state_display = all_state_cols[0] if all_state_cols else "None"
 
         report_lines.append(
-            f"| **{name}** | {len(schema.tables)} | `{tenant_display}` ({'OK' if tenant_ok else 'FAIL'}) | `{found_soft_deletes[0] if found_soft_deletes else 'None'}` ({'OK' if sd_ok else 'FAIL'}) | {len(found_measures)} measures ({'OK' if measures_ok else 'FAIL'}) | {len(join_tables)}-table join ({'OK' if join_ok else 'FAIL'}) | **{status_str}** |"
+            f"| **{name}** | {len(schema.tables)} | `{tenant_display}` ({'OK' if tenant_ok else 'FAIL'}) | `{state_display}` ({'OK' if sd_ok else 'FAIL'}) | {len(found_measures)} measures ({'OK' if measures_ok else 'FAIL'}) | {len(join_tables)}-table join ({'OK' if join_ok else 'FAIL'}) | **{status_str}** |"
         )
 
         domain_summaries.append({

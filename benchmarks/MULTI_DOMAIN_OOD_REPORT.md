@@ -2,7 +2,7 @@
 
 **Methodology:** Evaluates Schemap's heuristic compiler, provenance classification, and spanning-tree join engine across **6 completely distinct industry domains** outside SaaS billing with zero human configuration.
 
-| Industry Domain | Tables | Inferred Tenant Key | Inferred Soft Delete | Inferred Measures | Multi-Hop Spanning Join | Status |
+| Industry Domain | Tables | Inferred Tenant Key | Inferred Soft Delete / Lifecycle | Inferred Measures | Multi-Hop Spanning Join | Status |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: |
 | **E-Commerce & Logistics** | 5 | `merchant_id` (OK) | `is_deleted` (OK) | 4 measures (OK) | 4-table join (OK) | **PASS** |
 | **Fintech Ledger** | 3 | `institution_id` (OK) | `closed_at` (OK) | 2 measures (OK) | 3-table join (OK) | **PASS** |
