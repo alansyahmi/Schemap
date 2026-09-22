@@ -75,89 +75,73 @@ We evaluated Schemap across **500 controlled evaluation tasks** on seeded operat
 
 ---
 
+## 🚀 60-Second Quick Start
 
+### 1. Install & Run Instantly (No Cloning Required)
 
-
-## 🚀 30-Second Quick Start
-
-### 1. Run Instantly (No Installation Required)
-
-Using **`uvx`**:
+Run directly via **`uvx`**:
 ```bash
-uvx schemap-tool doctor --db "sqlite:///app.db"
+uvx schemap-tool --version       # Schemap 4.0.0
 ```
 
-Or install globally via **`pipx`** (recommended) or `uv` / `pip`:
+Or install globally via **`pip`**, **`uv`**, or **`pipx`**:
 ```bash
-pipx install schemap-tool
-```
-
-> **Alternative installs:**
-> * `uv tool install schemap-tool`
-> * `pip install schemap-tool`
-> 
-> *To update or cleanly remove Schemap anytime:*
-> ```bash
-> schemap update
-> schemap uninstall --purge
-> ```
-
----
-
-### 2. Run Database Health Diagnostic (`schemap doctor`)
-
-Audit your database schema for AI compatibility, missing foreign keys, and ambiguous naming:
-
-```bash
-schemap doctor
-```
-
-```text
-==================================================
- Schemap AI Database Health Check
-==================================================
-  Connection:             Connected (39 tables)
-  Relationships Analyzed: 26
---------------------------------------------------
-  AI Readiness Score:
-  [################----] 82/100
-
-  Top Diagnostic Insights:
-  - [High] 4 tables lack explicit foreign key constraints (-10 pts)
-  - [Med]  12 column names contain ambiguous abbreviations (-8 pts)
---------------------------------------------------
- Recommendation: Run `schemap context` to compile AI-ready database context.
-==================================================
+pip install schemap-tool
+# or
+uv tool install schemap-tool
 ```
 
 ---
 
-### 3. Compile AI Database Context (`schemap context`)
+### 2. 30-Second MCP Setup for Cursor & Claude Code
 
-Compile a clean, token-compressed markdown context file (`schemap_database_context.md`):
+Add Schemap to your `claude_desktop_config.json` or `.cursor/mcp.json`:
+
+```json
+{
+  "mcpServers": {
+    "schemap": {
+      "command": "uvx",
+      "args": ["schemap-tool", "mcp"],
+      "env": {
+        "DATABASE_URL": "postgresql://user:password@localhost:5432/dbname"
+      }
+    }
+  }
+}
+```
+
+> 🔒 **No YAML or configuration files required.** Schemap securely reads `DATABASE_URL` from the environment, introspects tables, columns, constraints, and foreign keys locally, and gives your AI agent three native tools:
+> * **`schemap_ground`**: *Call before writing SQL.* Resolves target tables, multi-hop joins, measures, and mandatory invariants with visible provenance (`[INFERRED]` vs `[DECLARED]`).
+> * **`schemap_verify`**: *Call before executing SQL.* Deny-by-default AST circuit breaker that blocks mutations (`DELETE`, `DROP`, `UPDATE`) and tenant leaks.
+> * **`schemap_patch`**: *Explicitly auto-patch SQL.* Automatically injects missing tenant predicates and soft-delete filters using AST transformation.
+
+---
+
+### 3. The 60-Second CLI Control Loop
 
 ```bash
-schemap context
+# 1. Ground an analytical question before writing SQL
+schemap ground "What was Org 42's revenue last month?" --tenant-id 42
+
+# 2. Verify SQL before executing against production (blocks mutations and leaks)
+schemap verify "SELECT * FROM orders" --tenant-id 42
+
+# 3. Safely auto-patch missing invariants without silent execution
+schemap patch "SELECT * FROM orders" --tenant-id 42
 ```
 
 ---
 
-### 4. Generate Agent Rule Files (`schemap agents`)
+### 4. Legacy Diagnostic & Context Generation Reference
 
-Generate native instruction files for Claude Code (`CLAUDE.md`), Cursor (`.cursorrules`), and AI agents (`AGENTS.md`):
-
-```bash
-schemap agents
-```
-
----
-
-### 5. Benchmark Token Savings (`schemap benchmark`)
-
-Measure real-time token compression and compilation speed on your own schema:
+For developers generating static repository context documents or measuring token savings:
 
 ```bash
-schemap benchmark
+schemap doctor          # Audit database AI Readiness Score (0–100) & missing FKs
+schemap context         # Compile token-compressed schemap_database_context.md
+schemap agents          # Generate CLAUDE.md, AGENTS.md, and .cursorrules
+schemap benchmark       # Benchmark token compression across database scales
 ```
 
 ---

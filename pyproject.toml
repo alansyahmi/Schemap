@@ -70,6 +70,7 @@ enrich = [
 
 [project.scripts]
 schemap = "schemap.cli:cli"
+schemap-tool = "schemap.cli:cli"
 
 [tool.hatch.build.targets.wheel]
 packages = ["schemap"]

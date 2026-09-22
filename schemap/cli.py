@@ -59,13 +59,14 @@ from .updater import (
 import webbrowser
 import urllib.parse
 
+from . import __version__
 from .menu import run_interactive_menu
 from .semantic import compile_semantic_graph
 from .ground import ground as run_ground
 from .validator import verify_sql as run_verify_sql
 
 @click.group(invoke_without_command=True)
-@click.version_option("3.3.1", package_name="schemap-tool", message="Schemap %(version)s")
+@click.version_option(__version__, package_name="schemap-tool", message="Schemap %(version)s")
 @click.option('--profile', default=None, help="Named profile to load from schemap.yaml.")
 @click.option('--db', default=None, help="Database connection URL (e.g. sqlite:///app.db, postgresql://...).")
 @click.option('--quiet', '-q', is_flag=True, help="Suppress informational messages.")
@@ -1925,6 +1926,17 @@ def verify(ctx, sql, tenant_id, patch, config, db):
     except Exception as e:
         click.secho(f"\n[ERROR] Verification failed: {str(e)}", fg="red")
         sys.exit(1)
+
+
+@cli.command()
+@click.argument('sql')
+@click.option('--tenant-id', default=None, help="Tenant identifier to enforce.")
+@click.option('--config', default="schemap.yaml", help="Path to configuration file.")
+@click.option('--db', default=None, help="Database connection URL.")
+@click.pass_context
+def patch(ctx, sql, tenant_id, config, db):
+    """Auto-patch SQL query to inject missing tenant and soft-delete filters."""
+    ctx.invoke(verify, sql=sql, tenant_id=tenant_id, patch=True, config=config, db=db)
 
 
 if __name__ == "__main__":

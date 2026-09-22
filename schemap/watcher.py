@@ -13,6 +13,7 @@ import urllib.error
 from pathlib import Path
 from typing import Dict, Any, List, Optional, Callable
 
+from . import __version__
 from .config import load_config, SchemapConfig
 from .models import DatabaseSchemaModel
 from .fingerprint import calculate_schema_fingerprint
@@ -76,7 +77,7 @@ def dispatch_webhook(webhook_url: str, event_type: str, payload: Dict[str, Any],
         req = urllib.request.Request(
             webhook_url,
             data=json.dumps(body).encode("utf-8"),
-            headers={"Content-Type": "application/json", "User-Agent": "Schemap-Watcher/3.1.2"},
+            headers={"Content-Type": "application/json", "User-Agent": f"Schemap-Watcher/{__version__}"},
             method="POST"
         )
         with urllib.request.urlopen(req, timeout=timeout) as resp:
