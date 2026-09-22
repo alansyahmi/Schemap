@@ -60,6 +60,9 @@ import webbrowser
 import urllib.parse
 
 from .menu import run_interactive_menu
+from .semantic import compile_semantic_graph
+from .ground import ground as run_ground
+from .validator import verify_sql as run_verify_sql
 
 @click.group(invoke_without_command=True)
 @click.version_option("3.3.1", package_name="schemap-tool", message="Schemap %(version)s")
@@ -1752,8 +1755,181 @@ def uninstall(yes, purge):
         click.echo(f"Manual uninstall command: {' '.join(cmd)}")
 
 
+
+@cli.command()
+@click.option('--config', default="schemap.yaml", help="Path to configuration file.")
+@click.option('--db', default=None, help="Database connection URL (e.g. sqlite:///app.db, postgresql://...).")
+@click.option('--output', '-o', 'out_file', default="schemap_semantic.json", help="Path to output semantic manifest.")
+@click.option('--json', 'as_json', is_flag=True, help="Output JSON directly to stdout.")
+@click.pass_context
+def semantic(ctx, config, db, out_file, as_json):
+    """Compile database into an active, provenance-aware Semantic Policy Graph."""
+    try:
+        import json
+        prof = ctx.obj.get('profile') if ctx.obj else None
+        db_url = db or (ctx.obj.get('db') if ctx.obj else None)
+        cfg = load_config(config, profile=prof, db_url=db_url)
+        schema_model, _, _ = _process_schema(cfg, enrich=False)
+
+        # Build declared overrides dictionary from config if present
+        declared_cfg = {
+            "metrics": getattr(cfg, "metrics", {}),
+            "invariants": getattr(cfg, "invariants", []),
+            "tenants": getattr(cfg, "tenants", {}),
+            "soft_deletes": getattr(cfg, "soft_deletes", {}),
+        }
+
+        graph = compile_semantic_graph(schema_model, declared_config=declared_cfg)
+        graph_dict = graph.model_dump()
+
+        if as_json:
+            click.echo(json.dumps(graph_dict, indent=2))
+            return
+
+        click.secho("\n" + "=" * 55, fg="cyan", bold=True)
+        click.secho(" Schemap 4.0: Semantic Policy Graph Compiler", fg="cyan", bold=True)
+        click.secho("=" * 55, fg="cyan", bold=True)
+
+        click.echo(f"  Database Engine:       {graph.database_name.upper()}")
+        click.echo(f"  Active Tables Mapped:  {len(graph.tables)}")
+        click.echo(f"  Tenant Keys Identified: {len(graph.tenant_keys)}")
+        for tbl, t_col in graph.tenant_keys.items():
+            prov = graph.provenance_map.get(f"{tbl}:tenant_key", "INFERRED")
+            click.echo(f"    - {tbl}.{t_col} [{prov}]")
+
+        click.echo(f"  Soft-Deletes Mapped:   {len(graph.soft_deletes)}")
+        for tbl, sd_col in graph.soft_deletes.items():
+            prov = graph.provenance_map.get(f"{tbl}:soft_delete", "INFERRED")
+            click.echo(f"    - {tbl}.{sd_col} [{prov}]")
+
+        click.echo(f"  Measures Detected:     {len(graph.measures)}")
+        for m in graph.measures[:5]:
+            expr = m.expression or f"SUM({m.table}.{m.column})"
+            click.echo(f"    - {m.table}.{m.column} [{m.provenance.value}]: {expr}")
+        if len(graph.measures) > 5:
+            click.echo(f"    ... and {len(graph.measures) - 5} more")
+
+        click.echo(f"  Dimensions Classified: {len(graph.dimensions)}")
+
+        # Save manifest
+        with open(out_file, "w", encoding="utf-8") as f:
+            json.dump(graph_dict, f, indent=2)
+
+        click.secho("-" * 55, fg="cyan")
+        click.secho(f"  Successfully compiled semantic manifest: {out_file}", fg="green", bold=True)
+        click.secho("=" * 55 + "\n", fg="cyan", bold=True)
+
+    except Exception as e:
+        click.secho(f"\n[ERROR] Semantic compilation failed: {str(e)}", fg="red")
+        sys.exit(1)
+
+
+@cli.command()
+@click.argument('question')
+@click.option('--tenant-id', default=None, help="Tenant identifier to isolate query scope.")
+@click.option('--config', default="schemap.yaml", help="Path to configuration file.")
+@click.option('--db', default=None, help="Database connection URL.")
+@click.option('--json', 'as_json', is_flag=True, help="Output grounding plan as JSON.")
+@click.pass_context
+def ground(ctx, question, tenant_id, config, db, as_json):
+    """Ground a natural language question into deterministic joins and mandatory policies."""
+    try:
+        import json
+        prof = ctx.obj.get('profile') if ctx.obj else None
+        db_url = db or (ctx.obj.get('db') if ctx.obj else None)
+        cfg = load_config(config, profile=prof, db_url=db_url)
+        schema_model, _, _ = _process_schema(cfg, enrich=False)
+
+        graph = compile_semantic_graph(schema_model)
+        plan = run_ground(question, graph=graph, tenant_id=tenant_id)
+
+        if as_json:
+            click.echo(json.dumps(plan.model_dump(), indent=2))
+            return
+
+        click.secho("\n" + "=" * 55, fg="cyan", bold=True)
+        click.secho(" Schemap Deterministic Grounding Plan", fg="cyan", bold=True)
+        click.secho("=" * 55, fg="cyan", bold=True)
+        click.echo(f"  Query: \"{question}\"")
+        if tenant_id:
+            click.echo(f"  Tenant Scope: {tenant_id} (Enforced)")
+        click.echo(f"  Target Tables: {', '.join(plan.target_tables)}")
+
+        if plan.join_path:
+            click.secho("\n  [Deterministic Join Path]", fg="yellow", bold=True)
+            for line in plan.join_path.sql_join_clause.splitlines():
+                click.echo(f"    {line}")
+
+        if plan.mandatory_filters:
+            click.secho("\n  [Mandatory Invariants (Must Include)]", fg="green", bold=True)
+            for f in plan.mandatory_filters:
+                click.echo(f"    * {f}")
+
+        if plan.measures:
+            click.secho("\n  [Resolved Measures]", fg="magenta", bold=True)
+            for m in plan.measures:
+                expr = m.expression or f"SUM({m.table}.{m.column})"
+                click.echo(f"    * {m.column} [{m.provenance.value}]: {expr}")
+
+        if plan.ambiguities:
+            click.secho("\n  [Ambiguities / Warnings]", fg="red", bold=True)
+            for a in plan.ambiguities:
+                click.echo(f"    * {a}")
+
+        click.secho("=" * 55 + "\n", fg="cyan", bold=True)
+
+    except Exception as e:
+        click.secho(f"\n[ERROR] Grounding failed: {str(e)}", fg="red")
+        sys.exit(1)
+
+
+@cli.command()
+@click.argument('sql')
+@click.option('--tenant-id', default=None, help="Tenant identifier to enforce.")
+@click.option('--patch', is_flag=True, help="Auto-patch missing tenant or soft-delete filters.")
+@click.option('--config', default="schemap.yaml", help="Path to configuration file.")
+@click.option('--db', default=None, help="Database connection URL.")
+@click.pass_context
+def verify(ctx, sql, tenant_id, patch, config, db):
+    """Verify SQL query against policy graph and tenant isolation rules."""
+    try:
+        prof = ctx.obj.get('profile') if ctx.obj else None
+        db_url = db or (ctx.obj.get('db') if ctx.obj else None)
+        cfg = load_config(config, profile=prof, db_url=db_url)
+        schema_model, _, _ = _process_schema(cfg, enrich=False)
+
+        graph = compile_semantic_graph(schema_model)
+        res = run_verify_sql(sql, graph=graph, tenant_id=tenant_id, auto_patch=patch)
+
+        click.secho("\n" + "=" * 55, fg="cyan", bold=True)
+        click.secho(" Schemap SQL Policy & Guardrail Verification", fg="cyan", bold=True)
+        click.secho("=" * 55, fg="cyan", bold=True)
+
+        if res.passed:
+            click.secho("  STATUS: [PASS] Query is policy-compliant & tenant-safe", fg="green", bold=True)
+        else:
+            click.secho("  STATUS: [REJECTED] Policy Violations Detected:", fg="red", bold=True)
+            for v in res.violations:
+                click.secho(f"    * {v}", fg="yellow")
+
+        if patch and res.patched_sql:
+            click.secho("\n  [Auto-Patched Sanitized SQL]:", fg="cyan", bold=True)
+            for line in res.patched_sql.splitlines():
+                click.echo(f"    {line}")
+
+        click.secho("=" * 55 + "\n", fg="cyan", bold=True)
+
+        if not res.passed and not patch:
+            sys.exit(1)
+
+    except Exception as e:
+        click.secho(f"\n[ERROR] Verification failed: {str(e)}", fg="red")
+        sys.exit(1)
+
+
 if __name__ == "__main__":
     cli()
+
 
 
 
