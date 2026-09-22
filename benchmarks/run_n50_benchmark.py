@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-Schemap N=50 Controlled Scientific Benchmark Runner
+Schemap N=50 Deterministic Policy & Gold-SQL Regression Suite
 
-Evaluates Schemap 4.0 across 50 controlled tasks on two real production-style schemas:
+Evaluates Schemap 4.0 policy validation and gold SQL execution across 50 controlled tasks on two real production-style schemas:
 1. Multi-Tenant B2B SaaS (35 tasks)
 2. E-Commerce & Retail (15 tasks)
 
@@ -12,6 +12,8 @@ Structured into 5 explicit strata:
 - Currency Unit Correctness (10 tasks)
 - Multi-Hop Joins (12 tasks)
 - Destructive Mutation Guardrails (8 tasks)
+
+NOTE: This is a deterministic regression suite (Condition A: curated naive queries omitting invariants; Condition B: curated policy-complete queries). It measures AST circuit-breaking and executable database precision. It does NOT invoke an LLM directly.
 
 Usage:
     uv run python benchmarks/run_n50_benchmark.py
@@ -494,30 +496,31 @@ def run_benchmark() -> Dict[str, Any]:
 
 def print_summary(res: Dict[str, Any]) -> None:
     """Prints a structured summary table to console."""
-    print("\n" + "=" * 76)
-    print(" SCHEMAP N=50 SCIENTIFIC BENCHMARK RESULTS")
-    print("=" * 76)
+    print("\n" + "=" * 82)
+    print(" SCHEMAP N=50 DETERMINISTIC POLICY & GOLD-SQL REGRESSION RESULTS")
+    print("=" * 82)
     print(f"Total Tasks: {res['total_tasks']} (SaaS: 35, E-Commerce: 15)")
-    print("-" * 76)
-    print(f"{'Stratum':<18} | {'Total':<6} | {'Condition A (Raw)':<20} | {'Condition B (Grounded)':<20}")
-    print("-" * 76)
+    print("Note: Deterministic regression suite (no LLM in loop). Measures AST guard & gold SQL.")
+    print("-" * 82)
+    print(f"{'Stratum':<16} | {'Total':<6} | {'Cond A (Naive SQL)':<24} | {'Cond B (Policy-Complete)':<26}")
+    print("-" * 82)
 
     for s, data in res["strata"].items():
         tot = data["total"]
         a_str = f"{data['condition_a_passed']}/{tot} ({data['condition_a_pct']}%)"
         b_str = f"{data['condition_b_passed']}/{tot} ({data['condition_b_pct']}%)"
-        print(f"{s:<18} | {tot:<6} | {a_str:<20} | {b_str:<20}")
+        print(f"{s:<16} | {tot:<6} | {a_str:<24} | {b_str:<26}")
 
-    print("-" * 76)
+    print("-" * 82)
     tot = res["total_tasks"]
     a_tot = f"{res['condition_a_raw']['passed']}/{tot} ({res['condition_a_raw']['accuracy_pct']}%)"
     b_tot = f"{res['condition_b_grounded']['passed']}/{tot} ({res['condition_b_grounded']['accuracy_pct']}%)"
-    print(f"{'OVERALL TOTAL':<18} | {tot:<6} | {a_tot:<20} | {b_tot:<20}")
-    print("=" * 76)
+    print(f"{'OVERALL TOTAL':<16} | {tot:<6} | {a_tot:<24} | {b_tot:<26}")
+    print("=" * 82)
     print(f"Sub-Millisecond Overhead:")
     print(f"  * Grounding Latency:    {res['latency']['avg_grounding_ms']} ms/query")
     print(f"  * AST Verification:     {res['latency']['avg_verification_ms']} ms/query")
-    print("=" * 76 + "\n")
+    print("=" * 82 + "\n")
 
 
 def generate_markdown_report(res: Dict[str, Any], output_path: Path) -> None:
@@ -527,23 +530,23 @@ def generate_markdown_report(res: Dict[str, Any], output_path: Path) -> None:
     b_pct = res["condition_b_grounded"]["accuracy_pct"]
 
     md = []
-    md.append("# Schemap N=50 Controlled Scientific Benchmark Report\n")
-    md.append("A controlled, reproducible evaluation of **Schemap 4.0** across **50 tasks** on two production-style schemas.\n")
+    md.append("# Schemap N=50 Policy & Gold-SQL Regression Suite Report\n")
+    md.append("A deterministic regression suite evaluating **Schemap 4.0 policy guardrails and gold SQL execution** across **50 tasks** on two production-style schemas.\n")
+    md.append("> **Important Methodology Note:** This suite tests deterministic database fixtures, invariant rules, and AST circuit-breaking. It does **not** invoke an LLM. Condition A consists of curated naive queries that omit tenant/soft-delete/units. Condition B consists of curated policy-complete queries validated by `verify_sql`. For live LLM evaluation, see our Antigravity Gemini A/B benchmark.\n")
     md.append("```bash")
     md.append("# Reproduce with a single command:")
     md.append("uv run python benchmarks/run_n50_benchmark.py")
     md.append("```\n")
-    md.append("## 🏆 Executive Summary\n")
+    md.append("## 🏆 Suite Summary\n")
     md.append(f"* **Total Evaluated Tasks:** $N = {tot}$")
-    md.append(f"* **Condition A (Raw LLM / Baseline):** **{res['condition_a_raw']['passed']} / {tot}** ({a_pct}%)")
-    md.append(f"* **Condition B (Schemap Grounded + Verified):** **{res['condition_b_grounded']['passed']} / {tot}** ({b_pct}%)")
-    md.append(f"* **Reliability Lift:** **{(b_pct / max(0.1, a_pct)):.1f}× improvement** in end-to-end task success.")
+    md.append(f"* **Condition A (Curated Naive Queries):** **{res['condition_a_raw']['passed']} / {tot}** ({a_pct}%)")
+    md.append(f"* **Condition B (Curated Policy-Complete + Guarded):** **{res['condition_b_grounded']['passed']} / {tot}** ({b_pct}%)")
     md.append(f"* **Destructive Mutations Blocked:** **{res['strata']['mutations']['condition_b_passed']} / {res['strata']['mutations']['total']} (100%)** intercepted pre-execution.")
-    md.append(f"* **Zero False Alarms:** 100% specificity on compliant queries.")
-    md.append(f"* **Overhead:** **{res['latency']['avg_grounding_ms']} ms** grounding + **{res['latency']['avg_verification_ms']} ms** verification (< 1 ms local latency).\n")
+    md.append(f"* **Zero False Alarms:** 100% specificity on safe, compliant queries.")
+    md.append(f"* **Local Overhead:** **{res['latency']['avg_grounding_ms']} ms** grounding + **{res['latency']['avg_verification_ms']} ms** verification (< 1 ms local latency).\n")
 
     md.append("## 📊 Stratum-by-Stratum Performance Breakdown\n")
-    md.append("| Stratum | Tasks | Description & Failure Mode in Baseline | Condition A (Raw) | Condition B (Schemap) | Lift |")
+    md.append("| Stratum | Tasks | Description & Tested Invariant | Cond A (Naive SQL) | Cond B (Policy-Complete) | Gold Verification |")
     md.append("| :--- | :---: | :--- | :---: | :---: | :---: |")
 
     strat_descs = {
@@ -561,17 +564,16 @@ def generate_markdown_report(res: Dict[str, Any], output_path: Path) -> None:
         b_pass = data["condition_b_passed"]
         a_p = data["condition_a_pct"]
         b_p = data["condition_b_pct"]
-        lift = f"{(b_p / max(0.1, a_p)):.1f}×" if a_p > 0 else "∞ (Safety)"
-        md.append(f"| **`{s}`** | {t_cnt} | {desc} | {a_pass}/{t_cnt} ({a_p}%) | **{b_pass}/{t_cnt} ({b_p}%)** | **{lift}** |")
+        md.append(f"| **`{s}`** | {t_cnt} | {desc} | {a_pass}/{t_cnt} ({a_p}%) | **{b_pass}/{t_cnt} ({b_p}%)** | Validated |")
 
     md.append("\n---\n")
     md.append("## 🔬 Benchmark Methodology & Protocol\n")
     md.append("### 1. Dual Real Schemas\n")
     md.append("1. **Multi-Tenant B2B SaaS (35 Tasks):** `organizations`, `users`, `plans`, `subscriptions`, `invoices`, `invoice_items`, `payments`, `usage_events`.")
     md.append("2. **E-Commerce & Retail (15 Tasks):** `categories`, `products`, `orders`, `order_items`, `payments`, `users`, `reviews`, `coupon_codes`.\n")
-    md.append("### 2. Dual-Condition Evaluation Protocol\n")
-    md.append("* **Condition A (Baseline):** Simulates standard unassisted text-to-SQL generation from raw schema DDL. Query is executed against the live SQLite database, and checked against the expected gold output and AST policy rules.")
-    md.append("* **Condition B (Schemap Grounded + Verified):** Evaluates SQL generated with Schemap grounding plan (target tables, spanning joins, mandatory invariants, inferred measures). Pre-execution AST verification (`verify_sql`) is applied.")
+    md.append("### 2. Regression Protocol\n")
+    md.append("* **Condition A (Naive SQL):** Uses curated baseline queries illustrating common failure patterns (omitted tenant filters, ignored soft deletes, unscaled cents).")
+    md.append("* **Condition B (Policy-Complete):** Uses curated reference queries conforming to Schemap invariants and validated through `verify_sql`.")
     md.append("* **Executable Gold Answers:** Every analytical query is validated against live database execution (checking exact row counts, scalar values, or exact ID sets). Every mutation task is checked for pre-execution interception.\n")
 
     md.append("---\n")
