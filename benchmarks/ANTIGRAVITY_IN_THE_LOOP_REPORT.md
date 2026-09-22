@@ -1,19 +1,20 @@
-# Antigravity In-the-Loop Model Evaluation (N=10 Pilot)
+# Schemap 10-Task Stratum & Trap Class Regression Report
 
-A controlled in-session A/B evaluation testing real model completions against live SQLite database execution and Schemap AST policy validation.
+A deterministic regression suite evaluating curated naive vs policy-complete queries across **5 architectural trap classes** on live SQLite fixtures.
 
-## 🏆 In-the-Loop Executive Summary
+> **Important Methodology Note:** This suite tests deterministic database fixtures, invariant rules, and AST circuit-breaking. It does **not** invoke an LLM directly. Condition A consists of curated naive queries illustrating typical model blindspots (omitted soft-delete, raw cents, naive joins, unchecked mutations). Condition B consists of curated policy-complete queries validated by `verify_sql`. For real live model completions, refer to the Live Gemini evaluation reports (such as [`LIVE_GEMINI_EVALUATION_REPORT.md`](LIVE_GEMINI_EVALUATION_REPORT.md)).
 
-* **Evaluator:** Antigravity (Google Flagship Frontier Model In-Session)
-* **Total Tasks Evaluated:** $N = 10$
-* **Condition A (Raw Schema DDL Baseline):** **3 / 10** (30.0%)
-* **Condition B (Schemap Grounded + AST Guard):** **10 / 10** (100.0%)
-* **Empirical Reliability Lift:** **3.3×** on live SQL generation.
+## 🏆 Suite Summary
+
+* **Total Evaluated Tasks:** $N = 10$
+* **Condition A (Curated Naive Queries):** **3 / 10** (30.0%)
+* **Condition B (Curated Policy-Complete + Guarded):** **10 / 10** (100.0%)
+* **Stratum Invariant Delta:** 3/10 (30.0%) -> 10/10 (100.0%) on curated trap battery.
 * **Destructive Mutations Blocked:** **2 / 2 (100%)** intercepted pre-execution.
 
-## 📊 Stratum Breakdown: Where Schemap Wins & Where It Ties
+## 📊 Stratum Breakdown: Where Invariants Matter vs. Where Baseline Passes
 
-| Stratum | Tasks | Description | Cond A (Raw DDL) | Cond B (Schemap Grounded) | Empirical Lift |
+| Stratum | Tasks | Description | Cond A (Naive Traps) | Cond B (Schemap Grounded) | Invariant Lift |
 | :--- | :---: | :--- | :---: | :---: | :---: |
 | **`tenant`** | 2 | Multi-tenant tenant isolation (`org_id`). | 2/2 (100.0%) | **2/2 (100.0%)** | **1.0×** |
 | **`soft-delete`** | 2 | Soft-delete invariants (`deleted_at IS NULL`). | 0/2 (0.0%) | **2/2 (100.0%)** | **∞ (Safety)** |

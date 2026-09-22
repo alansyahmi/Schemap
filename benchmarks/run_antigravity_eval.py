@@ -1,15 +1,14 @@
 #!/usr/bin/env python3
 """
-Antigravity In-the-Loop Model Evaluation (N=10 Pilot)
+Schemap 10-Task Stratum & Trap Class Regression Suite
 
-Evaluates real LLM completions generated in-session with Antigravity across:
-- Condition A (Raw Schema DDL Baseline)
-- Condition B (Schemap Grounding Plan + AST Guardrail)
+Evaluates curated SQL pairs across 5 architectural trap classes:
+- Condition A (Curated Naive SQL illustrating common model traps)
+- Condition B (Curated Policy-Complete SQL + AST Guardrail)
 
-Scoring:
-- Every query is executed against the live SQLite databases (saas_test.db & demo_ecommerce.db).
-- Every query is compared against exact executable gold answers.
-- Every query is verified by Schemap AST guardrail (verify_sql).
+Note: This is a deterministic policy & gold-SQL fixture regression suite.
+It does NOT invoke an LLM directly. For live model evaluations, see
+benchmarks/LIVE_GEMINI_EVALUATION_REPORT.md.
 """
 
 import json
@@ -188,7 +187,7 @@ def run_antigravity_eval() -> Dict[str, Any]:
     strata_cond_b = {s: 0 for s in strata_names}
 
     results = {
-        "evaluator": "Antigravity (In-Session Frontier Model)",
+        "suite": "Schemap 10-Task Stratum Regression Suite",
         "total_tasks": len(TASKS),
         "condition_a_raw": {"passed": 0, "failed": 0, "verified_pass": 0, "verified_reject": 0},
         "condition_b_grounded": {"passed": 0, "failed": 0, "verified_pass": 0, "verified_reject": 0},
@@ -197,7 +196,7 @@ def run_antigravity_eval() -> Dict[str, Any]:
     }
 
     print("\n" + "=" * 80)
-    print(" ANTIGRAVITY IN-THE-LOOP EVALUATION (N=10 PILOT)")
+    print(" SCHEMAP 10-TASK STRATUM & TRAP CLASS REGRESSION SUITE")
     print("=" * 80)
 
     for idx, task in enumerate(TASKS, start=1):
@@ -325,9 +324,10 @@ def run_antigravity_eval() -> Dict[str, Any]:
 
 def print_summary(res: Dict[str, Any]) -> None:
     print("\n" + "=" * 82)
-    print(f" ANTIGRAVITY IN-THE-LOOP EVALUATION SCORECARD (N={res['total_tasks']})")
+    print(f" SCHEMAP 10-TASK STRATUM REGRESSION SCORECARD (N={res['total_tasks']})")
+    print(" Note: Deterministic fixture suite (no LLM in loop). Measures AST guard & gold SQL.")
     print("=" * 82)
-    print(f"{'Stratum':<16} | {'Total':<6} | {'Cond A (Raw DDL)':<24} | {'Cond B (Schemap Grounded)':<26}")
+    print(f"{'Stratum':<16} | {'Total':<6} | {'Cond A (Naive Traps)':<24} | {'Cond B (Schemap Grounded)':<26}")
     print("-" * 82)
 
     for s, data in res["strata"].items():
@@ -350,18 +350,18 @@ def generate_markdown_report(res: Dict[str, Any], output_path: Path) -> None:
     b_pct = res["condition_b_grounded"]["accuracy_pct"]
 
     md = []
-    md.append(f"# Antigravity In-the-Loop Model Evaluation (N={tot} Pilot)\n")
-    md.append("A controlled in-session A/B evaluation testing real model completions against live SQLite database execution and Schemap AST policy validation.\n")
-    md.append("## 🏆 In-the-Loop Executive Summary\n")
-    md.append(f"* **Evaluator:** Antigravity (Google Flagship Frontier Model In-Session)")
-    md.append(f"* **Total Tasks Evaluated:** $N = {tot}$")
-    md.append(f"* **Condition A (Raw Schema DDL Baseline):** **{res['condition_a_raw']['passed']} / {tot}** ({a_pct}%)")
-    md.append(f"* **Condition B (Schemap Grounded + AST Guard):** **{res['condition_b_grounded']['passed']} / {tot}** ({b_pct}%)")
-    md.append(f"* **Empirical Reliability Lift:** **{(b_pct / max(0.1, a_pct)):.1f}×** on live SQL generation.")
+    md.append(f"# Schemap 10-Task Stratum & Trap Class Regression Report\n")
+    md.append("A deterministic regression suite evaluating curated naive vs policy-complete queries across **5 architectural trap classes** on live SQLite fixtures.\n")
+    md.append("> **Important Methodology Note:** This suite tests deterministic database fixtures, invariant rules, and AST circuit-breaking. It does **not** invoke an LLM directly. Condition A consists of curated naive queries illustrating typical model blindspots (omitted soft-delete, raw cents, naive joins, unchecked mutations). Condition B consists of curated policy-complete queries validated by `verify_sql`. For real live model completions, refer to the Live Gemini evaluation reports (such as [`LIVE_GEMINI_EVALUATION_REPORT.md`](LIVE_GEMINI_EVALUATION_REPORT.md)).\n")
+    md.append("## 🏆 Suite Summary\n")
+    md.append(f"* **Total Evaluated Tasks:** $N = {tot}$")
+    md.append(f"* **Condition A (Curated Naive Queries):** **{res['condition_a_raw']['passed']} / {tot}** ({a_pct}%)")
+    md.append(f"* **Condition B (Curated Policy-Complete + Guarded):** **{res['condition_b_grounded']['passed']} / {tot}** ({b_pct}%)")
+    md.append(f"* **Stratum Invariant Delta:** 3/10 (30.0%) -> 10/10 (100.0%) on curated trap battery.")
     md.append(f"* **Destructive Mutations Blocked:** **{res['strata']['mutations']['condition_b_passed']} / {res['strata']['mutations']['total']} (100%)** intercepted pre-execution.\n")
 
-    md.append("## 📊 Stratum Breakdown: Where Schemap Wins & Where It Ties\n")
-    md.append("| Stratum | Tasks | Description | Cond A (Raw DDL) | Cond B (Schemap Grounded) | Empirical Lift |")
+    md.append("## 📊 Stratum Breakdown: Where Invariants Matter vs. Where Baseline Passes\n")
+    md.append("| Stratum | Tasks | Description | Cond A (Naive Traps) | Cond B (Schemap Grounded) | Invariant Lift |")
     md.append("| :--- | :---: | :--- | :---: | :---: | :---: |")
 
     strat_descs = {
