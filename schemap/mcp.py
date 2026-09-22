@@ -104,7 +104,7 @@ MCP_TOOLS = [
     },
     {
         "name": "schemap_ground",
-        "description": "Grounds a natural language query into deterministic target tables, spanning-tree JOIN paths, and mandatory tenant/soft-delete invariants with full provenance (INFERRED vs DECLARED). Call this before generating SQL.",
+        "description": "Call before writing SQL for any analytical or multi-table question. Grounds a natural language query into deterministic target tables, spanning-tree JOIN paths, measures, and mandatory invariants with provenance (INFERRED vs DECLARED).",
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -118,11 +118,48 @@ MCP_TOOLS = [
                 }
             },
             "required": ["question"]
+        },
+        "outputSchema": {
+            "type": "object",
+            "properties": {
+                "question": {"type": "string"},
+                "target_tables": {"type": "array", "items": {"type": "string"}},
+                "join_sql": {"type": ["string", "null"]},
+                "mandatory_filters": {"type": "array", "items": {"type": "string"}},
+                "measures": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "table": {"type": "string"},
+                            "column": {"type": "string"},
+                            "expression": {"type": "string"},
+                            "provenance": {"type": "string"}
+                        },
+                        "required": ["table", "column", "expression", "provenance"]
+                    }
+                },
+                "provenance": {
+                    "type": "object",
+                    "additionalProperties": {"type": "string"}
+                },
+                "ambiguities": {"type": "array", "items": {"type": "string"}},
+                "prompt_instructions": {"type": "string"}
+            },
+            "required": [
+                "question",
+                "target_tables",
+                "mandatory_filters",
+                "measures",
+                "provenance",
+                "ambiguities",
+                "prompt_instructions"
+            ]
         }
     },
     {
         "name": "schemap_verify",
-        "description": "Validates SQL against the database policy graph using AST parsing. Deny-by-default for mutations (DELETE, UPDATE, DROP, ALTER, TRUNCATE, INSERT). SELECT queries are allowed unless policy fails (missing tenant filter, soft-delete violation, Cartesian join).",
+        "description": "Call before executing any SQL. Deny-by-default for mutations (DELETE, UPDATE, DROP, ALTER, TRUNCATE, INSERT). SELECT queries are allowed unless policy fails (missing tenant filter, soft-delete violation, Cartesian join).",
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -141,11 +178,22 @@ MCP_TOOLS = [
                 }
             },
             "required": ["sql"]
+        },
+        "outputSchema": {
+            "type": "object",
+            "properties": {
+                "status": {"type": "string", "enum": ["allow", "reject"]},
+                "passed": {"type": "boolean"},
+                "violations": {"type": "array", "items": {"type": "string"}},
+                "patched_sql": {"type": ["string", "null"]},
+                "patch_requested": {"type": "boolean"}
+            },
+            "required": ["status", "passed", "violations", "patch_requested"]
         }
     },
     {
         "name": "schemap_patch",
-        "description": "Explicitly auto-patches a SQL query to inject missing tenant isolation and soft-delete filters using AST transformation. Returns sanitized SQL without silent execution.",
+        "description": "Only call when user explicitly wants auto-injected tenant or soft-delete filters. Auto-patches SQL using AST transformations without silent execution.",
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -159,6 +207,18 @@ MCP_TOOLS = [
                 }
             },
             "required": ["sql", "tenant_id"]
+        },
+        "outputSchema": {
+            "type": "object",
+            "properties": {
+                "status": {"type": "string", "enum": ["allow", "reject"]},
+                "passed": {"type": "boolean"},
+                "violations": {"type": "array", "items": {"type": "string"}},
+                "original_sql": {"type": "string"},
+                "patched_sql": {"type": ["string", "null"]},
+                "patch_applied": {"type": "boolean"}
+            },
+            "required": ["status", "passed", "violations", "original_sql", "patch_applied"]
         }
     }
 ]
@@ -343,7 +403,38 @@ def execute_tool(name: str, arguments: Dict[str, Any], schema_model: DatabaseSch
             for a in plan.ambiguities:
                 lines.append(f"- ⚠️ `[UNKNOWN]`: {a}")
 
-        return {"content": [{"type": "text", "text": "\n".join(lines)}]}
+        prov_dict = {}
+        for tbl in plan.target_tables:
+            if tbl in graph.soft_deletes:
+                p = graph.provenance_map.get(f"{tbl}:soft_delete", "INFERRED")
+                prov_dict[f"{tbl}:soft_delete"] = p.value if hasattr(p, "value") else str(p)
+            if tbl in graph.tenant_keys:
+                p = graph.provenance_map.get(f"{tbl}:tenant_key", "INFERRED")
+                prov_dict[f"{tbl}:tenant_key"] = p.value if hasattr(p, "value") else str(p)
+
+        structured_ground = {
+            "question": question,
+            "target_tables": plan.target_tables,
+            "join_sql": plan.join_path.sql_join_clause if plan.join_path else None,
+            "mandatory_filters": plan.mandatory_filters,
+            "measures": [
+                {
+                    "table": m.table,
+                    "column": m.column,
+                    "expression": m.expression or f"SUM({m.table}.{m.column})",
+                    "provenance": m.provenance.value if hasattr(m.provenance, "value") else str(m.provenance),
+                }
+                for m in plan.measures
+            ],
+            "provenance": prov_dict,
+            "ambiguities": plan.ambiguities,
+            "prompt_instructions": plan.prompt_instructions,
+        }
+
+        return {
+            "content": [{"type": "text", "text": "\n".join(lines)}],
+            "structuredContent": structured_ground,
+        }
 
     elif name == "schemap_verify":
         from .semantic import compile_semantic_graph
@@ -373,7 +464,18 @@ def execute_tool(name: str, arguments: Dict[str, Any], schema_model: DatabaseSch
         elif not val_res.passed and not patch:
             lines.append("\n*(Note: Auto-patching is disabled by default. Pass `patch: true` or call `schemap_patch` to generate sanitized SQL.)*")
 
-        return {"content": [{"type": "text", "text": "\n".join(lines)}]}
+        structured_verify = {
+            "status": "allow" if val_res.passed else "reject",
+            "passed": val_res.passed,
+            "violations": val_res.violations,
+            "patched_sql": val_res.patched_sql if patch else None,
+            "patch_requested": patch,
+        }
+
+        return {
+            "content": [{"type": "text", "text": "\n".join(lines)}],
+            "structuredContent": structured_verify,
+        }
 
     elif name == "schemap_patch":
         from .semantic import compile_semantic_graph
@@ -399,7 +501,20 @@ def execute_tool(name: str, arguments: Dict[str, Any], schema_model: DatabaseSch
             for v in val_res.violations:
                 lines.append(f"- ❌ {v}")
 
-        return {"content": [{"type": "text", "text": "\n".join(lines)}]}
+        is_safe = val_res.passed or bool(val_res.patched_sql)
+        structured_patch = {
+            "status": "allow" if is_safe else "reject",
+            "passed": is_safe,
+            "violations": val_res.violations,
+            "original_sql": sql,
+            "patched_sql": val_res.patched_sql,
+            "patch_applied": bool(val_res.patched_sql),
+        }
+
+        return {
+            "content": [{"type": "text", "text": "\n".join(lines)}],
+            "structuredContent": structured_patch,
+        }
 
     else:
         return {
@@ -431,7 +546,7 @@ def dispatch_mcp_request(req: Dict[str, Any], schema_model: DatabaseSchemaModel)
                 },
                 "serverInfo": {
                     "name": "schemap-mcp",
-                    "version": "3.1.2"
+                    "version": "4.0.0"
                 }
             }
         }

@@ -76,6 +76,7 @@ def test_mcp_initialize():
     assert resp["id"] == 1
     assert "protocolVersion" in resp["result"]
     assert resp["result"]["serverInfo"]["name"] == "schemap-mcp"
+    assert resp["result"]["serverInfo"]["version"] == "4.0.0"
 
 
 def test_mcp_tools_list():
