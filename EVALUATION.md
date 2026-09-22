@@ -17,9 +17,9 @@ Following rigorous evaluation hygiene, we explicitly decouple **Analytical Data 
 | :--- | :---: | :---: | :---: | :---: |
 | **Analytical Query Success ($N=500$ controlled)** | 10.6% (53/500) | **90.0%** (450/500) | **90.0%** (450/500) | **8.5× Higher Analytical Success** |
 | **Live Frontier Model Pilot ($N=10$ Gemini Flash)** | 20.0% (2/10) | **80.0%** (8/10) | **100.0%** (10/10)* | **4.0× Exact Answer Correctness** |
-| **Destructive Mutation Defense ($N=50$ suite)** | 0.0% Blocked (100% Ran!) 🚨 | 0.0% Blocked | **100.0% Blocked (0 Escaped)** 🛡️ | **100% Threat Elimination** |
-| **Cross-Tenant Data Isolation (Multi-Hop)** | 70.0% Safe (30% Leaked) | **100.0% Safe (0 Leaks)** | **100.0% Safe (0 Leaks)** | **Zero Cross-Tenant Leakage** |
-| **Soft-Delete Invariant Compliance** | 50.0% Safe (50% Leaked) | **100.0% Safe (0 Leaks)** | **100.0% Safe (0 Leaks)** | **Zero Ghost Record Ingestion** |
+| **Destructive Mutation Defense ($N=50$ suite)** | 0.0% Blocked (100% Ran!) 🚨 | 0.0% Blocked | **100.0% Blocked (0 Escaped)** 🛡️ | **100% of tested mutations blocked** |
+| **Cross-Tenant Data Isolation (Multi-Hop)** | 70.0% Safe (30% Leaked) | **100.0% Safe (0 Leaks)** | **100.0% Safe (0 Leaks)** | **0 cross-tenant leaks in evaluated set** |
+| **Soft-Delete Invariant Compliance** | 50.0% Safe (50% Leaked) | **100.0% Safe (0 Leaks)** | **100.0% Safe (0 Leaks)** | **0 ghost records in evaluated set** |
 | **Safe-Query Specificity (False Alarms)** | N/A | 0.0% | **0.0% (0 False Alarms)** | **100% Specificity on Safe Queries** |
 | **Local Processing Overhead** | 0 ms | 0.12 ms | 0.65 ms total (< 1 ms) | **Sub-millisecond Latency** |
 
@@ -36,19 +36,19 @@ Empirical evaluation reveals that modern frontier LLMs are **not uniformly incom
    On clean, single-table queries with explicit tenant filters requested in the prompt,
    models already produce correct WHERE org_id = 42 clauses without Schemap.
 
-2. Implicit Soft-Delete Lifecycles  → WIN (33% vs 100%)
+2. Implicit Soft-Delete Lifecycles  → Grounded: 100%; Raw DDL: 33%
    When queries involve soft-deleted users (deleted_at IS NOT NULL), raw DDL fails to
    exclude deleted entities from aggregated metrics (e.g. usage events or payment history).
 
-3. The "Cents Illusion" (Units)     → WIN (0% vs 100%)
+3. The "Cents Illusion" (Units)     → Grounded: 100%; Raw DDL: 0%
    Raw DDL prompts cause models to default to summing raw integer columns (SUM(amount_cents)),
    returning 199800 instead of $1,998.00 (a 100x metric error). Schemap measures enforce scaling.
 
-4. Multi-Hop Join Traversal        → WIN (0% vs 100%)
+4. Multi-Hop Join Traversal        → Grounded: 100%; Raw DDL: 0%
    When joining across unscoped or intermediate bridge tables (invoices -> subscriptions -> plans),
    raw models attempt direct shortcuts (invoices.subscription_id = plans.id) linking wrong entities.
 
-5. Destructive Operations          → WIN (0% vs 100% Blocked)
+5. Destructive Operations          → AST Guardrail: 100% Blocked; Unguarded: 0%
    Prompt injection or administrative requests (DELETE FROM users) execute unchecked on raw models.
    Schemap's AST circuit breaker intercepts 100% of tested mutations before database dispatch.
 ```

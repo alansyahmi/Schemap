@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "schemap-tool"
-version = "4.0.0"
+version = "4.0.1"
 description = "Local semantic compiler for AI agents working with databases. Compiles schema semantics and invariants into deterministic context; verifies generated SQL."
 readme = "README.md"
 license = { text = "MIT" }

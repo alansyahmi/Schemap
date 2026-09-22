@@ -15,6 +15,7 @@ from .models import DatabaseSchemaModel
 from .context import generate_database_context, sanitize_schema_for_llm, filter_schema_by_scope
 from .query_explainer import find_join_path, explain_table, validate_query_against_schema
 from .config import load_config
+from . import __version__
 
 
 MCP_TOOLS = [
@@ -564,7 +565,7 @@ def dispatch_mcp_request(req: Dict[str, Any], schema_model: DatabaseSchemaModel)
                 },
                 "serverInfo": {
                     "name": "schemap-mcp",
-                    "version": "4.0.0"
+                    "version": __version__
                 }
             }
         }

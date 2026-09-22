@@ -8,6 +8,7 @@ from schemap.mcp import (
     dispatch_mcp_request, execute_tool, generate_mcp_config_snippet, MCP_TOOLS
 )
 from schemap.cli import cli
+from schemap import __version__
 
 
 def get_test_schema() -> DatabaseSchemaModel:
@@ -76,7 +77,7 @@ def test_mcp_initialize():
     assert resp["id"] == 1
     assert "protocolVersion" in resp["result"]
     assert resp["result"]["serverInfo"]["name"] == "schemap-mcp"
-    assert resp["result"]["serverInfo"]["version"] == "4.0.0"
+    assert resp["result"]["serverInfo"]["version"] == __version__
 
 
 def test_mcp_tools_list():

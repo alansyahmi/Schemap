@@ -16,7 +16,7 @@ To maintain scientific hygiene, analytical answering accuracy and destructive mu
 | Evaluation Dimension | Condition A: Raw DDL Only | Condition B: Schemap Grounding | Condition C: Grounding + AST Guardrail | Measured Lift |
 | :--- | :---: | :---: | :---: | :---: |
 | **Analytical Query Exact Match ($N=8$)** | 25.0% (2/8) | **100.0%** (8/8) | **100.0%** (8/8) | **4.0× Exact Accuracy Lift** |
-| **Destructive Mutation Defense ($N=2$)** | 0.0% Blocked (2/2 Ran!) 🚨 | 0.0% Blocked (2/2 Ran!) 🚨 | **100.0% Blocked (0 Escaped)** 🛡️ | **100% Threat Elimination** |
+| **Destructive Mutation Defense ($N=2$)** | 0.0% Blocked (2/2 Ran!) 🚨 | 0.0% Blocked (2/2 Ran!) 🚨 | **100.0% Blocked (0 Escaped)** 🛡️ | **100% of tested mutations blocked** |
 | **Overall Task Outcome ($N=10$)** | 20.0% (2/10) | **80.0%** (8/10) | **100.0%** (10/10)* | **+80.0% Reliable Outcomes** |
 | **Execution Rate (SQL Parseable)** | 70.0% (7/10) | **80.0%** (8/10) | **100.0%** (10/10) | Syntactically fluent across all conditions |
 
@@ -29,10 +29,10 @@ To maintain scientific hygiene, analytical answering accuracy and destructive mu
 | Stratum Trap Class | Tasks | Cond A (Raw DDL) | Cond B (Schemap Grounded) | Diagnostic Reality |
 | :--- | :---: | :---: | :---: | :--- |
 | **Straightforward Tenant Filter** | 2 | 2 / 2 (100.0%) | 2 / 2 (100.0%) | **TIE.** When asked for tenant-scoped users/plans, Gemini reliably injects `WHERE org_id = X` on single-table queries. |
-| **Soft-Delete Invariant Hazards** | 3 | 1 / 3 (33.3%) | **3 / 3 (100.0%)** | **WIN.** Raw DDL passed LIVE-01, but failed LIVE-02 and LIVE-05 by ingesting soft-deleted users and their usage events. |
-| **Currency Units ("Cents Illusion")** | 3 | 0 / 3 (0.0%) | **3 / 3 (100.0%)** | **WIN.** Raw DDL generated `SUM(amount_cents)`, returning 199800 vs $1,998.00 ($100\times$ metric distortion). |
-| **Multi-Hop Unscoped Joins** | 1 | 0 / 1 (0.0%) | **1 / 1 (100.0%)** | **WIN.** Raw DDL skipped the intermediate `subscriptions` table and joined `invoices` directly to `plans`, matching the wrong plan. |
-| **Destructive / Injection Safety** | 2 | 0 / 2 Safe (0.0%) | 0 / 2 Safe (0.0%) | **WIN (AST Guardrail).** Grounding alone does not stop mutations. AST circuit-breaking intercepted both. |
+| **Soft-Delete Invariant Hazards** | 3 | 1 / 3 (33.3%) | **3 / 3 (100.0%)** | **Grounded: 100%; Raw: 33.3%.** Raw DDL passed LIVE-01, but failed LIVE-02 and LIVE-05 by ingesting soft-deleted users and their usage events. |
+| **Currency Units ("Cents Illusion")** | 3 | 0 / 3 (0.0%) | **3 / 3 (100.0%)** | **Grounded: 100%; Raw: 0.0%.** Raw DDL generated `SUM(amount_cents)`, returning 199800 vs $1,998.00 ($100\times$ metric distortion). |
+| **Multi-Hop Unscoped Joins** | 1 | 0 / 1 (0.0%) | **1 / 1 (100.0%)** | **Grounded: 100%; Raw: 0.0%.** Raw DDL skipped the intermediate `subscriptions` table and joined `invoices` directly to `plans`, matching the wrong plan. |
+| **Destructive / Injection Safety** | 2 | 0 / 2 Safe (0.0%) | 0 / 2 Safe (0.0%) | **AST Guardrail: 100% Blocked; Unguarded: 0.0%.** Grounding alone does not stop mutations. AST circuit-breaking intercepted both. |
 
 ---
 

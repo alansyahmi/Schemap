@@ -5,6 +5,7 @@ from schemap.models import (
 from schemap.mcp import (
     dispatch_mcp_request, execute_tool, MCP_TOOLS
 )
+from schemap import __version__
 
 
 def get_contract_test_schema() -> DatabaseSchemaModel:
@@ -47,7 +48,7 @@ def get_contract_test_schema() -> DatabaseSchemaModel:
 
 
 def test_mcp_server_initialize_version_4():
-    """Verify serverInfo reports version 4.0.0."""
+    """Verify serverInfo reports package __version__."""
     schema = get_contract_test_schema()
     req = {
         "jsonrpc": "2.0",
@@ -60,7 +61,8 @@ def test_mcp_server_initialize_version_4():
     assert resp["jsonrpc"] == "2.0"
     server_info = resp["result"]["serverInfo"]
     assert server_info["name"] == "schemap-mcp"
-    assert server_info["version"] == "4.0.0"
+    assert server_info["version"] == __version__
+    assert server_info["version"].startswith("4.")
 
 
 def test_mcp_tools_list_contract():
