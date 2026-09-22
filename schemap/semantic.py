@@ -293,41 +293,44 @@ def find_deterministic_join(
                 adj[t_name].append((ref_tbl, col, ref_col, True))
                 adj[ref_tbl].append((t_name, ref_col, col, True))
 
-    start_table = tables[0]
-    if start_table not in adj:
-        return None
-
     target_set = set(tables)
-    queue = deque([(start_table, [start_table], [])])
-    visited_paths = set()
-
     found_tables = None
     found_steps = None
 
-    while queue:
-        curr, path_nodes, steps = queue.popleft()
-
-        if target_set.issubset(set(path_nodes)):
-            found_tables = path_nodes
-            found_steps = steps
-            break
-
-        path_key = tuple(path_nodes)
-        if path_key in visited_paths:
+    for start_table in tables:
+        if start_table not in adj:
             continue
-        visited_paths.add(path_key)
 
-        for neighbor, from_col, to_col, is_virt in adj.get(curr, []):
-            if neighbor not in path_nodes:
-                next_nodes = path_nodes + [neighbor]
-                step = JoinStep(
-                    from_table=curr,
-                    from_column=from_col,
-                    to_table=neighbor,
-                    to_column=to_col,
-                    is_virtual=is_virt
-                )
-                queue.append((neighbor, next_nodes, steps + [step]))
+        queue = deque([([start_table], [])])
+        visited = set()
+
+        while queue:
+            path_nodes, steps = queue.popleft()
+
+            if target_set.issubset(set(path_nodes)):
+                if found_tables is None or len(path_nodes) < len(found_tables):
+                    found_tables = path_nodes
+                    found_steps = steps
+                break
+
+            key = tuple(sorted(path_nodes))
+            if key in visited:
+                continue
+            visited.add(key)
+
+            # Expand from any node currently joined to form join trees
+            for curr in path_nodes:
+                for neighbor, from_col, to_col, is_virt in adj.get(curr, []):
+                    if neighbor not in path_nodes:
+                        next_nodes = path_nodes + [neighbor]
+                        step = JoinStep(
+                            from_table=curr,
+                            from_column=from_col,
+                            to_table=neighbor,
+                            to_column=to_col,
+                            is_virtual=is_virt
+                        )
+                        queue.append((next_nodes, steps + [step]))
 
     if not found_tables or not found_steps:
         return None
