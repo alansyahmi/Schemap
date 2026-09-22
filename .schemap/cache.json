@@ -18,7 +18,9 @@
           "business_name": "Identifier",
           "tags": [],
           "semantic_type": null,
-          "guardrails": []
+          "guardrails": [],
+          "semantic_role": null,
+          "provenance": "INFERRED"
         },
         {
           "name": "email",
@@ -29,12 +31,16 @@
           "business_name": "Email",
           "tags": [],
           "semantic_type": null,
-          "guardrails": []
+          "guardrails": [],
+          "semantic_role": null,
+          "provenance": "INFERRED"
         }
       ],
       "foreign_keys": [],
       "virtual_relationships": [],
-      "hierarchy_tree": null
+      "hierarchy_tree": null,
+      "tenant_key": null,
+      "soft_delete_column": null
     },
     {
       "name": "orders",
@@ -54,7 +60,9 @@
           "business_name": "Identifier",
           "tags": [],
           "semantic_type": null,
-          "guardrails": []
+          "guardrails": [],
+          "semantic_role": null,
+          "provenance": "INFERRED"
         },
         {
           "name": "user_id",
@@ -65,7 +73,9 @@
           "business_name": "User Identifier",
           "tags": [],
           "semantic_type": null,
-          "guardrails": []
+          "guardrails": [],
+          "semantic_role": null,
+          "provenance": "INFERRED"
         },
         {
           "name": "amount",
@@ -76,12 +86,16 @@
           "business_name": "Amount",
           "tags": [],
           "semantic_type": null,
-          "guardrails": []
+          "guardrails": [],
+          "semantic_role": null,
+          "provenance": "INFERRED"
         }
       ],
       "foreign_keys": [],
       "virtual_relationships": [],
-      "hierarchy_tree": null
+      "hierarchy_tree": null,
+      "tenant_key": null,
+      "soft_delete_column": null
     }
   ],
   "common_journeys": [],
