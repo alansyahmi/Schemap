@@ -159,7 +159,7 @@ MCP_TOOLS = [
     },
     {
         "name": "schemap_verify",
-        "description": "Call before executing any SQL. Deny-by-default for mutations (DELETE, UPDATE, DROP, ALTER, TRUNCATE, INSERT). SELECT queries are allowed unless policy fails (missing tenant filter, soft-delete violation, Cartesian join).",
+        "description": "Call before executing any SQL. Deny-by-default for mutations (DELETE, UPDATE, DROP, ALTER, TRUNCATE, INSERT). SELECT queries are allowed unless policy fails. When patch=true and violations occur, use 'patched_sql' instead of the rejected original SQL.",
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -185,7 +185,10 @@ MCP_TOOLS = [
                 "status": {"type": "string", "enum": ["allow", "reject"]},
                 "passed": {"type": "boolean"},
                 "violations": {"type": "array", "items": {"type": "string"}},
-                "patched_sql": {"type": ["string", "null"]},
+                "patched_sql": {
+                    "type": ["string", "null"],
+                    "description": "When patch=true and violations occur, use this sanitized query to execute safely."
+                },
                 "patch_requested": {"type": "boolean"}
             },
             "required": ["status", "passed", "violations", "patch_requested"]
@@ -459,7 +462,7 @@ def execute_tool(name: str, arguments: Dict[str, Any], schema_model: DatabaseSch
                 lines.append(f"- ❌ {v}")
 
         if patch and val_res.patched_sql:
-            lines.append("\n**Explicitly Auto-Patched Sanitized SQL**:")
+            lines.append("\n**Explicitly Auto-Patched Sanitized SQL (Execute this instead of the rejected original)**:")
             lines.append(f"```sql\n{val_res.patched_sql}\n```")
         elif not val_res.passed and not patch:
             lines.append("\n*(Note: Auto-patching is disabled by default. Pass `patch: true` or call `schemap_patch` to generate sanitized SQL.)*")
