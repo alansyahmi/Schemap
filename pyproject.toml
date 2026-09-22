@@ -74,3 +74,24 @@ schemap-tool = "schemap.cli:cli"
 
 [tool.hatch.build.targets.wheel]
 packages = ["schemap"]
+
+[tool.hatch.build.targets.sdist]
+exclude = [
+    ".github",
+    "assets/*",
+    "dist",
+    "dist-rebuilt",
+    "docs/*",
+    "server/*",
+    "video_assets/*",
+    "worker/*",
+    "uv.lock",
+    "schemap_semantic.json",
+    "*.mp4",
+    "*.webm",
+    "*.png",
+    "*.zip",
+]
+
+
+
