@@ -1913,14 +1913,26 @@ def verify(ctx, sql, tenant_id, patch, config, db):
             for v in res.violations:
                 click.secho(f"    * {v}", fg="yellow")
 
+        reval_passed = False
         if patch and res.patched_sql:
-            click.secho("\n  [Auto-Patched Sanitized SQL]:", fg="cyan", bold=True)
-            for line in res.patched_sql.splitlines():
-                click.echo(f"    {line}")
+            reval = run_verify_sql(res.patched_sql, graph=graph, tenant_id=tenant_id, auto_patch=False)
+            reval_passed = reval.passed
+            if reval.passed:
+                click.secho("\n  [Auto-Patched Sanitized SQL]:", fg="cyan", bold=True)
+                for line in res.patched_sql.splitlines():
+                    click.echo(f"    {line}")
+            else:
+                click.secho("\n  [Incomplete Patch — Remaining Violations Detected]:", fg="red", bold=True)
+                for line in res.patched_sql.splitlines():
+                    click.echo(f"    {line}")
+                click.secho("  Remaining Hazards:", fg="yellow", bold=True)
+                for v in reval.violations:
+                    click.secho(f"    * {v}", fg="yellow")
 
         click.secho("=" * 55 + "\n", fg="cyan", bold=True)
 
-        if not res.passed and not patch:
+        is_allowed = res.passed or (patch and bool(res.patched_sql) and reval_passed)
+        if not is_allowed:
             sys.exit(1)
 
     except Exception as e:

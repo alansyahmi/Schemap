@@ -33,6 +33,8 @@ htmlcov/
 # Schemap Cache & Context
 .schemap/
 schemap_database_context.md
+schemap_semantic.json
+schemap_server.db
 schemap_tools.py
 llm_data_context.*
 test_llm_data_context.*

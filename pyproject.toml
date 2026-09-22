@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "schemap-tool"
 version = "4.0.0"
-description = "Deterministic AI Data Access & Governance for Postgres. Semantic compilation, policy enforcement, and verified SQL execution for AI agents."
+description = "Local semantic compiler for AI agents working with databases. Compiles schema semantics and invariants into deterministic context; verifies generated SQL."
 readme = "README.md"
 license = { text = "MIT" }
 authors = [
@@ -25,7 +25,7 @@ keywords = [
     "deterministic-sql"
 ]
 classifiers = [
-    "Development Status :: 5 - Production/Stable",
+    "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
     "Topic :: Software Development :: Build Tools",
     "Topic :: Database",

@@ -1,108 +1,56 @@
-# 📊 Schemap Complete Benchmark Suite & Performance Metrics
+# Schemap Benchmark Suite & Evaluation Index
 
-This document contains full, reproducible benchmarks across all three performance dimensions:
-1. **Tier 1:** Database Reasoning Outcome (Dual-Gate First-Pass Success, Observed Tokens, Calculated Cost & Latency)
-2. **Tier 2:** Context Efficiency (Token Compression & Deterministic Foreign Key Graph)
-3. **Tier 3:** Scalability & Reliability (Compiler Latency & Memory Footprint Scaling)
+> **Notice:** Schemap 4.0 establishes a strict, three-tier canonical evaluation hierarchy to separate live model reasoning, controlled policy verification, and out-of-distribution heuristic discovery.
+
+## 📖 Canonical Evaluation Documents
+
+| Document | Scope | What It Measures | Headline Result |
+| :--- | :--- | :--- | :--- |
+| **[EVALUATION.md](EVALUATION.md)** | **Master Methodology & Headline Results** | Decoupled 500-task controlled benchmark & mutation safety suite | **10.6% → 90.0%** analytical match; **100%** tested mutations blocked |
+| **[LIVE_MODEL_EVALUATION.md](LIVE_MODEL_EVALUATION.md)** | **Live Model-in-the-Loop Evaluation** | Actual Gemini 3.8 Flash model completions against seeded SQLite gold | **2/8 → 8/8** analytical match; **2/2** destructive operations blocked |
+| **[GENERALIZATION.md](GENERALIZATION.md)** | **Cross-Domain Generalization** | Heuristic convention discovery across 6 non-SaaS domains | **6/6 domains passed** with zero configuration |
 
 ---
 
-## 🏆 Tier 1: Database Reasoning Outcome (Hero Benchmark Framework)
+## ⚡ Supplementary Micro-Benchmarks: Efficiency & Latency
 
-### Hero Question
-> **Does Schemap actually reduce the AI Database Amnesia Tax?**
+### Context Efficiency & Token Compression
+Evaluated with OpenAI's `tiktoken` tokenizer (`cl100k_base` and `o200k_base`):
 
-### Evaluation Architecture & Scientific Protocol
-To eliminate marketing claims and prevent fabricated results, Schemap establishes a transparent, automated **Dual-Gate Evaluation Protocol** (`benchmarks/tier1_outcome_benchmark.py`).
+| Database Schema | Tables | Columns | Raw SQL Dump (`pg_dump`) | Schemap Compiled Context | Token Reduction | Compiler Latency |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: |
+| **Chinook** | 11 | 64 | 995 tokens | **536 tokens** | **46.1%** | `0.92 ms` |
+| **Northwind** | 13 | 86 | 1,045 tokens | **590 tokens** | **43.5%** | `1.05 ms` |
+| **Pagila (PostgreSQL)** | 15 | 82 | 1,222 tokens | **673 tokens** | **44.9%** | `1.20 ms` |
+| **SaaS E-Commerce** | 30 | 360 | 2,572 tokens | **532 tokens** | **79.3%** | `1.77 ms` |
+| **Enterprise Scale** | 100 | 1,237 | 9,027 tokens | **1,103 tokens** | **87.8%** | `5.27 ms` |
 
-* **Controlled Matrix:** 10 realistic developer tasks across 4 difficulty tiers evaluated across 3 conditions:
-  1. **Mode A: Blind (Zero Context)** — Query without schema context.
-  2. **Mode B: Raw DDL (`pg_dump`)** — Full CREATE TABLE definitions and constraints.
-  3. **Mode C: Schemap Compiled Context** — Deterministic foreign key graph, join paths, and safety guardrails.
-* **Dual-Gate Verification Standard:**
-  1. **Gate 1 (Syntax & Execution):** The generated SQL must execute without syntax errors or table/column errors in SQLite.
-  2. **Gate 2 (Semantic Dataset Result Match):** The query's returned row dataset must match the ground-truth result from the seeded database.
-  *A query is marked a First-Pass Success ONLY if BOTH Gate 1 and Gate 2 pass.*
-* **Strict No-Fallback Policy:** Schemap does not fabricate or substitute ground-truth queries as model output.
+### Compiler Latency & Scalability (Synthetic Schemas)
+Benchmarked on synthetic schemas with 40% foreign key density:
 
-### Planned Evaluation Matrix (150 Evaluations)
-When executed with `--runs 5`, the benchmark executes 150 trials (10 tasks × 5 runs × 3 modes) and dynamically records observed tokens, execution latency, and first-pass success.
+| Tables | Columns | Foreign Keys | Mean Latency | Median (p50) | p95 Latency | Throughput |
+| :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| **10** | 105 | 8 | `0.52 ms` | `0.52 ms` | `0.55 ms` | **1,920 ops/sec** |
+| **50** | 648 | 28 | `2.11 ms` | `2.08 ms` | `2.20 ms` | **475 ops/sec** |
+| **100** | 1,265 | 42 | `3.61 ms` | `3.60 ms` | `3.71 ms` | **277 ops/sec** |
+| **500** | 6,109 | 261 | `19.07 ms` | `19.51 ms` | `20.62 ms` | **52 ops/sec** |
+| **1,000** | 12,358 | 509 | `43.15 ms` | `43.09 ms` | `47.38 ms` | **23 ops/sec** |
+
+---
+
+## 🛠️ How to Reproduce
 
 ```bash
-# Execute the live benchmark with your API credentials
-export ANTHROPIC_API_KEY="sk-ant-..."
-uv run python benchmarks/tier1_outcome_benchmark.py --runs 5
-```
-*Current benchmark status: See [TIER1_OUTCOME_REPORT.md](benchmarks/TIER1_OUTCOME_REPORT.md).*
+# 1. Master Controlled Evaluation (N=500)
+uv run python benchmarks/scaled_evaluation_500.py
 
+# 2. Live Model-in-the-Loop Evaluation (Gemini)
+GEMINI_API_KEY="..." uv run python benchmarks/live_gemini_eval.py
 
----
+# 3. Out-Of-Distribution (OOD) Domain Evaluation
+uv run python benchmarks/multi_domain_ood_benchmark.py
 
-## 🎯 Tier 2: Context Efficiency & Model Economics
-
-### Methodology
-We benchmarked Schemap using OpenAI's `tiktoken` tokenizer (`cl100k_base` and `o200k_base`) across 5 canonical database architectures:
-1. **Chinook (11 Tables)** — Media store with audio tracks, artists, invoices, and customers.
-2. **Northwind (13 Tables)** — Enterprise inventory and order processing schema.
-3. **Pagila / Sakila (15 Tables)** — Relational video rental schema with many-to-many relationships and circular foreign keys.
-4. **Modern SaaS Platform (30 Tables)** — Multi-tenant schema with organizations, RBAC, audit logs, and billing.
-5. **Enterprise Production Scale (100 Tables)** — Large-scale enterprise schema with cross-domain relations.
-
-### 📈 Token Compression across Database Scales
-
-| Database Schema | Tables | Columns | Raw SQL Dump (`pg_dump`) | Schemap Compiled Context | `CLAUDE.md` Rules | Token Reduction | Compiler Latency |
-| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| **Chinook** | 11 | 64 | 995 tokens | **536 tokens** | 953 tokens | **46.1%** | `0.92 ms` |
-| **Northwind** | 13 | 86 | 1,045 tokens | **590 tokens** | 999 tokens | **43.5%** | `1.05 ms` |
-| **Pagila (PostgreSQL)** | 15 | 82 | 1,222 tokens | **673 tokens** | 1,054 tokens | **44.9%** | `1.20 ms` |
-| **SaaS E-Commerce** | 30 | 360 | 2,572 tokens | **532 tokens** | 918 tokens | **79.3%** | `1.77 ms` |
-| **Enterprise Scale** | 100 | 1,237 | 9,027 tokens | **1,103 tokens** | 1,789 tokens | **87.8%** | `5.27 ms` |
-
----
-
-## ⚡ Tier 3: Compiler Latency, Memory & Scaling (10 to 1,000 Tables)
-
-### Methodology
-We evaluated Schemap compiler performance across synthetic schemas (40% foreign key density and cyclic dependencies) measuring high-precision latency percentiles and peak memory allocation.
-
-### Latency & Throughput Scaling Table
-
-| Tables | Columns | Foreign Keys | Mean Latency | Median (p50) | p95 Latency | p99 Latency | Throughput |
-| :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| **10** | 105 | 8 | `0.52 ms` | **`0.52 ms`** | `0.55 ms` | `0.56 ms` | **1,920 ops/sec** |
-| **25** | 333 | 14 | `1.08 ms` | **`1.08 ms`** | `1.12 ms` | `1.30 ms` | **930 ops/sec** |
-| **50** | 648 | 28 | `2.11 ms` | **`2.08 ms`** | `2.20 ms` | `2.38 ms` | **475 ops/sec** |
-| **100** | 1,265 | 42 | `3.61 ms` | **`3.60 ms`** | `3.71 ms` | `3.73 ms` | **277 ops/sec** |
-| **250** | 3,049 | 124 | `9.57 ms` | **`9.53 ms`** | `9.88 ms` | `10.07 ms` | **104 ops/sec** |
-| **500** | 6,109 | 261 | `19.07 ms` | **`19.51 ms`** | `20.62 ms` | `20.63 ms` | **52 ops/sec** |
-| **1,000** | 12,358 | 509 | `43.15 ms` | **`43.09 ms`** | `47.38 ms` | `48.42 ms` | **23 ops/sec** |
-
-### Memory Footprint Profile
-
-| Tables | Peak RAM (KB) | Peak RAM (MB) | RAM per Table | Pre-Commit Overhead |
-| :---: | :---: | :---: | :---: | :---: |
-| **10** | `17.72 KB` | `0.017 MB` | `1.77 KB/table` | Imperceptible ($< 1\text{ms}$) |
-| **50** | `47.58 KB` | `0.046 MB` | `0.95 KB/table` | Imperceptible ($2\text{ms}$) |
-| **100** | `76.42 KB` | `0.075 MB` | `0.76 KB/table` | Imperceptible ($3.6\text{ms}$) |
-| **500** | `391.56 KB` | `0.382 MB` | `0.78 KB/table` | Fast ($19\text{ms}$) |
-| **1,000** | `777.67 KB` | `0.759 MB` | `0.78 KB/table` | Ultra-fast ($43\text{ms}$) |
-
----
-
-## 🚀 How to Reproduce All Benchmarks
-
-```bash
-# Clone the repository
-git clone https://github.com/alansyahmi/Schemap.git
-cd Schemap
-
-# 1. Tier 1: Agent Task Outcome Benchmark (Hero Benchmark)
-uv run python benchmarks/tier1_outcome_benchmark.py
-
-# 2. Tier 2: Token Efficiency & Context Compression Benchmark
+# 4. Token & Latency Micro-Benchmarks
 uv run python benchmarks/tier1_token_benchmark.py
-
-# 3. Tier 3: Compiler Latency & Stress Benchmark
 uv run python benchmarks/tier3_latency_stress_benchmark.py
 ```
-

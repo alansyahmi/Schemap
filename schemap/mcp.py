@@ -492,26 +492,41 @@ def execute_tool(name: str, arguments: Dict[str, Any], schema_model: DatabaseSch
         graph = compile_semantic_graph(schema_model)
         val_res = run_verify_sql(sql, graph=graph, tenant_id=tenant_id, auto_patch=True)
 
-        lines = ["### Schemap AST SQL Patch Result", ""]
+        # Re-validate the patched SQL to ensure no remaining violations exist
+        reval_passed = False
+        final_violations = list(val_res.violations)
         if val_res.patched_sql:
+            reval = run_verify_sql(val_res.patched_sql, graph=graph, tenant_id=tenant_id, auto_patch=False, allow_mutations=False)
+            reval_passed = reval.passed
+            final_violations = list(reval.violations)
+
+        is_safe = val_res.passed or reval_passed
+
+        lines = ["### Schemap AST SQL Patch Result", ""]
+        if is_safe and val_res.patched_sql:
             lines.append("🔧 **Sanitized SQL with injected tenant & soft-delete filters**:")
             lines.append(f"```sql\n{val_res.patched_sql}\n```")
-        elif val_res.passed:
+        elif is_safe and val_res.passed:
             lines.append("🟢 **No Patch Needed** — Query is already policy-compliant.")
             lines.append(f"```sql\n{sql}\n```")
+        elif val_res.patched_sql and not reval_passed:
+            lines.append("🔴 **Incomplete Patch — Remaining Hazards Detected**:")
+            lines.append("The query was patched for tenant/soft-delete, but still contains unresolvable safety violations:")
+            lines.append(f"```sql\n{val_res.patched_sql}\n```")
+            for v in final_violations:
+                lines.append(f"- ❌ {v}")
         else:
             lines.append("🔴 **Unpatchable Security Hazard** — The query contains violations that cannot be safely auto-patched (e.g. destructive mutation):")
             for v in val_res.violations:
                 lines.append(f"- ❌ {v}")
 
-        is_safe = val_res.passed or bool(val_res.patched_sql)
         structured_patch = {
             "status": "allow" if is_safe else "reject",
             "passed": is_safe,
-            "violations": val_res.violations,
+            "violations": final_violations,
             "original_sql": sql,
-            "patched_sql": val_res.patched_sql,
-            "patch_applied": bool(val_res.patched_sql),
+            "patched_sql": val_res.patched_sql if is_safe else None,
+            "patch_applied": bool(val_res.patched_sql) and is_safe,
         }
 
         return {

@@ -323,3 +323,35 @@ def test_mcp_patch_tool_rejects_destructive_mutation():
     assert sc["passed"] is False
     assert sc["patch_applied"] is False
     assert sc["patched_sql"] is None
+
+
+def test_mcp_patch_tool_rejects_mixed_violation_with_remaining_cartesian_join():
+    """
+    P0 Regression Test: If a query has a patchable violation (missing tenant filter)
+    AND an unpatchable violation (Cartesian join), schemap_patch must REJECT
+    because the re-validated query still contains violations.
+    """
+    schema = get_contract_test_schema()
+    mixed_sql = "SELECT * FROM orders, users"
+    req = {
+        "jsonrpc": "2.0",
+        "id": 11,
+        "method": "tools/call",
+        "params": {
+            "name": "schemap_patch",
+            "arguments": {
+                "sql": mixed_sql,
+                "tenant_id": "42"
+            }
+        }
+    }
+    resp = dispatch_mcp_request(req, schema)
+    result = resp["result"]
+    sc = result["structuredContent"]
+
+    # Must reject because Cartesian join remains even after WHERE injection
+    assert sc["status"] == "reject"
+    assert sc["passed"] is False
+    assert sc["patch_applied"] is False
+    assert sc["patched_sql"] is None
+    assert any("Cartesian" in v for v in sc["violations"])
