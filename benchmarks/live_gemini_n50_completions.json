@@ -1,0 +1,264 @@
+{
+  "model": "gemini-3.5-flash-lite",
+  "temperature": 0.0,
+  "total_tasks": 5,
+  "condition_a_raw": {
+    "passed": 4,
+    "failed": 1,
+    "verified_pass": 5,
+    "verified_reject": 0,
+    "accuracy_pct": 80.0
+  },
+  "condition_b_grounded": {
+    "passed": 4,
+    "failed": 1,
+    "verified_pass": 5,
+    "verified_reject": 0,
+    "accuracy_pct": 80.0
+  },
+  "strata": {
+    "tenant": {
+      "total": 5,
+      "condition_a_passed": 4,
+      "condition_a_pct": 80.0,
+      "condition_b_passed": 4,
+      "condition_b_pct": 80.0
+    },
+    "soft-delete": {
+      "total": 0,
+      "condition_a_passed": 0,
+      "condition_a_pct": 0,
+      "condition_b_passed": 0,
+      "condition_b_pct": 0
+    },
+    "units": {
+      "total": 0,
+      "condition_a_passed": 0,
+      "condition_a_pct": 0,
+      "condition_b_passed": 0,
+      "condition_b_pct": 0
+    },
+    "joins": {
+      "total": 0,
+      "condition_a_passed": 0,
+      "condition_a_pct": 0,
+      "condition_b_passed": 0,
+      "condition_b_pct": 0
+    },
+    "mutations": {
+      "total": 0,
+      "condition_a_passed": 0,
+      "condition_a_pct": 0,
+      "condition_b_passed": 0,
+      "condition_b_pct": 0
+    }
+  },
+  "completions": [
+    {
+      "id": "SaaS-01",
+      "schema": "saas",
+      "stratum": "tenant",
+      "question": "List all active user emails for Beta Inc (tenant 2)",
+      "tenant_id": 2,
+      "is_destructive": false,
+      "gold": [
+        [
+          "eve@beta.com"
+        ],
+        [
+          "frank@beta.com"
+        ]
+      ],
+      "condition_a": {
+        "passed": true,
+        "raw_response": "```sql\nSELECT email \nFROM users \nWHERE org_id = 2 \n  AND status = 'active' \n  AND deleted_at IS NULL;\n```",
+        "sql": "SELECT email \nFROM users \nWHERE org_id = 2 \n  AND status = 'active' \n  AND deleted_at IS NULL;",
+        "actual_output": [
+          [
+            "eve@beta.com"
+          ],
+          [
+            "frank@beta.com"
+          ]
+        ],
+        "verify_passed": true,
+        "violations": []
+      },
+      "condition_b": {
+        "passed": true,
+        "grounding_plan": "### Schemap Deterministic Grounding Context\n- User Intent: \"List all active user emails for Beta Inc (tenant 2)\"\n- Target Tables: organizations, users\n- Deterministic Join Path [INFERRED (Physical Foreign Keys)]:\n```sql\nFROM organizations\nJOIN users ON organizations.id = users.org_id\n```\n- Mandatory Filters (MUST be included in WHERE clause):\n  * organizations.id = 2 [INFERRED]\n  * users.org_id = 2 [INFERRED]\n  * users.deleted_at IS NULL [INFERRED]",
+        "raw_response": "```sql\nSELECT users.email\nFROM organizations\nJOIN users ON organizations.id = users.org_id\nWHERE organizations.id = 2\n  AND users.org_id = 2\n  AND users.deleted_at IS NULL\n  AND users.status = 'active';\n```",
+        "sql": "SELECT users.email\nFROM organizations\nJOIN users ON organizations.id = users.org_id\nWHERE organizations.id = 2\n  AND users.org_id = 2\n  AND users.deleted_at IS NULL\n  AND users.status = 'active';",
+        "actual_output": [
+          [
+            "eve@beta.com"
+          ],
+          [
+            "frank@beta.com"
+          ]
+        ],
+        "verify_passed": true,
+        "violations": []
+      }
+    },
+    {
+      "id": "SaaS-02",
+      "schema": "saas",
+      "stratum": "tenant",
+      "question": "Show active subscription ID and plan ID for Beta Inc (tenant 2)",
+      "tenant_id": 2,
+      "is_destructive": false,
+      "gold": [
+        [
+          2,
+          2
+        ]
+      ],
+      "condition_a": {
+        "passed": true,
+        "raw_response": "```sql\nSELECT s.id AS subscription_id, s.plan_id\nFROM subscriptions s\nJOIN organizations o ON s.org_id = o.id\nWHERE o.name = 'Beta Inc' AND s.status = 'active';\n```",
+        "sql": "SELECT s.id AS subscription_id, s.plan_id\nFROM subscriptions s\nJOIN organizations o ON s.org_id = o.id\nWHERE o.name = 'Beta Inc' AND s.status = 'active';",
+        "actual_output": [
+          [
+            2,
+            2
+          ]
+        ],
+        "verify_passed": true,
+        "violations": []
+      },
+      "condition_b": {
+        "passed": true,
+        "grounding_plan": "### Schemap Deterministic Grounding Context\n- User Intent: \"Show active subscription ID and plan ID for Beta Inc (tenant 2)\"\n- Target Tables: organizations, subscriptions, plans\n- Deterministic Join Path [INFERRED (Physical Foreign Keys)]:\n```sql\nFROM organizations\nJOIN subscriptions ON organizations.id = subscriptions.org_id\nJOIN plans ON subscriptions.plan_id = plans.id\n```\n- Mandatory Filters (MUST be included in WHERE clause):\n  * organizations.id = 2 [INFERRED]\n  * subscriptions.org_id = 2 [INFERRED]",
+        "raw_response": "```sql\nSELECT \n    subscriptions.id AS subscription_id,\n    plans.id AS plan_id\nFROM organizations\nJOIN subscriptions ON organizations.id = subscriptions.org_id\nJOIN plans ON subscriptions.plan_id = plans.id\nWHERE organizations.id = 2 \n  AND subscriptions.org_id = 2 \n  AND subscriptions.status = 'active';\n```",
+        "sql": "SELECT \n    subscriptions.id AS subscription_id,\n    plans.id AS plan_id\nFROM organizations\nJOIN subscriptions ON organizations.id = subscriptions.org_id\nJOIN plans ON subscriptions.plan_id = plans.id\nWHERE organizations.id = 2 \n  AND subscriptions.org_id = 2 \n  AND subscriptions.status = 'active';",
+        "actual_output": [
+          [
+            2,
+            2
+          ]
+        ],
+        "verify_passed": true,
+        "violations": []
+      }
+    },
+    {
+      "id": "SaaS-03",
+      "schema": "saas",
+      "stratum": "tenant",
+      "question": "Find user emails with role owner for Acme Corp (tenant 1)",
+      "tenant_id": 1,
+      "is_destructive": false,
+      "gold": [
+        [
+          "alice@acme.com"
+        ]
+      ],
+      "condition_a": {
+        "passed": true,
+        "raw_response": "```sql\nSELECT email \nFROM users \nWHERE org_id = 1 AND role = 'owner';\n```",
+        "sql": "SELECT email \nFROM users \nWHERE org_id = 1 AND role = 'owner';",
+        "actual_output": [
+          [
+            "alice@acme.com"
+          ]
+        ],
+        "verify_passed": true,
+        "violations": []
+      },
+      "condition_b": {
+        "passed": true,
+        "grounding_plan": "### Schemap Deterministic Grounding Context\n- User Intent: \"Find user emails with role owner for Acme Corp (tenant 1)\"\n- Target Tables: organizations, users\n- Deterministic Join Path [INFERRED (Physical Foreign Keys)]:\n```sql\nFROM organizations\nJOIN users ON organizations.id = users.org_id\n```\n- Mandatory Filters (MUST be included in WHERE clause):\n  * organizations.id = 1 [INFERRED]\n  * users.org_id = 1 [INFERRED]\n  * users.deleted_at IS NULL [INFERRED]",
+        "raw_response": "```sql\nSELECT users.email\nFROM organizations\nJOIN users ON organizations.id = users.org_id\nWHERE organizations.id = 1\n  AND users.org_id = 1\n  AND users.deleted_at IS NULL\n  AND users.role = 'owner';\n```",
+        "sql": "SELECT users.email\nFROM organizations\nJOIN users ON organizations.id = users.org_id\nWHERE organizations.id = 1\n  AND users.org_id = 1\n  AND users.deleted_at IS NULL\n  AND users.role = 'owner';",
+        "actual_output": [
+          [
+            "alice@acme.com"
+          ]
+        ],
+        "verify_passed": true,
+        "violations": []
+      }
+    },
+    {
+      "id": "SaaS-04",
+      "schema": "saas",
+      "stratum": "tenant",
+      "question": "Find all unpaid or open invoices for Beta Inc (tenant 2)",
+      "tenant_id": 2,
+      "is_destructive": false,
+      "gold": [
+        [
+          "INV-2026-004"
+        ]
+      ],
+      "condition_a": {
+        "passed": false,
+        "raw_response": "```sql\nSELECT *\nFROM invoices\nWHERE org_id = 2\n  AND status != 'paid';\n```",
+        "sql": "SELECT *\nFROM invoices\nWHERE org_id = 2\n  AND status != 'paid';",
+        "actual_output": [
+          [
+            4,
+            2,
+            2,
+            "INV-2026-004",
+            19900,
+            "open",
+            "2026-02-05",
+            null,
+            "2026-09-22 16:52:46"
+          ]
+        ],
+        "verify_passed": true,
+        "violations": []
+      },
+      "condition_b": {
+        "passed": false,
+        "grounding_plan": "### Schemap Deterministic Grounding Context\n- User Intent: \"Find all unpaid or open invoices for Beta Inc (tenant 2)\"\n- Target Tables: invoices, organizations\n- Deterministic Join Path [INFERRED (Physical Foreign Keys)]:\n```sql\nFROM invoices\nJOIN organizations ON invoices.org_id = organizations.id\n```\n- Mandatory Filters (MUST be included in WHERE clause):\n  * invoices.org_id = 2 [INFERRED]\n  * organizations.id = 2 [INFERRED]",
+        "raw_response": "```sql\nSELECT \n    invoices.id,\n    invoices.org_id,\n    invoices.subscription_id,\n    invoices.invoice_number,\n    invoices.amount_cents,\n    invoices.status,\n    invoices.due_date,\n    invoices.paid_at,\n    invoices.created_at\nFROM invoices\nJOIN organizations ON invoices.org_id = organizations.id\nWHERE invoices.org_id = 2 \n  AND organizations.id = 2 \n  AND invoices.status != 'paid'\n```",
+        "sql": "SELECT \n    invoices.id,\n    invoices.org_id,\n    invoices.subscription_id,\n    invoices.invoice_number,\n    invoices.amount_cents,\n    invoices.status,\n    invoices.due_date,\n    invoices.paid_at,\n    invoices.created_at\nFROM invoices\nJOIN organizations ON invoices.org_id = organizations.id\nWHERE invoices.org_id = 2 \n  AND organizations.id = 2 \n  AND invoices.status != 'paid'",
+        "actual_output": [
+          [
+            4,
+            2,
+            2,
+            "INV-2026-004",
+            19900,
+            "open",
+            "2026-02-05",
+            null,
+            "2026-09-22 16:52:46"
+          ]
+        ],
+        "verify_passed": true,
+        "violations": []
+      }
+    },
+    {
+      "id": "SaaS-05",
+      "schema": "saas",
+      "stratum": "tenant",
+      "question": "Show count of paid invoices for Stripe Killer (tenant 3)",
+      "tenant_id": 3,
+      "is_destructive": false,
+      "gold": 0,
+      "condition_a": {
+        "passed": true,
+        "raw_response": "```sql\nSELECT count(*) \nFROM invoices \nWHERE org_id = 3 AND status = 'paid';\n```",
+        "sql": "SELECT count(*) \nFROM invoices \nWHERE org_id = 3 AND status = 'paid';",
+        "actual_output": 0,
+        "verify_passed": true,
+        "violations": []
+      },
+      "condition_b": {
+        "passed": true,
+        "grounding_plan": "### Schemap Deterministic Grounding Context\n- User Intent: \"Show count of paid invoices for Stripe Killer (tenant 3)\"\n- Target Tables: invoices, organizations\n- Deterministic Join Path [INFERRED (Physical Foreign Keys)]:\n```sql\nFROM invoices\nJOIN organizations ON invoices.org_id = organizations.id\n```\n- Mandatory Filters (MUST be included in WHERE clause):\n  * invoices.org_id = 3 [INFERRED]\n  * organizations.id = 3 [INFERRED]",
+        "raw_response": "```sql\nSELECT\n  COUNT(invoices.id)\nFROM invoices\nJOIN organizations\n  ON invoices.org_id = organizations.id\nWHERE\n  invoices.org_id = 3\n  AND invoices.status = 'paid'\n```",
+        "sql": "SELECT\n  COUNT(invoices.id)\nFROM invoices\nJOIN organizations\n  ON invoices.org_id = organizations.id\nWHERE\n  invoices.org_id = 3\n  AND invoices.status = 'paid'",
+        "actual_output": 0,
+        "verify_passed": true,
+        "violations": []
+      }
+    }
+  ]
+}

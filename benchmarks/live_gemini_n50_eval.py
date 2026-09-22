@@ -15,7 +15,7 @@ Scoring:
 
 Usage:
     export GEMINI_API_KEY="your-api-key"
-    uv run python benchmarks/live_gemini_n50_eval.py [--model gemini-2.5-flash] [--limit 50]
+    uv run python benchmarks/live_gemini_n50_eval.py [--model gemini-3.6-flash] [--limit 50]
 """
 
 import argparse
@@ -214,23 +214,47 @@ def extract_sql_from_completion(text: str) -> str:
     return cleaned
 
 
-def call_gemini(client: genai.Client, model: str, prompt: str, system_instruction: str) -> str:
-    """Invokes Gemini API with temperature=0.0."""
-    response = client.models.generate_content(
-        model=model,
-        contents=prompt,
-        config=types.GenerateContentConfig(
-            system_instruction=system_instruction,
-            temperature=0.0,
-            max_output_tokens=1000,
-        )
-    )
-    return response.text or ""
+def call_gemini(client: genai.Client, model: str, prompt: str, system_instruction: str, max_retries: int = 5) -> str:
+    """Invokes Gemini API with temperature=0.0 and robust backoff handling rate limits & quota."""
+    for attempt in range(max_retries):
+        try:
+            response = client.models.generate_content(
+                model=model,
+                contents=prompt,
+                config=types.GenerateContentConfig(
+                    system_instruction=system_instruction,
+                    temperature=0.0,
+                    max_output_tokens=1000,
+                    automatic_function_calling=types.AutomaticFunctionCallingConfig(disable=True),
+                )
+            )
+            return response.text or ""
+        except Exception as e:
+            err_str = str(e)
+            # Detect daily free-tier quota exhaustion
+            if "GenerateRequestsPerDay" in err_str or "limit: 20" in err_str:
+                print(f"\n[DAILY QUOTA EXHAUSTED: Model '{model}' free-tier 20 requests/day limit reached. Please use a billed project key or specify a model with higher free quota such as --model gemini-3.5-flash or gemini-3.5-flash-lite]\n", flush=True)
+                return ""
+
+            # Check if API gave an explicit retry delay
+            match = re.search(r"Please retry in ([\d\.]+)s", err_str)
+            if match:
+                wait_sec = float(match.group(1)) + 1.0
+            else:
+                wait_sec = float(2 ** (attempt + 1))
+
+            if attempt < max_retries - 1:
+                print(f"[RETRY in {wait_sec:.1f}s: {e}]", end=" ", flush=True)
+                time.sleep(wait_sec)
+            else:
+                print(f"[ERROR: {e}]", end=" ", flush=True)
+                return ""
+    return ""
 
 
 def run_live_evaluation(
     api_key: str,
-    model: str = "gemini-2.5-flash",
+    model: str = "gemini-3.6-flash",
     limit: Optional[int] = None,
     delay: float = 0.5
 ) -> Dict[str, Any]:
@@ -373,7 +397,7 @@ def run_live_evaluation(
         # CONDITION B: SCHEMAP GROUNDED + VERIFIED
         # -------------------------------------------------------------
         grounding_res = ground(question, graph, tenant_id=tenant_id)
-        grounding_plan = grounding_res.markdown_plan
+        grounding_plan = grounding_res.prompt_instructions
 
         sys_prompt_b = (
             "You are a database SQL expert. Write a single executable SQLite query for the following question "
@@ -536,7 +560,7 @@ def generate_live_markdown_report(res: Dict[str, Any], output_path: Path) -> Non
 def main():
     parser = argparse.ArgumentParser(description="Live Gemini Model Evaluation on N=50 Benchmark")
     parser.add_argument("--api-key", default=os.environ.get("GEMINI_API_KEY"), help="Google Gemini API Key")
-    parser.add_argument("--model", default="gemini-2.5-flash", help="Gemini Model ID (default: gemini-2.5-flash)")
+    parser.add_argument("--model", default="gemini-3.6-flash", help="Gemini Model ID (default: gemini-3.6-flash)")
     parser.add_argument("--limit", type=int, default=None, help="Limit number of tasks to evaluate")
     parser.add_argument("--delay", type=float, default=0.5, help="Delay between API calls in seconds (default: 0.5)")
     args = parser.parse_args()

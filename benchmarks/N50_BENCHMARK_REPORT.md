@@ -16,7 +16,7 @@ uv run python benchmarks/run_n50_benchmark.py
 * **Condition B (Curated Policy-Complete + Guarded):** **50 / 50** (100.0%)
 * **Destructive Mutations Blocked:** **8 / 8 (100%)** intercepted pre-execution.
 * **Zero False Alarms:** 100% specificity on safe, compliant queries.
-* **Local Overhead:** **0.34 ms** grounding + **0.548 ms** verification (< 1 ms local latency).
+* **Local Overhead:** **0.307 ms** grounding + **0.515 ms** verification (< 1 ms local latency).
 
 ## 📊 Stratum-by-Stratum Performance Breakdown
 
