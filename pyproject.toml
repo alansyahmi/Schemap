@@ -62,7 +62,14 @@ Changelog = "https://github.com/alansyahmi/Schemap/releases"
 [project.optional-dependencies]
 dev = [
     "pytest>=8.0.0",
-    "pytest-mock>=3.10.0"
+    "pytest-mock>=3.10.0",
+    "fastapi>=0.100.0",
+    "httpx>=0.25.0",
+    "pydantic-settings>=2.0.0",
+    "sqlalchemy>=2.0.0",
+    "stripe>=8.0.0",
+    "resend>=0.8.0",
+    "numpy>=1.24.0"
 ]
 enrich = [
     "openai>=1.14.0"
