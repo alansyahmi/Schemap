@@ -5,9 +5,9 @@ document.addEventListener("DOMContentLoaded", () => {
     // HERO INTERACTIVE TERMINAL
     // ============================================================
     const heroTabCommands = {
+        ground: 'schemap ground "What was total revenue?" --tenant-id 1',
+        verify: 'schemap verify "DELETE FROM users WHERE status = \'inactive\'"',
         context: "schemap context",
-        doctor: "schemap doctor",
-        join: "schemap join users payments",
         agents: "schemap agents --targets codex,claude,cursor"
     };
 
@@ -38,7 +38,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // Initial typing
-    typeCommandText(heroTabCommands.context);
+    typeCommandText(heroTabCommands.ground);
 
     // Hero Command Tabs Click Handler
     document.querySelectorAll("[data-hero-cmd]").forEach((tab) => {
@@ -236,23 +236,28 @@ document.addEventListener("DOMContentLoaded", () => {
     // PACKAGE MANAGER SWITCHER
     // ============================================================
     const pmCommands = {
+        uvx: {
+            install: 'uvx schemap-tool@4.0.1 ground "What was total revenue?" --db "sqlite:///saas.db"',
+            upgrade: "uvx --refresh schemap-tool@4.0.1 --version",
+            copyText: "Copy uvx command"
+        },
         pipx: {
-            install: "pipx install schemap-tool",
+            install: "pipx install schemap-tool==4.0.1",
             upgrade: "pipx upgrade schemap-tool",
             copyText: "Copy pipx install"
         },
         uv: {
-            install: "uv tool install schemap-tool",
+            install: "uv tool install schemap-tool==4.0.1",
             upgrade: "uv tool upgrade schemap-tool",
             copyText: "Copy uv install"
         },
         pip: {
-            install: "pip install schemap-tool",
+            install: "pip install schemap-tool==4.0.1",
             upgrade: "pip install --upgrade schemap-tool",
             copyText: "Copy pip install"
         }
     };
-    let currentPm = "pipx";
+    let currentPm = "uvx";
 
     document.querySelectorAll("[data-pm]").forEach((btn) => {
         btn.addEventListener("click", () => {
@@ -281,7 +286,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (copy) {
         copy.addEventListener("click", async () => {
             try {
-                const textToCopy = pmCommands[currentPm]?.install || "pipx install schemap-tool";
+                const textToCopy = pmCommands[currentPm]?.install || 'uvx schemap-tool@4.0.1 ground "What was total revenue?" --db "sqlite:///saas.db"';
                 await navigator.clipboard.writeText(textToCopy);
                 const original = copy.textContent;
                 copy.textContent = "Copied to clipboard!";

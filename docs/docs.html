@@ -4,21 +4,21 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Schemap v3.3.0 Documentation &amp; CLI Reference | AI Database Context</title>
+    <title>Schemap v4.0.1 Documentation &amp; CLI Reference | AI Database Context</title>
     <meta name="description"
-        content="Complete CLI command reference, interactive TUI menu, agent rules generator (.mdc, CLAUDE.md, AGENTS.md), and configuration documentation for Schemap v3.3.0 database intelligence compiler.">
+        content="Complete CLI command reference, interactive TUI menu, agent rules generator (.mdc, CLAUDE.md, AGENTS.md), and configuration documentation for Schemap v4.0.1 database intelligence compiler.">
     <meta name="keywords"
         content="schemap documentation, database context cli reference, cursor rules database cli, claude code database context, agents md generator, schemap doctor, schemap join, ai readiness score">
     <link rel="canonical" href="https://schemap-tool.pages.dev/docs.html">
     <meta property="og:type" content="article">
     <meta property="og:url" content="https://schemap-tool.pages.dev/docs.html">
-    <meta property="og:title" content="Schemap v3.3.0 Documentation &amp; CLI Reference">
-    <meta property="og:description" content="Complete CLI command reference, interactive TUI menu, agent rules generator (.mdc, CLAUDE.md, AGENTS.md), and configuration documentation for Schemap v3.3.0.">
+    <meta property="og:title" content="Schemap v4.0.1 Documentation &amp; CLI Reference">
+    <meta property="og:description" content="Complete CLI command reference, interactive TUI menu, agent rules generator (.mdc, CLAUDE.md, AGENTS.md), and configuration documentation for Schemap v4.0.1.">
     <meta property="og:image" content="https://schemap-tool.pages.dev/assets/Icon%20Dark.png">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:url" content="https://schemap-tool.pages.dev/docs.html">
-    <meta name="twitter:title" content="Schemap v3.3.0 Documentation &amp; CLI Reference">
-    <meta name="twitter:description" content="Complete CLI command reference, interactive TUI menu, agent rules generator (.mdc, CLAUDE.md, AGENTS.md), and configuration documentation for Schemap v3.3.0.">
+    <meta name="twitter:title" content="Schemap v4.0.1 Documentation &amp; CLI Reference">
+    <meta name="twitter:description" content="Complete CLI command reference, interactive TUI menu, agent rules generator (.mdc, CLAUDE.md, AGENTS.md), and configuration documentation for Schemap v4.0.1.">
     <meta name="twitter:image" content="https://schemap-tool.pages.dev/assets/Icon%20Dark.png">
     <link rel="icon" href="assets/Icon Dark.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -32,8 +32,8 @@
     {
       "@context": "https://schema.org",
       "@type": "TechArticle",
-      "headline": "Schemap v3.3.0 Documentation & CLI Reference",
-      "description": "Complete CLI command reference, interactive TUI menu, AI agent skill guide, and configuration documentation for Schemap v3.3.0.",
+      "headline": "Schemap v4.0.1 Documentation & CLI Reference",
+      "description": "Complete CLI command reference, interactive TUI menu, AI agent skill guide, and configuration documentation for Schemap v4.0.1.",
       "url": "https://schemap-tool.pages.dev/docs.html",
       "inLanguage": "en",
       "articleSection": "Developer Tools Documentation",
@@ -98,7 +98,7 @@
 
     <main class="docs-container">
         <header class="docs-hero">
-            <a href="docs.html" class="v3-banner"><span class="v3-badge">v3.1.0</span> Database Intelligence Layer Reference</a>
+            <a href="docs.html" class="v3-banner"><span class="v3-badge">v4.0.1</span> Database Intelligence Layer Reference</a>
             <h1>Schemap CLI Reference &amp; Safety Guide</h1>
             <p class="section-lead">Learn how to configure AI safety guardrails, scope context profiles, measure token cost savings, analyze schema health, and compile deterministic context maps for Claude Code, Cursor, Codex, and AI agents.</p>
             <div class="docs-search-bar">
@@ -127,7 +127,10 @@
                 <div class="docs-nav-group">
                     <div class="docs-nav-title">Getting Started</div>
                     <a href="#install" class="docs-nav-link">Installation</a>
-                    <a href="#quickstart" class="docs-nav-link">schemap quickstart <span class="doc-tag new">v3</span></a>
+                    <a href="#ground" class="docs-nav-link">schemap ground <span class="doc-tag new">v4</span></a>
+                    <a href="#verify" class="docs-nav-link">schemap verify <span class="doc-tag new">v4</span></a>
+                    <a href="#mcp" class="docs-nav-link">schemap mcp <span class="doc-tag new">v4</span></a>
+                    <a href="#quickstart" class="docs-nav-link">schemap quickstart</a>
                     <a href="#init" class="docs-nav-link">schemap init</a>
                 </div>
 
@@ -183,22 +186,81 @@
                     <div class="doc-card">
                         <div class="doc-card-header">
                             <span class="doc-cmd">Installation</span>
-                            <span class="doc-tag">pipx / uv / pip</span>
+                            <span class="doc-tag">uvx / pipx / uv</span>
                         </div>
-                        <p>Install Schemap globally on your workstation using <code>pipx</code> or <code>uv</code>:</p>
-                        <pre><code># Recommended: Install globally via pipx
-pipx install schemap-tool
+                        <p>Run instantly with zero install via <code>uvx</code>, or install globally:</p>
+                        <pre><code># 1. Zero install — run grounding directly
+uvx schemap-tool@4.0.1 ground "What was total revenue?" --db "sqlite:///saas.db"
 
-# Or using uv
-uv tool install schemap-tool
+# 2. Or install globally on your workstation
+uv tool install schemap-tool==4.0.1
+pipx install schemap-tool==4.0.1
 
-# Self-update to latest PyPI version anytime
+# 3. Self-update to latest PyPI version anytime
 schemap update
-schemap update --check   # Check without installing
+schemap update --check   # Check without installing</code></pre>
+                    </div>
+                </section>
 
-# Clean uninstallation with optional config purge
-schemap uninstall
-schemap uninstall --purge   # Completely remove credentials & cache</code></pre>
+                <section id="ground" class="doc-section">
+                    <div class="doc-card">
+                        <div class="doc-card-header">
+                            <span class="doc-cmd">schemap ground</span>
+                            <span class="doc-tag new">v4.0 New</span>
+                        </div>
+                        <p>Generates a deterministic grounding plan for an AI coding agent before it writes SQL. Automatically resolves currency scale (e.g. cents to dollars), multi-hop foreign key join paths, and mandatory invariants (soft-delete filters, tenant isolation).</p>
+                        <pre><code># Ground prompt with tenant isolation
+schemap ground "What was Acme Corp's total paid revenue?" --db "sqlite:///saas.db" --tenant-id 1
+
+# Ground multi-hop join relationships
+schemap ground "List every invoice ID and its plan name" --db "sqlite:///saas.db"</code></pre>
+                        <table class="param-table">
+                            <thead>
+                                <tr><th>Option</th><th>Description</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td><code>--db &lt;url&gt;</code></td><td>Override target database connection string.</td></tr>
+                                <tr><td><code>--tenant-id &lt;id&gt;</code></td><td>Enforce tenant isolation invariant in the generated grounding plan.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section id="verify" class="doc-section">
+                    <div class="doc-card">
+                        <div class="doc-card-header">
+                            <span class="doc-cmd">schemap verify</span>
+                            <span class="doc-tag new">v4.0 New</span>
+                        </div>
+                        <p>Verifies agent-generated SQL against policy rules and tenant invariants. Rejects and intercepts destructive mutations (<code>DELETE</code>, <code>DROP</code>, <code>TRUNCATE</code>) in read/analytics scopes before execution.</p>
+                        <pre><code># Verify tenant-safe query
+schemap verify "SELECT SUM(amount_cents)/100.0 FROM invoices WHERE org_id = 1" --db "sqlite:///saas.db" --tenant-id 1
+
+# Intercept and block dangerous mutations
+schemap verify "DELETE FROM users WHERE status = 'inactive'" --db "sqlite:///saas.db"</code></pre>
+                    </div>
+                </section>
+
+                <section id="mcp" class="doc-section">
+                    <div class="doc-card">
+                        <div class="doc-card-header">
+                            <span class="doc-cmd">schemap mcp</span>
+                            <span class="doc-tag new">v4.0 New</span>
+                        </div>
+                        <p>Launches the Model Context Protocol (MCP) server for Cursor and Claude Code, providing <code>schemap_ground</code> and <code>schemap_verify</code> tool endpoints.</p>
+                        <pre><code># Launch stdio MCP server directly
+uvx schemap-tool@4.0.1 mcp
+
+# In Cursor (.cursor/mcp.json) or Claude Code (claude_desktop_config.json):
+# {
+#   "mcpServers": {
+#     "schemap": {
+#       "command": "uvx",
+#       "args": ["schemap-tool@4.0.1", "mcp"],
+#       "env": { "DATABASE_URL": "postgresql://user:pass@host:5432/dbname" }
+#     }
+#   }
+# }</code></pre>
                     </div>
                 </section>
 

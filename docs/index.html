@@ -40,7 +40,7 @@
       "applicationCategory": "DeveloperApplication",
       "description": "Deterministic AI Database Context Compiler and TUI menu for Claude Code (CLAUDE.md), Cursor (.cursor/rules/*.mdc), Windsurf, Codex (AGENTS.md), and GitHub Copilot.",
       "url": "https://schemap-tool.pages.dev/",
-      "softwareVersion": "3.3.0",
+      "softwareVersion": "4.0.1",
       "offers": [
         {
           "@type": "Offer",
@@ -184,25 +184,56 @@
                     style="display:flex;align-items:center;justify-content:space-between;padding:8px 14px;border-bottom:1px solid var(--line);">
                     <div style="display:flex;align-items:center;gap:7px;">
                         <i class="dot red"></i><i class="dot yellow"></i><i class="dot green"></i>
-                        <span style="color:var(--subtle);font-size:.72rem;margin-left:4px;">schemap cli v3.3.0</span>
+                        <span style="color:var(--subtle);font-size:.72rem;margin-left:4px;">schemap cli v4.0.1</span>
                     </div>
                     <div class="hero-cmd-tabs" style="display:flex;gap:4px;">
-                        <button class="hero-cmd-tab is-active" data-hero-cmd="context"
-                            style="padding:4px 10px;font:600 .72rem 'JetBrains Mono',monospace;border:1px solid var(--line);background:var(--surface2);color:var(--text);border-radius:var(--radius);cursor:pointer;">context</button>
-                        <button class="hero-cmd-tab" data-hero-cmd="doctor"
-                            style="padding:4px 10px;font:600 .72rem 'JetBrains Mono',monospace;border:1px solid var(--line);background:transparent;color:var(--muted);border-radius:var(--radius);cursor:pointer;">doctor</button>
-                        <button class="hero-cmd-tab" data-hero-cmd="join"
-                            style="padding:4px 10px;font:600 .72rem 'JetBrains Mono',monospace;border:1px solid var(--line);background:transparent;color:var(--muted);border-radius:var(--radius);cursor:pointer;">join</button>
+                        <button class="hero-cmd-tab is-active" data-hero-cmd="ground"
+                            style="padding:4px 10px;font:600 .72rem 'JetBrains Mono',monospace;border:1px solid var(--line);background:var(--surface2);color:var(--text);border-radius:var(--radius);cursor:pointer;">ground</button>
+                        <button class="hero-cmd-tab" data-hero-cmd="verify"
+                            style="padding:4px 10px;font:600 .72rem 'JetBrains Mono',monospace;border:1px solid var(--line);background:transparent;color:var(--muted);border-radius:var(--radius);cursor:pointer;">verify</button>
+                        <button class="hero-cmd-tab" data-hero-cmd="context"
+                            style="padding:4px 10px;font:600 .72rem 'JetBrains Mono',monospace;border:1px solid var(--line);background:transparent;color:var(--muted);border-radius:var(--radius);cursor:pointer;">context</button>
                         <button class="hero-cmd-tab" data-hero-cmd="agents"
                             style="padding:4px 10px;font:600 .72rem 'JetBrains Mono',monospace;border:1px solid var(--line);background:transparent;color:var(--muted);border-radius:var(--radius);cursor:pointer;">agents</button>
                     </div>
                 </div>
                 <div class="terminal-body" style="min-height:220px;padding:18px 20px;">
-                    <p style="margin-bottom:10px;"><b class="prompt">$</b> <span id="type-cmd">schemap context</span><i
+                    <p style="margin-bottom:10px;"><b class="prompt">$</b> <span id="type-cmd">schemap ground "What was total revenue?" --tenant-id 1</span><i
                             class="cursor"></i></p>
 
+                    <!-- Output: schemap ground -->
+                    <div id="hero-output-ground" class="hero-output-panel">
+                        <p class="muted">→ Connecting to database... Connected (6 tables)</p>
+                        <p><b class="ok">✓</b> Generated deterministic invariants &amp; measures:</p>
+                        <pre
+                            style="margin:8px 0 0;padding:8px 12px;background:var(--bg);border:1px solid var(--line);border-radius:var(--radius);color:#a6e5c9;font-size:.78rem;line-height:1.5;">[Deterministic Join Path]
+  FROM invoices
+  JOIN subscriptions ON invoices.subscription_id = subscriptions.id
+  JOIN plans ON subscriptions.plan_id = plans.id
+
+[Mandatory Invariants]
+  * invoices.org_id = '1' (Tenant Isolation Enforced)
+  * usage_events.deleted_at IS NULL (Soft Delete Filter)
+
+[Resolved Measures]
+  * amount_cents [INFERRED]: SUM(invoices.amount_cents) / 100.0</pre>
+                    </div>
+
+                    <!-- Output: schemap verify -->
+                    <div id="hero-output-verify" class="hero-output-panel" hidden>
+                        <p class="muted">→ Evaluating SQL against safety guardrails...</p>
+                        <p style="color:var(--red);"><b>✗</b> Policy Violation Intercepted (Blocked Before Execution)</p>
+                        <pre
+                            style="margin:8px 0 0;padding:8px 12px;background:var(--bg);border:1px solid rgba(255,119,112,.3);border-radius:var(--radius);color:#ff9e9a;font-size:.78rem;line-height:1.5;">=======================================================
+ Schemap SQL Policy &amp; Guardrail Verification
+=======================================================
+  STATUS: [REJECTED] Policy Violations Detected:
+    * Policy Violation: Mutation 'Delete' is forbidden in read/analytics scope.
+=======================================================</pre>
+                    </div>
+
                     <!-- Output: schemap context -->
-                    <div id="hero-output-context" class="hero-output-panel">
+                    <div id="hero-output-context" class="hero-output-panel" hidden>
                         <p class="muted">→ Inspecting schema metadata (8 tables)...</p>
                         <p class="muted">→ Resolving 12 foreign-key relationships &amp; centrality scores...</p>
                         <p><b class="ok">✓</b> Compiled 8 tables into <span
@@ -213,31 +244,6 @@
 orders (account_id → accounts.id) [PK: id]
   ├─ payments (order_id → orders.id)
   └─ order_items (order_id → orders.id, product_id → products.id)</pre>
-                    </div>
-
-                    <!-- Output: schemap doctor -->
-                    <div id="hero-output-doctor" class="hero-output-panel" hidden>
-                        <p class="muted">→ Running AI database health check...</p>
-                        <p><b class="ok">✓</b> Calculated AI Readiness Score: <strong
-                                style="color:var(--green);">92/100</strong></p>
-                        <p style="color:var(--yellow);margin-top:6px;"><b>!</b> Inferred foreign key candidate found:
-                        </p>
-                        <pre
-                            style="margin:6px 0 0;padding:8px 12px;background:var(--bg);border:1px solid var(--line);border-radius:var(--radius);color:var(--blue);font-size:.78rem;line-height:1.5;">orders.user_id ──(95% confidence)──> users.id
-Run `schemap fix --interactive` to add override to schemap.yaml</pre>
-                    </div>
-
-                    <!-- Output: schemap join -->
-                    <div id="hero-output-join" class="hero-output-panel" hidden>
-                        <p class="muted">→ Solving shortest join path between <code
-                                style="color:var(--text);">users</code> and <code
-                                style="color:var(--text);">payments</code>...</p>
-                        <p><b class="ok">✓</b> Path found (2 hops): <span style="color:var(--blue);">users → orders →
-                                payments</span></p>
-                        <pre
-                            style="margin:8px 0 0;padding:8px 12px;background:var(--bg);border:1px solid var(--line);border-radius:var(--radius);color:#c69bff;font-size:.78rem;line-height:1.5;">SELECT * FROM users
-JOIN orders ON users.id = orders.user_id
-JOIN payments ON orders.id = payments.order_id;</pre>
                     </div>
 
                     <!-- Output: schemap agents -->
@@ -560,43 +566,37 @@ Success: 100% accurate join path generated</pre>
                 <h2>Built to stop AI SQL errors and cut token costs.</h2>
                 <div class="feature-grid">
                     <article><small>01</small>
-                        <h3>Anti-Hallucination Guardrails</h3>
-                        <p>Auto-detect ambiguous foreign keys and write explicit negative rules to stop AI agents from
-                            querying invalid JOINs.</p>
-                        <code>schemap agents</code>
+                        <h3>Deterministic Semantic Grounding</h3>
+                        <p>Resolve currency scaling (cents to dollars), multi-hop foreign keys, and soft-delete filters before your agent writes SQL.</p>
+                        <code>schemap ground "query"</code>
                     </article>
                     <article><small>02</small>
-                        <h3>Role-Scoped Profiles</h3>
-                        <p>Filter schema context outputs by role (e.g. <code>analytics</code> vs <code>backend</code>)
-                            to keep prompt context hyper-focused.</p>
-                        <code>schemap context --scope analytics</code>
+                        <h3>Policy &amp; Guardrail Verification</h3>
+                        <p>Intercept and reject dangerous mutations (DELETE, DROP) and enforce tenant isolation before queries run in production.</p>
+                        <code>schemap verify "SQL"</code>
                     </article>
                     <article><small>03</small>
-                        <h3>Token Savings &amp; Cost Inspector</h3>
-                        <p>Measure raw vs. compiled context tokens (80%+ savings) and calculate dollar savings per
-                            prompt.</p>
-                        <code>schemap benchmark --cost</code>
+                        <h3>Live MCP Server Integration</h3>
+                        <p>Connect Schemap directly to Cursor and Claude Code via Model Context Protocol for automated query grounding.</p>
+                        <code>schemap mcp</code>
                     </article>
                     <article><small>04</small>
-                        <h3>Shortest JOIN Path Solver</h3>
-                        <p>Solve multi-hop foreign key paths across tables and output canonical reference SQL JOIN
-                            clauses instantly.</p>
-                        <code>schemap join users payments</code>
+                        <h3>Native Agent Rules Generation</h3>
+                        <p>Compile persistent, token-compressed schema context and anti-hallucination rules for <code>.cursor/rules/*.mdc</code>, <code>CLAUDE.md</code>, and <code>AGENTS.md</code>.</p>
+                        <code>schemap agents</code>
                     </article>
                     <article><small>05</small>
-                        <h3>AI Readiness &amp; Auto-Fix</h3>
-                        <p>Diagnose schema health (0-100 score) and interactively accept inferred foreign keys and
-                            abbreviation mappings.</p>
-                        <code>schemap doctor / fix</code>
+                        <h3>Shortest JOIN Path Solver</h3>
+                        <p>Solve complex multi-hop foreign key relationships across tables and output canonical reference SQL JOIN clauses instantly.</p>
+                        <code>schemap join users payments</code>
                     </article>
                     <article><small>06</small>
                         <div style="display:flex;align-items:center;justify-content:space-between;">
-                            <h3>CI/CD Migration Risk Gate</h3>
+                            <h3>CI/CD Migration Quality Gate</h3>
                             <span class="flow-badge pro" style="font-size:0.65rem;padding:2px 6px;">PRO</span>
                         </div>
-                        <p>Analyze migration diffs for breaking schema changes that threaten AI context maps in
-                            automated CI/CD builds.</p>
-                        <code>schemap diff --risk --fail-on-breaking</code>
+                        <p>Evaluate schema PRs against AI readiness scores and block breaking changes with automated GitHub Actions comments.</p>
+                        <code>schemap gate --fail-on-breaking</code>
                     </article>
                 </div>
             </div>
@@ -611,8 +611,10 @@ Success: 100% accurate join path generated</pre>
                 </p>
 
                 <div class="pm-toggle"
-                    style="display:flex;justify-content:center;gap:6px;margin:-1rem auto 2rem;max-width:320px;background:var(--surface2);padding:4px;border:1px solid var(--line);border-radius:var(--radius);">
-                    <button class="pm-btn is-active" data-pm="pipx"
+                    style="display:flex;justify-content:center;gap:6px;margin:-1rem auto 2rem;max-width:380px;background:var(--surface2);padding:4px;border:1px solid var(--line);border-radius:var(--radius);">
+                    <button class="pm-btn is-active" data-pm="uvx"
+                        style="flex:1;padding:6px 12px;border:0;background:var(--blue);color:var(--bg);font-weight:600;font-size:0.8rem;border-radius:var(--radius);cursor:pointer;">uvx (Zero Install)</button>
+                    <button class="pm-btn" data-pm="pipx"
                         style="flex:1;padding:6px 12px;border:0;background:transparent;color:var(--muted);font-weight:600;font-size:0.8rem;border-radius:var(--radius);cursor:pointer;">pipx</button>
                     <button class="pm-btn" data-pm="uv"
                         style="flex:1;padding:6px 12px;border:0;background:transparent;color:var(--muted);font-weight:600;font-size:0.8rem;border-radius:var(--radius);cursor:pointer;">uv</button>
@@ -625,14 +627,41 @@ Success: 100% accurate join path generated</pre>
                         <span class="flow-badge free">Free (Works immediately)</span>
                     </div>
                     <div class="install-steps">
-                        <p class="step-comment"># 1. Install developer CLI globally</p>
-                        <pre><code id="install-cmd-code">pipx install schemap-tool</code></pre>
-                        <p class="step-comment"># 2. Verify installation</p>
-                        <pre><code>schemap --version</code></pre>
-                        <p class="step-comment"># 3. Initialize &amp; compile context</p>
-                        <pre><code>schemap init</code></pre>
-                        <pre><code>schemap context</code></pre>
+                        <p class="step-comment"># 1. Zero install — run deterministic grounding</p>
+                        <pre><code id="install-cmd-code">uvx schemap-tool@4.0.1 ground "What was total revenue?" --db "sqlite:///saas.db"</code></pre>
+                        <p class="step-comment"># 2. Verify SQL safety before execution</p>
+                        <pre><code>uvx schemap-tool@4.0.1 verify "SELECT SUM(amount_cents)/100.0 FROM invoices" --db "sqlite:///saas.db"</code></pre>
+                        <p class="step-comment"># 3. Or launch native MCP server in Cursor / Claude Code</p>
+                        <pre><code>uvx schemap-tool@4.0.1 mcp</code></pre>
                     </div>
+                </div>
+
+                <!-- LIVE MCP CONFIGURATION -->
+                <div class="install-card" style="margin-top: 1.5rem; background: var(--surface2); border: 1px solid var(--line);">
+                    <div class="install-flow-header">
+                        <span class="flow-badge" style="background: rgba(141,184,255,0.15); color: var(--blue); border: 1px solid rgba(141,184,255,0.3);">Cursor &amp; Claude Code MCP Configuration</span>
+                    </div>
+                    <p class="step-comment" style="margin-bottom: 8px;">Add to <code>.cursor/mcp.json</code> or <code>claude_desktop_config.json</code>:</p>
+                    <pre><code style="font-size: 0.78rem;">{
+  "mcpServers": {
+    "schemap": {
+      "command": "uvx",
+      "args": ["schemap-tool@4.0.1", "mcp"],
+      "env": {
+        "DATABASE_URL": "postgresql://user:pass@host:5432/dbname"
+      }
+    }
+  }
+}</code></pre>
+                </div>
+
+                <!-- 10-MINUTE STRANGER TEST KIT -->
+                <div class="install-card" style="margin-top: 1.5rem; background: rgba(80,211,154,0.05); border: 1px solid rgba(80,211,154,0.3);">
+                    <div class="install-flow-header">
+                        <span class="flow-badge free" style="background: rgba(80,211,154,0.15); color: var(--green); border: 1px solid rgba(80,211,154,0.3);">⚡ 10-Minute Stranger Evaluation Kit</span>
+                    </div>
+                    <p style="font-size: 0.85rem; color: var(--text); margin: 0 0 12px; line-height: 1.5;">Test whether your AI coding agent makes semantic errors on a real SaaS schema (cents scale, soft-deleted records, multi-hop joins) in 5 hands-on evaluation tasks.</p>
+                    <a class="btn btn-secondary full-width" href="https://github.com/alansyahmi/Schemap/tree/main/demo" target="_blank" rel="noopener" style="text-align: center; display: block;">Open 10-Minute Test Kit on GitHub ↗</a>
                 </div>
 
                 <div class="install-card pro-card"
@@ -651,13 +680,13 @@ Success: 100% accurate join path generated</pre>
 
                 <div
                     style="margin-top: 2rem; display: flex; align-items: center; justify-content: center; gap: 1rem; flex-wrap: wrap;">
-                    <button id="copy-install-btn" class="btn btn-primary">Copy pipx install</button>
+                    <button id="copy-install-btn" class="btn btn-primary">Copy uvx command</button>
                     <span class="muted" style="font-size: 0.875rem;">Requirements: Python 3.10+ · Local-First</span>
                 </div>
                 <div
                     style="margin-top: 1rem; color: var(--subtle); font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; text-align: center;">
                     Already installed? Update anytime with <code style="color: var(--blue);">schemap update</code> or <code id="upgrade-cmd-code"
-                        style="color: var(--blue);">pipx upgrade schemap-tool</code>
+                        style="color: var(--blue);">uvx --refresh schemap-tool@4.0.1 --version</code>
                 </div>
             </div>
         </section>
