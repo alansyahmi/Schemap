@@ -89,6 +89,24 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // ============================================================
+    // MCP CLIENT TABS
+    // ============================================================
+    document.querySelectorAll("[data-mcp-tab]").forEach((tab) => {
+        tab.addEventListener("click", () => {
+            const target = tab.dataset.mcpTab;
+            document.querySelectorAll("[data-mcp-tab]").forEach((item) => {
+                const active = item === tab;
+                item.classList.toggle("is-active", active);
+                item.style.background = active ? "var(--blue)" : "transparent";
+                item.style.color = active ? "var(--bg)" : "var(--muted)";
+            });
+            document.querySelectorAll("[data-mcp-panel]").forEach((panel) => {
+                panel.hidden = panel.dataset.mcpPanel !== target;
+            });
+        });
+    });
+
+    // ============================================================
     // BENCHMARK VISUALIZATION SUITE
     // ============================================================
     const benchmarkSchemas = {

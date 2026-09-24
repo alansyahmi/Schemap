@@ -146,6 +146,7 @@
                 <a href="#how-it-works">How it works</a>
                 <a href="#benchmarks">Benchmarks</a>
                 <a href="#features">Features</a>
+                <a href="#mcp">MCP</a>
                 <a href="security.html">Security</a>
                 <a href="blog.html">Blog</a>
                 <a href="docs.html">Docs</a>
@@ -624,6 +625,131 @@ orders (account_id → accounts.id) [PK: id]
             </div>
         </section>
 
+        <!-- 5b. LIVE MODEL CONTEXT PROTOCOL (MCP) INTEGRATION -->
+        <section id="mcp" class="section section-dark" style="border-top:1px solid var(--line);border-bottom:1px solid var(--line);">
+            <div class="section-container">
+                <div style="text-align:center;max-width:760px;margin:0 auto 3rem;">
+                    <div style="display:inline-flex;align-items:center;gap:6px;padding:4px 12px;background:rgba(141,184,255,0.12);border:1px solid rgba(141,184,255,0.3);border-radius:100px;font-size:0.8rem;font-weight:600;color:var(--blue);margin-bottom:1rem;">
+                        <svg class="inline-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v6"/><path d="M6 8h12v4a6 6 0 0 1-12 0V8z"/><path d="M12 18v4"/></svg>
+                        Model Context Protocol (MCP) Integration
+                    </div>
+                    <p class="eyebrow">Zero-Latency Autonomous IDE Grounding</p>
+                    <h2>Give Cursor &amp; Claude Code Instant Database Awareness</h2>
+                    <p class="section-lead">Your coding agent calls Schemap tools over local stdio JSON-RPC before writing or running SQL. Zero manual copy-pasting, zero prompt bloat, zero credential leakage.</p>
+                </div>
+
+                <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(320px, 1fr));gap:24px;align-items:stretch;">
+                    <!-- LEFT COLUMN: The Automated Agent Protocol -->
+                    <div style="background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:24px;display:flex;flex-direction:column;justify-content:space-between;">
+                        <div>
+                            <span style="font:600 .75rem 'JetBrains Mono',monospace;color:var(--yellow);text-transform:uppercase;letter-spacing:0.5px;">The Autonomous Tool Loop</span>
+                            <h3 style="margin:8px 0 16px;font-size:1.3rem;">How Your Agent Works With Schemap</h3>
+                            
+                            <div style="display:flex;flex-direction:column;gap:16px;">
+                                <div style="display:flex;gap:14px;align-items:flex-start;">
+                                    <span style="display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;background:rgba(80,211,154,0.15);color:var(--green);border:1px solid rgba(80,211,154,0.3);border-radius:50%;font:700 0.8rem 'JetBrains Mono',monospace;flex-shrink:0;">1</span>
+                                    <div>
+                                        <h4 style="margin:0 0 4px;font-size:0.95rem;color:var(--text);font-family:'JetBrains Mono',monospace;">schemap_ground</h4>
+                                        <p style="margin:0;font-size:0.83rem;color:var(--muted);line-height:1.45;">Before generating SQL, your agent calls <code>schemap_ground</code> with its question. Schemap extracts mandatory invariants, currency scale (<code style="color:var(--blue);">amount_cents / 100.0</code>), multi-hop join graphs, and soft-delete filters.</p>
+                                    </div>
+                                </div>
+
+                                <div style="display:flex;gap:14px;align-items:flex-start;">
+                                    <span style="display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;background:rgba(141,184,255,0.15);color:var(--blue);border:1px solid rgba(141,184,255,0.3);border-radius:50%;font:700 0.8rem 'JetBrains Mono',monospace;flex-shrink:0;">2</span>
+                                    <div>
+                                        <h4 style="margin:0 0 4px;font-size:0.95rem;color:var(--text);font-family:'JetBrains Mono',monospace;">schemap_verify</h4>
+                                        <p style="margin:0;font-size:0.83rem;color:var(--muted);line-height:1.45;">Before running SQL, your agent passes the query to <code>schemap_verify</code>. Schemap AST inspects permissions, enforces tenant boundaries, and strictly rejects destructive mutations (<code style="color:var(--red);">DELETE</code> / <code style="color:var(--red);">DROP</code>).</p>
+                                    </div>
+                                </div>
+
+                                <div style="display:flex;gap:14px;align-items:flex-start;">
+                                    <span style="display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;background:rgba(245,200,101,0.15);color:var(--yellow);border:1px solid rgba(245,200,101,0.3);border-radius:50%;font:700 0.8rem 'JetBrains Mono',monospace;flex-shrink:0;">3</span>
+                                    <div>
+                                        <h4 style="margin:0 0 4px;font-size:0.95rem;color:var(--text);font-family:'JetBrains Mono',monospace;">100% Local-First Security</h4>
+                                        <p style="margin:0;font-size:0.83rem;color:var(--muted);line-height:1.45;">Runs over local stdio JSON-RPC 2.0. No cloud daemon, zero database row data is inspected, and zero credentials leave your workstation.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+                            <span style="font-size:0.75rem;color:var(--subtle);font-family:'JetBrains Mono',monospace;">Protocol: Model Context Protocol (stdio)</span>
+                            <span style="font-size:0.75rem;color:var(--green);font-weight:600;">✓ Sub-3ms response</span>
+                        </div>
+                    </div>
+
+                    <!-- RIGHT COLUMN: Client Configuration Tabs -->
+                    <div style="background:var(--bg);border:1px solid var(--line);border-radius:var(--radius);padding:24px;display:flex;flex-direction:column;justify-content:space-between;">
+                        <div>
+                            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+                                <span style="font:600 .75rem 'JetBrains Mono',monospace;color:var(--blue);text-transform:uppercase;letter-spacing:0.5px;">Client Configuration</span>
+                                <span style="font:600 .72rem 'JetBrains Mono',monospace;color:var(--green);background:rgba(80,211,154,0.1);padding:3px 8px;border-radius:var(--radius);">Zero Install (uvx)</span>
+                            </div>
+
+                            <!-- Tabs Switcher -->
+                            <div class="mcp-tabs" style="display:flex;gap:6px;margin-bottom:14px;background:var(--surface2);padding:4px;border:1px solid var(--line);border-radius:var(--radius);">
+                                <button class="mcp-tab-btn is-active" data-mcp-tab="cursor" style="flex:1;padding:6px 10px;border:0;background:var(--blue);color:var(--bg);font-weight:600;font-size:0.78rem;border-radius:var(--radius);cursor:pointer;">Cursor</button>
+                                <button class="mcp-tab-btn" data-mcp-tab="claude" style="flex:1;padding:6px 10px;border:0;background:transparent;color:var(--muted);font-weight:600;font-size:0.78rem;border-radius:var(--radius);cursor:pointer;">Claude Desktop</button>
+                                <button class="mcp-tab-btn" data-mcp-tab="windsurf" style="flex:1;padding:6px 10px;border:0;background:transparent;color:var(--muted);font-weight:600;font-size:0.78rem;border-radius:var(--radius);cursor:pointer;">Windsurf</button>
+                            </div>
+
+                            <!-- Panel Cursor -->
+                            <div id="mcp-panel-cursor" data-mcp-panel="cursor">
+                                <p style="font-size:0.78rem;color:var(--muted);margin:0 0 8px;">Add to your workspace root at <code style="color:var(--blue);">.cursor/mcp.json</code>:</p>
+                                <pre style="margin:0;padding:12px;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);font-size:0.76rem;line-height:1.45;color:#a6e5c9;overflow-x:auto;"><code>{
+  "mcpServers": {
+    "schemap": {
+      "command": "uvx",
+      "args": ["schemap-tool@4.0.1", "mcp"],
+      "env": {
+        "DATABASE_URL": "postgresql://user:pass@localhost:5432/dbname"
+      }
+    }
+  }
+}</code></pre>
+                            </div>
+
+                            <!-- Panel Claude -->
+                            <div id="mcp-panel-claude" data-mcp-panel="claude" hidden>
+                                <p style="font-size:0.78rem;color:var(--muted);margin:0 0 8px;">Add to <code style="color:var(--blue);">claude_desktop_config.json</code>:</p>
+                                <pre style="margin:0;padding:12px;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);font-size:0.76rem;line-height:1.45;color:#a6e5c9;overflow-x:auto;"><code>{
+  "mcpServers": {
+    "schemap": {
+      "command": "uvx",
+      "args": ["schemap-tool@4.0.1", "mcp"],
+      "env": {
+        "DATABASE_URL": "sqlite:///absolute/path/to/database.db"
+      }
+    }
+  }
+}</code></pre>
+                            </div>
+
+                            <!-- Panel Windsurf -->
+                            <div id="mcp-panel-windsurf" data-mcp-panel="windsurf" hidden>
+                                <p style="font-size:0.78rem;color:var(--muted);margin:0 0 8px;">Add to <code style="color:var(--blue);">~/.codeium/windsurf/mcp_config.json</code>:</p>
+                                <pre style="margin:0;padding:12px;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);font-size:0.76rem;line-height:1.45;color:#a6e5c9;overflow-x:auto;"><code>{
+  "mcpServers": {
+    "schemap": {
+      "command": "uvx",
+      "args": ["schemap-tool@4.0.1", "mcp"],
+      "env": {
+        "DATABASE_URL": "mysql://user:pass@localhost:3306/dbname"
+      }
+    }
+  }
+}</code></pre>
+                            </div>
+                        </div>
+
+                        <div style="margin-top:16px;text-align:center;">
+                            <a href="guide-setup-schemap-mcp-cursor-claude.html" style="color:var(--blue);font:600 .8rem 'JetBrains Mono',monospace;text-decoration:none;">Read Full MCP Configuration &amp; Tool Reference Guide ↗</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <!-- 6. 60-SECOND QUICKSTART & INSTALLATION -->
         <section id="installation" class="section section-dark">
             <div class="section-container narrow install-content">
@@ -656,25 +782,6 @@ orders (account_id → accounts.id) [PK: id]
                         <p class="step-comment"># 3. Or launch native MCP server in Cursor / Claude Code</p>
                         <pre><code>uvx schemap-tool@4.0.1 mcp</code></pre>
                     </div>
-                </div>
-
-                <!-- LIVE MCP CONFIGURATION -->
-                <div class="install-card" style="margin-top: 1.5rem; background: var(--surface2); border: 1px solid var(--line);">
-                    <div class="install-flow-header">
-                        <span class="flow-badge" style="background: rgba(141,184,255,0.15); color: var(--blue); border: 1px solid rgba(141,184,255,0.3);">Cursor &amp; Claude Code MCP Configuration</span>
-                    </div>
-                    <p class="step-comment" style="margin-bottom: 8px;">Add to <code>.cursor/mcp.json</code> or <code>claude_desktop_config.json</code>:</p>
-                    <pre><code style="font-size: 0.78rem;">{
-  "mcpServers": {
-    "schemap": {
-      "command": "uvx",
-      "args": ["schemap-tool@4.0.1", "mcp"],
-      "env": {
-        "DATABASE_URL": "postgresql://user:pass@host:5432/dbname"
-      }
-    }
-  }
-}</code></pre>
                 </div>
 
                 <!-- 10-MINUTE STRANGER TEST KIT -->
