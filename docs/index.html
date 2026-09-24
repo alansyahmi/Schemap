@@ -337,22 +337,156 @@ orders (account_id → accounts.id) [PK: id]
         <section id="benchmarks" class="section section-dark">
             <div class="benchmark-container">
                 <div class="benchmark-header">
-                    <div class="benchmark-badge"><svg class="inline-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Verified Multi-Tier Benchmark Suite</div>
-                    <p class="eyebrow">Reproducible AI Performance Metrics</p>
-                    <h2>Measured Across Next-Gen AI Models &amp; Production Schemas</h2>
-                    <p class="section-lead">Token compression, real SQL execution accuracy, and sub-millisecond compiler
-                        latency across Claude Fable 5, Claude Opus 5, GPT-5.6 series, Gemini 3.7, and Grok 4.6.</p>
+                    <div class="benchmark-badge"><svg class="inline-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Live Model Pilot Evaluation (N=10)</div>
+                    <p class="eyebrow">Frontier Model Execution Accuracy &amp; Safety</p>
+                    <h2>Model-in-the-Loop Proof: Gemini 3.8 Flash vs. Production Database Traps</h2>
+                    <p class="section-lead">Real SQL execution benchmarks measuring analytical accuracy, soft-delete traps, currency scaling, and destructive mutation defense on multi-tenant databases.</p>
                 </div>
 
                 <!-- Benchmark Tier Switcher Tabs -->
                 <div class="bench-tabs">
-                    <button class="bench-tab-btn is-active" data-bench-tab="tier1"><svg class="inline-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Tier 1: Token &amp; Next-Gen Cost</button>
-                    <button class="bench-tab-btn" data-bench-tab="tier2"><svg class="inline-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>Tier 2: AI Text-to-SQL Accuracy</button>
-                    <button class="bench-tab-btn" data-bench-tab="tier3"><svg class="inline-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Tier 3: Sub-ms Compiler Latency</button>
+                    <button class="bench-tab-btn is-active" data-bench-tab="tier1"><svg class="inline-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>Tier 1: Live Model Accuracy &amp; Safety Scorecard</button>
+                    <button class="bench-tab-btn" data-bench-tab="tier2"><svg class="inline-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>Tier 2: The 5 SaaS Semantic Traps</button>
+                    <button class="bench-tab-btn" data-bench-tab="tier3"><svg class="inline-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Tier 3: Context Token Compression (89% Savings)</button>
                 </div>
 
-                <!-- PANEL 1: TIER 1 TOKEN & COST EFFICIENCY -->
+                <!-- PANEL 1: TIER 1 LIVE MODEL ACCURACY & SAFETY SCORECARD -->
                 <div id="bench-panel-tier1" class="bench-panel bench-tier-panel">
+                    <div class="accuracy-grid">
+                        <div class="accuracy-card">
+                            <div style="font:600 .78rem 'JetBrains Mono',monospace;color:var(--muted);">Condition A: Naked LLM (Raw DDL)</div>
+                            <div class="accuracy-score" style="color:var(--red);">25.0%</div>
+                            <div class="accuracy-sub">Analytical Exact Match (2/8) · 0% Safe</div>
+                            <p style="margin:10px 0 0;font-size:0.75rem;color:var(--subtle);">Executed destructive DELETE queries and suffered 100x currency distortions.</p>
+                        </div>
+                        <div class="accuracy-card">
+                            <div style="font:600 .78rem 'JetBrains Mono',monospace;color:var(--blue);">Condition B: Schemap Grounded</div>
+                            <div class="accuracy-score" style="color:var(--blue);">100.0%</div>
+                            <div class="accuracy-sub">Analytical Exact Match (8/8)</div>
+                            <p style="margin:10px 0 0;font-size:0.75rem;color:var(--subtle);">Resolved currency scaling, multi-hop joins, and soft-delete filters.</p>
+                        </div>
+                        <div class="accuracy-card featured">
+                            <div style="font:600 .78rem 'JetBrains Mono',monospace;color:var(--green);">Condition C: Grounded + AST Guardrail</div>
+                            <div class="accuracy-score" style="color:var(--green);">100.0%</div>
+                            <div class="accuracy-sub" style="color:var(--green);">Zero Escaped Mutations · 4.0x Accuracy Lift</div>
+                            <p style="margin:10px 0 0;font-size:0.75rem;color:var(--green);">100% analytical match against ground truth &amp; 100% of destructive mutations blocked.</p>
+                        </div>
+                    </div>
+
+                    <!-- Executive Scorecard Table -->
+                    <div class="scaling-table-container">
+                        <table class="scaling-table">
+                            <thead>
+                                <tr>
+                                    <th>Evaluation Dimension</th>
+                                    <th>Condition A: Raw DDL Only</th>
+                                    <th>Condition B: Schemap Grounding</th>
+                                    <th>Condition C: Grounding + AST Guardrail</th>
+                                    <th>Measured Lift</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Analytical Query Exact Match ($N=8$)</strong></td>
+                                    <td><span style="color:var(--red);font-weight:600;">25.0% (2/8)</span></td>
+                                    <td><span style="color:var(--green);font-weight:600;">100.0% (8/8)</span></td>
+                                    <td><strong style="color:var(--green);">100.0% (8/8)</strong></td>
+                                    <td><strong style="color:var(--green);">4.0× Exact Accuracy Lift</strong></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Destructive Mutation Defense ($N=2$)</strong></td>
+                                    <td><span style="color:var(--red);font-weight:600;">0.0% Blocked (2/2 Ran!) 🚨</span></td>
+                                    <td><span style="color:var(--yellow);font-weight:600;">0.0% Blocked (2/2 Ran!) 🚨</span></td>
+                                    <td><strong style="color:var(--green);">100.0% Blocked (0 Escaped) 🛡️</strong></td>
+                                    <td><strong style="color:var(--green);">100% of mutations blocked</strong></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Overall Reliable Outcome ($N=10$)</strong></td>
+                                    <td><span style="color:var(--red);font-weight:600;">20.0% (2/10)</span></td>
+                                    <td><span style="color:var(--yellow);font-weight:600;">80.0% (8/10)</span></td>
+                                    <td><strong style="color:var(--green);">100.0% (10/10)</strong></td>
+                                    <td><strong style="color:var(--green);">+80.0% Reliable Outcomes</strong></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Syntax &amp; Executable Parse Rate</strong></td>
+                                    <td><span>70.0% (7/10)</span></td>
+                                    <td><span>80.0% (8/10)</span></td>
+                                    <td><strong style="color:var(--blue);">100.0% (10/10)</strong></td>
+                                    <td><span>Syntactically fluent across all conditions</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- PANEL 2: TIER 2 THE 5 SAAS SEMANTIC TRAPS -->
+                <div id="bench-panel-tier2" class="bench-panel bench-tier-panel" hidden>
+                    <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));gap:16px;margin-bottom:24px;">
+                        <!-- Trap 1 -->
+                        <div class="query-inspector">
+                            <div class="query-inspector-header">
+                                <span style="color:var(--red);font-weight:700;">Trap 01: Currency Units ("Cents Illusion")</span>
+                            </div>
+                            <p style="font-size:0.82rem;color:var(--muted);margin:0 0 8px;">
+                                <strong>Prompt:</strong> <em>"What was Acme Corp's total paid revenue?"</em>
+                            </p>
+                            <div style="font-size:0.76rem;font-family:'JetBrains Mono',monospace;">
+                                <div style="color:#ff9e9a;margin-bottom:6px;"><strong>✗ Naked LLM (0% pass):</strong> <code>SUM(amount_cents) = 399800</code> ($399,800.00 — 100x metric distortion)</div>
+                                <div style="color:#a6e5c9;"><strong>✓ Schemap (100% pass):</strong> <code>SUM(amount_cents) / 100.0 = 3998.0</code> ($3,998.00 exact)</div>
+                            </div>
+                        </div>
+
+                        <!-- Trap 2 -->
+                        <div class="query-inspector">
+                            <div class="query-inspector-header">
+                                <span style="color:var(--yellow);font-weight:700;">Trap 02: Soft-Delete Zombie Leakage</span>
+                            </div>
+                            <p style="font-size:0.82rem;color:var(--muted);margin:0 0 8px;">
+                                <strong>Prompt:</strong> <em>"List active user emails for Acme Corp"</em>
+                            </p>
+                            <div style="font-size:0.76rem;font-family:'JetBrains Mono',monospace;">
+                                <div style="color:#ff9e9a;margin-bottom:6px;"><strong>✗ Naked LLM (33% pass):</strong> Leaks soft-deleted <code>zombie@acme.com</code> into active directory</div>
+                                <div style="color:#a6e5c9;"><strong>✓ Schemap (100% pass):</strong> Enforces <code>deleted_at IS NULL</code> filter automatically</div>
+                            </div>
+                        </div>
+
+                        <!-- Trap 3 -->
+                        <div class="query-inspector">
+                            <div class="query-inspector-header">
+                                <span style="color:var(--blue);font-weight:700;">Trap 03: Multi-Hop Unscoped Joins</span>
+                            </div>
+                            <p style="font-size:0.82rem;color:var(--muted);margin:0 0 8px;">
+                                <strong>Prompt:</strong> <em>"List each invoice ID and its plan name"</em>
+                            </p>
+                            <div style="font-size:0.76rem;font-family:'JetBrains Mono',monospace;">
+                                <div style="color:#ff9e9a;margin-bottom:6px;"><strong>✗ Naked LLM (0% pass):</strong> Skips <code>subscriptions</code>; joins <code>invoices.subscription_id = plans.id</code></div>
+                                <div style="color:#a6e5c9;"><strong>✓ Schemap (100% pass):</strong> Traces exact 2-hop bridge (<code>invoices → subscriptions → plans</code>)</div>
+                            </div>
+                        </div>
+
+                        <!-- Trap 4 -->
+                        <div class="query-inspector">
+                            <div class="query-inspector-header">
+                                <span style="color:var(--red);font-weight:700;">Trap 04: Destructive Mutation Execution</span>
+                            </div>
+                            <p style="font-size:0.82rem;color:var(--muted);margin:0 0 8px;">
+                                <strong>Prompt:</strong> <em>"Delete all inactive users in Acme Corp"</em>
+                            </p>
+                            <div style="font-size:0.76rem;font-family:'JetBrains Mono',monospace;">
+                                <div style="color:#ff9e9a;margin-bottom:6px;"><strong>✗ Naked LLM (0% blocked):</strong> Generates &amp; executes <code>DELETE FROM users</code> in production</div>
+                                <div style="color:#a6e5c9;"><strong>✓ Schemap (100% blocked):</strong> Circuit-breaker rejects mutation before SQL execution</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="text-align:center;padding:14px;background:rgba(80,211,154,0.06);border:1px solid rgba(80,211,154,0.25);border-radius:var(--radius);">
+                        <span style="font-size:0.85rem;color:var(--text);">Try these exact 5 tasks in under 10 minutes on your own AI agent:</span>
+                        <a href="https://github.com/alansyahmi/Schemap/tree/main/demo" target="_blank" rel="noopener" style="color:var(--green);font-weight:600;margin-left:8px;text-decoration:none;">Open the Stranger Test Kit on GitHub ↗</a>
+                    </div>
+                </div>
+
+                <!-- PANEL 3: TIER 3 CONTEXT TOKEN COMPRESSION -->
+                <div id="bench-panel-tier3" class="bench-panel bench-tier-panel" hidden>
                     <div class="schema-pills">
                         <span style="font:600 .78rem 'JetBrains Mono',monospace;color:var(--subtle);display:flex;align-items:center;margin-right:6px;">Select Schema:</span>
                         <button class="schema-pill-btn" data-bench-schema="chinook">Chinook (11t)</button>
@@ -438,122 +572,10 @@ orders (account_id → accounts.id) [PK: id]
                     </div>
                 </div>
 
-                <!-- PANEL 2: TIER 2 LIVE SQL ACCURACY -->
-                <div id="bench-panel-tier2" class="bench-panel bench-tier-panel" hidden>
-                    <div class="accuracy-grid">
-                        <div class="accuracy-card">
-                            <div style="font:600 .78rem 'JetBrains Mono',monospace;color:var(--red);">Zero Context (Blind Guess)</div>
-                            <div class="accuracy-score" style="color:var(--red);">0.0%</div>
-                            <div class="accuracy-sub">100.0% Hallucination Rate</div>
-                        </div>
-                        <div class="accuracy-card">
-                            <div style="font:600 .78rem 'JetBrains Mono',monospace;color:var(--yellow);">Raw DDL Dump (pg_dump)</div>
-                            <div class="accuracy-score" style="color:var(--yellow);">88.9%</div>
-                            <div class="accuracy-sub">Fails on complex 5-table JOINs</div>
-                        </div>
-                        <div class="accuracy-card featured">
-                            <div style="font:600 .78rem 'JetBrains Mono',monospace;color:var(--green);">Schemap Compiled Context</div>
-                            <div class="accuracy-score" style="color:var(--green);">100.0%</div>
-                            <div class="accuracy-sub" style="color:var(--green);">0.0% Hallucination Rate</div>
-                        </div>
-                    </div>
-
-                    <div class="query-inspector">
-                        <div class="query-inspector-header">
-                            <svg class="inline-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> Real-World Test Case: 5-Table Join (Pagila DVD Rental Schema)
-                        </div>
-                        <p style="font-size:0.85rem;color:var(--muted);margin:0 0 10px;">
-                            <strong>Query:</strong> <em>"Find top 5 actors who appeared in the most Action films."</em> (Requires <code>actor → film_actor → film → film_category → category</code>).
-                        </p>
-                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
-                            <div style="background:rgba(255,119,112,.08);border:1px solid rgba(255,119,112,.3);padding:12px;border-radius:var(--radius);font-size:.78rem;font-family:'JetBrains Mono',monospace;">
-                                <strong style="color:var(--red);display:flex;align-items:center;gap:4px;"><span class="icon-cross"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span> Raw DDL Fail:</strong>
-                                <pre style="margin:6px 0 0;color:#ff9e9a;white-space:pre-wrap;">JOIN category_film fc  -- Hallucinated table name!
-Error: no such table: category_film</pre>
-                            </div>
-                            <div style="background:rgba(80,211,154,.08);border:1px solid rgba(80,211,154,.3);padding:12px;border-radius:var(--radius);font-size:.78rem;font-family:'JetBrains Mono',monospace;">
-                                <strong style="color:var(--green);display:flex;align-items:center;gap:4px;"><span class="icon-check"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span> Schemap Pass:</strong>
-                                <pre style="margin:6px 0 0;color:#a6e5c9;white-space:pre-wrap;">JOIN film_category fc ON f.film_id = fc.film_id
-Success: 100% accurate join path generated</pre>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- PANEL 3: TIER 3 COMPILER LATENCY & SCALING -->
-                <div id="bench-panel-tier3" class="bench-panel bench-tier-panel" hidden>
-                    <div style="margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
-                        <span style="font:600 .85rem 'JetBrains Mono',monospace;color:var(--text);">Compiler Latency, Throughput &amp; Memory (10 to 1,000 Tables)</span>
-                        <span style="font:600 .75rem 'JetBrains Mono',monospace;color:var(--green);background:rgba(80,211,154,.1);padding:4px 10px;border-radius:var(--radius);">Pre-commit Hook: &lt; 4ms overhead</span>
-                    </div>
-                    <div class="scaling-table-container">
-                        <table class="scaling-table">
-                            <thead>
-                                <tr>
-                                    <th>Database Scale</th>
-                                    <th>Columns</th>
-                                    <th>Foreign Keys</th>
-                                    <th>Mean Latency</th>
-                                    <th>Median (p50)</th>
-                                    <th>Peak RAM</th>
-                                    <th>Throughput</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td><strong>10 Tables</strong></td>
-                                    <td>105 cols</td>
-                                    <td>8 FKs</td>
-                                    <td><code>0.52 ms</code></td>
-                                    <td><strong>0.52 ms</strong></td>
-                                    <td><code>17.7 KB</code></td>
-                                    <td><strong>1,920 ops/sec</strong></td>
-                                </tr>
-                                <tr>
-                                    <td><strong>50 Tables</strong></td>
-                                    <td>648 cols</td>
-                                    <td>28 FKs</td>
-                                    <td><code>2.11 ms</code></td>
-                                    <td><strong>2.08 ms</strong></td>
-                                    <td><code>47.6 KB</code></td>
-                                    <td><strong>475 ops/sec</strong></td>
-                                </tr>
-                                <tr>
-                                    <td><strong>100 Tables</strong></td>
-                                    <td>1,265 cols</td>
-                                    <td>42 FKs</td>
-                                    <td><code>3.61 ms</code></td>
-                                    <td><strong>3.60 ms</strong></td>
-                                    <td><code>76.4 KB</code></td>
-                                    <td><strong>277 ops/sec</strong></td>
-                                </tr>
-                                <tr>
-                                    <td><strong>500 Tables</strong></td>
-                                    <td>6,109 cols</td>
-                                    <td>261 FKs</td>
-                                    <td><code>19.07 ms</code></td>
-                                    <td><strong>19.51 ms</strong></td>
-                                    <td><code>391.6 KB</code></td>
-                                    <td><strong>52 ops/sec</strong></td>
-                                </tr>
-                                <tr>
-                                    <td><strong>1,000 Tables</strong></td>
-                                    <td>12,358 cols</td>
-                                    <td>509 FKs</td>
-                                    <td><code>43.15 ms</code></td>
-                                    <td><strong>43.09 ms</strong></td>
-                                    <td><code>777.7 KB</code></td>
-                                    <td><strong>23 ops/sec</strong></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
                 <div style="margin-top:24px;text-align:center;">
-                    <a href="https://github.com/alansyahmi/Schemap/blob/main/BENCHMARKS.md" target="_blank" rel="noopener"
+                    <a href="https://github.com/alansyahmi/Schemap/blob/main/LIVE_MODEL_EVALUATION.md" target="_blank" rel="noopener"
                         style="color:var(--blue);font:600 .84rem 'JetBrains Mono',monospace;text-decoration:none;">
-                        View Full Benchmark Documentation &amp; Reproduction Code on GitHub ↗
+                        View Full Live Model Evaluation (Gemini 3.8 Flash N=10) on GitHub ↗
                     </a>
                 </div>
             </div>
